@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>三国杀 Lite - 手机版</title>
+    <title>三国杀 Lite - 增强版</title>
     <style>
         :root {
             --bg-color: #2c3e50;
-            --card-bg: #ecf0f1;
-            --log-bg: rgba(0, 0, 0, 0.6);
+            --modal-bg: rgba(0, 0, 0, 0.9);
             --lord-color: #f1c40f;
             --loyal-color: #e67e22;
             --rebel-color: #2ecc71;
@@ -30,199 +29,206 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- 顶部：敌方区域 (3个AI并排) --- */
+        /* --- 顶部栏：帮助按钮 --- */
+        #top-bar {
+            height: 30px;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 10px;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+        }
+        #btn-help {
+            background: none; border: 1px solid #bdc3c7; color: #bdc3c7;
+            border-radius: 50%; width: 24px; height: 24px; font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* --- 敌方区域 --- */
         #enemy-zone {
-            flex: 0 0 28%; /* 占屏幕高度约 28% */
+            flex: 0 0 26%;
             display: flex;
             justify-content: space-around;
             align-items: center;
             padding: 5px;
-            background: rgba(0,0,0,0.2);
             border-bottom: 1px solid #444;
         }
 
         .enemy-card {
-            width: 31%; /* 三等分 */
-            height: 95%;
+            width: 30%;
+            height: 100%;
             background: #34495e;
             border: 2px solid #555;
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            padding: 4px;
             position: relative;
             transition: all 0.2s;
-            font-size: 12px;
+            overflow: hidden;
         }
 
-        .enemy-card.active-turn { border-color: #f1c40f; box-shadow: 0 0 10px #f1c40f; transform: scale(1.02); z-index: 2; }
-        .enemy-card.dead { opacity: 0.4; filter: grayscale(100%); border-style: dashed; }
-        .enemy-card.targetable { 
-            border-color: #e74c3c; 
-            box-shadow: 0 0 15px #e74c3c; 
-            animation: pulse 0.8s infinite; 
-        }
+        .enemy-card.active-turn { border-color: #f1c40f; box-shadow: 0 0 12px #f1c40f; transform: scale(1.02); z-index: 2; }
+        .enemy-card.dead { opacity: 0.5; filter: grayscale(100%); }
+        .enemy-card.targetable { border-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; animation: pulse 0.8s infinite; }
 
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        /* 头像模拟 */
+        .avatar-img {
+            width: 100%; height: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 40px; background: #2c3e50;
+            border-bottom: 1px solid #555;
+        }
 
         .role-badge { 
-            font-size: 10px; padding: 1px 4px; border-radius: 4px; 
-            background: #7f8c8d; color: white; margin-bottom: 2px;
+            position: absolute; top: 2px; right: 2px;
+            font-size: 10px; padding: 2px 5px; border-radius: 4px; 
+            background: #7f8c8d; color: white; z-index: 1;
         }
         .role-lord { background: var(--lord-color); color: black; }
         .role-loyal { background: var(--loyal-color); }
         .role-rebel { background: var(--rebel-color); }
         .role-traitor { background: var(--traitor-color); }
 
-        .general-info { text-align: center; line-height: 1.2; }
-        .general-name { font-weight: bold; font-size: 14px; display: block; }
-        .skill-name { font-size: 10px; color: #bdc3c7; }
+        .info-block { width: 100%; padding: 2px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
+        .general-name { font-weight: bold; font-size: 13px; }
+        .skill-tag { font-size: 10px; color: #3498db; background: rgba(52, 152, 219, 0.1); padding: 1px 4px; border-radius: 3px; display: inline-block; }
 
-        /* --- 中间：日志区域 --- */
+        /* --- 日志区域 --- */
         #log-zone {
-            flex: 1; /* 占据剩余空间 */
-            background: var(--log-bg);
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
             overflow-y: auto;
-            padding: 8px;
+            padding: 10px;
             font-size: 13px;
             border-bottom: 1px solid #555;
-            text-shadow: 1px 1px 1px black;
         }
         .log-line { margin-bottom: 4px; line-height: 1.4; }
-        .log-turn { color: #f1c40f; border-top: 1px dashed #555; margin-top: 4px; padding-top: 2px; }
+        .log-turn { color: #f1c40f; border-top: 1px dashed #555; margin-top: 6px; padding-top: 4px; }
         .log-damage { color: #e74c3c; font-weight: bold; }
         .log-skill { color: #3498db; font-weight: bold; }
 
-        /* --- 底部：玩家区域 --- */
+        /* --- 玩家区域 --- */
         #player-zone {
-            flex: 0 0 45%; /* 占屏幕高度 45% */
+            flex: 0 0 42%;
             display: flex;
             flex-direction: column;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.2);
             padding: 5px;
         }
 
-        /* 玩家状态栏 */
         #player-status {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px;
-            margin-bottom: 5px;
-            height: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 10px; height: 30px;
         }
-        .my-info { font-size: 16px; font-weight: bold; color: #f1c40f; }
+        .my-avatar-small { font-size: 20px; margin-right: 5px; }
         
-        /* 血条样式 */
-        .hp-bar { display: flex; gap: 2px; }
-        .hp-point { width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; border: 1px solid #fff; }
+        .hp-bar { display: flex; gap: 3px; }
+        .hp-point { width: 12px; height: 12px; border-radius: 50%; background: #2ecc71; border: 1px solid #fff; box-shadow: 0 0 2px black; }
         .hp-lost { background: #555; border-color: #777; }
 
-        /* 手牌区域 (横向滚动) */
+        /* 手牌 */
         #hand-scroll-container {
             flex: 1;
             overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap; /* 关键：横向排列 */
+            white-space: nowrap;
             padding: 10px 5px;
-            -webkit-overflow-scrolling: touch; /* iOS流畅滚动 */
-            display: flex;
-            align-items: center;
+            -webkit-overflow-scrolling: touch;
+            display: flex; align-items: center;
         }
 
         .card {
-            display: inline-flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 65px;
-            height: 95px;
-            background: #ecf0f1;
-            border-radius: 6px;
-            margin-right: 8px;
-            flex-shrink: 0; /* 防止被压缩 */
+            display: inline-flex; flex-direction: column; justify-content: center; align-items: center;
+            width: 68px; height: 98px;
+            background: #ecf0f1; border-radius: 6px;
+            margin-right: 8px; flex-shrink: 0;
             position: relative;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-            transition: transform 0.2s, border 0.2s;
-            color: #333;
-            font-weight: bold;
+            transition: transform 0.2s;
+            color: #333; font-weight: bold; border-bottom: 4px solid #bdc3c7;
         }
+        .card.selected { transform: translateY(-15px); border: 2px solid #e74c3c; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
 
-        .card.selected { 
-            transform: translateY(-15px); 
-            border: 3px solid #e74c3c; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-        }
+        /* 卡牌颜色定义 */
+        .card[data-type="杀"] { color: #c0392b; border-bottom-color: #c0392b; }
+        .card[data-type="闪"] { color: #2980b9; border-bottom-color: #2980b9; }
+        .card[data-type="桃"] { color: #e91e63; border-bottom-color: #e91e63; }
+        .card[data-type="万箭"] { color: #8e44ad; border-bottom-color: #8e44ad; }
+        .card[data-type="南蛮"] { color: #d35400; border-bottom-color: #d35400; }
+        .card[data-type="无中"] { color: #27ae60; border-bottom-color: #27ae60; }
 
-        .card[data-type="杀"] { color: #c0392b; border-bottom: 3px solid #c0392b; }
-        .card[data-type="闪"] { color: #2980b9; border-bottom: 3px solid #2980b9; }
-        .card[data-type="桃"] { color: #e91e63; border-bottom: 3px solid #e91e63; }
-        .card[data-type="万箭"] { color: #8e44ad; border-bottom: 3px solid #8e44ad; }
-
-        .card-icon { font-size: 24px; margin-bottom: 5px; }
+        .card-icon { font-size: 26px; margin-bottom: 5px; }
         .card-text { font-size: 14px; }
 
-        /* 底部按钮栏 */
-        #controls {
-            height: 50px;
-            display: flex;
-            gap: 10px;
-            padding: 5px;
-        }
+        /* 按钮 */
+        #controls { height: 45px; display: flex; gap: 10px; padding: 0 5px 5px 5px; }
         button {
-            flex: 1;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background: #7f8c8d;
-            transition: background 0.2s;
+            flex: 1; border: none; border-radius: 5px;
+            font-size: 15px; font-weight: bold; color: white;
+            background: #7f8c8d; transition: background 0.2s;
         }
-        button:active { transform: scale(0.95); }
+        button:active { transform: scale(0.96); }
         button:disabled { opacity: 0.3; }
-        
-        #btn-confirm { background: #e67e22; } /* 橙色 */
-        #btn-confirm:not(:disabled) { box-shadow: 0 0 10px #e67e22; }
-        
-        #btn-end { background: #27ae60; } /* 绿色 */
+        #btn-confirm { background: #e67e22; }
+        #btn-end { background: #27ae60; }
 
-        /* 遮罩层 */
-        #overlay {
+        /* --- 弹窗 (结算 & 帮助) --- */
+        .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: var(--modal-bg);
             display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100;
+            padding: 20px;
         }
-        #overlay h1 { font-size: 32px; margin-bottom: 30px; text-align: center; padding: 0 20px; }
+        
+        /* 帮助弹窗内容 */
+        #help-content {
+            background: #ecf0f1; color: #333;
+            width: 90%; max-height: 80%;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        #help-content h3 { border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-top: 20px; color: #2c3e50; }
+        #help-content ul { padding-left: 20px; }
+        #help-content li { margin-bottom: 5px; }
+        .close-btn { margin-top: 15px; padding: 10px 30px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 16px; }
+
+        /* 结算文字 */
+        #game-result-title { font-size: 32px; margin-bottom: 30px; text-align: center; font-weight: bold; }
         .win { color: #f1c40f; }
         .lose { color: #e74c3c; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
     </style>
 </head>
 <body>
 
-    <!-- 顶部：3个AI -->
-    <div id="enemy-zone">
-        <!-- JS 动态填充 -->
+    <div id="top-bar">
+        <button id="btn-help" onclick="showHelp()">?</button>
     </div>
+
+    <!-- 顶部：3个AI -->
+    <div id="enemy-zone"></div>
 
     <!-- 中间：日志 -->
     <div id="log-zone">
-        <div class="log-line">欢迎来到三国杀 Lite 手机版！</div>
+        <div class="log-line">三国杀 Lite 增强版 - 游戏开始</div>
     </div>
 
     <!-- 底部：玩家 -->
     <div id="player-zone">
         <div id="player-status">
-            <div class="my-info">主公 (曹操)</div>
+            <div style="display:flex; align-items:center;">
+                <span class="my-avatar-small">👑</span>
+                <span style="color:#f1c40f; font-weight:bold;">主公 (曹操)</span>
+            </div>
             <div class="hp-bar" id="my-hp-bar"></div>
         </div>
         
-        <div id="hand-scroll-container">
-            <!-- 手牌 JS 填充 -->
-        </div>
+        <div id="hand-scroll-container"></div>
 
         <div id="controls">
             <button id="btn-confirm" onclick="confirmAction()" disabled>出牌</button>
@@ -232,25 +238,65 @@
     </div>
 
     <!-- 结算弹窗 -->
-    <div id="overlay">
+    <div id="result-overlay" class="overlay">
         <h1 id="game-result-title"></h1>
-        <button onclick="location.reload()" style="flex:0; padding: 15px 40px; background:#3498db;">再来一局</button>
+        <button class="close-btn" onclick="location.reload()">再来一局</button>
+    </div>
+
+    <!-- 帮助弹窗 -->
+    <div id="help-overlay" class="overlay" style="align-items: center;">
+        <div id="help-content">
+            <h2 style="margin-top:0; text-align:center;">游戏说明书</h2>
+            
+            <h3>🎯 胜利条件</h3>
+            <ul>
+                <li><b>主公 (你)</b>：消灭所有【反贼】和【内奸】。</li>
+                <li><b>反贼</b>：杀死【主公】。</li>
+                <li><b>忠臣</b>：保护主公，消灭反贼和内奸。</li>
+                <li><b>内奸</b>：先消灭其他人，最后单挑杀死主公。</li>
+            </ul>
+
+            <h3>🃏 卡牌说明</h3>
+            <ul>
+                <li><span style="color:#c0392b">⚔️ 杀</span>：攻击距离为1的角色。需出【闪】抵挡，否则扣1血。</li>
+                <li><span style="color:#2980b9">💨 闪</span>：被动牌，抵挡【杀】或【万箭齐发】。</li>
+                <li><span style="color:#e91e63">🍑 桃</span>：出牌阶段给自己回1血，或濒死时救人。</li>
+                <li><span style="color:#8e44ad">🏹 万箭齐发</span>：全场AOE。除使用者外，每人需出【闪】，否则扣1血。</li>
+                <li><span style="color:#d35400">🐘 南蛮入侵</span>：全场AOE。除使用者外，每人需出【杀】，否则扣1血。</li>
+                <li><span style="color:#27ae60">🎁 无中生有</span>：锦囊牌，立即摸 2 张牌。</li>
+            </ul>
+
+            <h3>🦸 武将技能</h3>
+            <ul>
+                <li><b>曹操 (奸雄)</b>：受到伤害后，立即摸 1 张牌。</li>
+                <li><b>张飞 (咆哮)</b>：出【杀】没有次数限制。</li>
+                <li><b>郭嘉 (遗计)</b>：受到伤害后，立即摸 2 张牌。</li>
+                <li><b>赵云 (龙胆)</b>：防御力较强，AI出闪概率更高。</li>
+            </ul>
+            
+            <div style="text-align:center;">
+                <button class="close-btn" onclick="hideHelp()">关闭</button>
+            </div>
+        </div>
     </div>
 
 <script>
-    // --- 游戏配置 (逻辑保持不变) ---
+    // --- 游戏配置 ---
     const GENERALS = [
-        { name: '曹操', hp: 5, skill: '奸雄', desc: '受伤摸牌' },
-        { name: '张飞', hp: 4, skill: '咆哮', desc: '无限杀' },
-        { name: '郭嘉', hp: 3, skill: '遗计', desc: '受伤摸2' },
-        { name: '赵云', hp: 4, skill: '龙胆', desc: '防御强' }
+        { name: '曹操', hp: 5, skill: '奸雄', avatar: '👑', color: '#8e44ad' },
+        { name: '张飞', hp: 4, skill: '咆哮', avatar: '👹', color: '#2c3e50' },
+        { name: '郭嘉', hp: 3, skill: '遗计', avatar: '🔮', color: '#2980b9' },
+        { name: '赵云', hp: 4, skill: '龙胆', avatar: '🛡️', color: '#95a5a6' }
     ];
     
+    // 增加新卡牌：南蛮、无中
     const DECK_TEMPLATE = [
         ...Array(20).fill('杀'),
-        ...Array(12).fill('闪'),
+        ...Array(10).fill('闪'),
         ...Array(8).fill('桃'),
-        ...Array(3).fill('万箭')
+        ...Array(2).fill('万箭'),
+        ...Array(2).fill('南蛮'),
+        ...Array(3).fill('无中')
     ];
 
     let players = [];
@@ -291,7 +337,7 @@
 
         players.forEach(p => drawCards(p, 4));
         renderAll();
-        log("游戏开始！击败反贼和内奸！", "turn");
+        log("游戏开始！点击右上角 ? 查看规则。", "turn");
         startTurn(0);
     }
 
@@ -316,7 +362,7 @@
             updateHandUI();
             updateButtons();
         } else {
-            updateButtons(); // 禁用按钮
+            updateButtons();
             setTimeout(() => aiAction(p), 800);
         }
     }
@@ -333,7 +379,7 @@
         if (!players[0].isUser || currentTurnIndex !== 0) return;
         
         if (selectedCardIndex === index) {
-            cancelAction(); // 反选
+            cancelAction();
         } else {
             selectedCardIndex = index;
             const card = players[0].hand[index];
@@ -345,7 +391,7 @@
             }
             updateHandUI();
             updateButtons();
-            renderEnemies(); // 更新目标高亮
+            renderEnemies();
         }
     }
 
@@ -370,7 +416,7 @@
         if (selectedCardIndex === -1) return;
         const card = players[0].hand[selectedCardIndex];
         if (card === '桃') useCard(players[0], selectedCardIndex, players[0]);
-        else if (card === '万箭') useCard(players[0], selectedCardIndex, null);
+        else if (card === '万箭' || card === '南蛮' || card === '无中') useCard(players[0], selectedCardIndex, null);
         cancelAction();
     }
 
@@ -393,33 +439,48 @@
         source.hand.splice(cardIndex, 1);
 
         if (card === '杀') {
-            log(`${source.name} 对 ${target.name} 出杀`);
+            log(`${source.name} 对 ${target.name} 出【杀】`);
             source.hasAttacked = true;
-            resolveAttack(source, target);
+            resolveAttack(source, target, 'sha');
         } 
         else if (card === '桃') {
             if (target.hp < target.maxHp) {
                 target.hp++;
-                log(`${source.name} 吃桃回血`, "skill");
+                log(`${source.name} 吃【桃】回血`, "skill");
             } else {
                 log(`${source.name} 满血吃桃(无效)`);
             }
         }
         else if (card === '万箭') {
-            log(`${source.name} 放万箭齐发！`, "skill");
+            log(`${source.name} 释放【万箭齐发】！`, "skill");
             players.forEach(p => {
-                if (p !== source && !p.isDead) resolveAttack(source, p, true);
+                if (p !== source && !p.isDead) resolveAttack(source, p, 'wanjian');
             });
+        }
+        else if (card === '南蛮') {
+            log(`${source.name} 释放【南蛮入侵】！`, "skill");
+            players.forEach(p => {
+                if (p !== source && !p.isDead) resolveAttack(source, p, 'nanman');
+            });
+        }
+        else if (card === '无中') {
+            log(`${source.name} 使用【无中生有】，摸2牌`, "skill");
+            drawCards(source, 2);
         }
 
         renderAll();
     }
 
-    function resolveAttack(source, target, isAOE = false) {
-        const shanIndex = target.hand.indexOf('闪');
-        if (shanIndex !== -1) {
-            target.hand.splice(shanIndex, 1);
-            log(`${target.name} 出闪`, "skill");
+    // attackType: 'sha' (普通杀), 'wanjian' (需闪), 'nanman' (需杀)
+    function resolveAttack(source, target, attackType) {
+        let defendCard = '闪';
+        if (attackType === 'nanman') defendCard = '杀';
+
+        const cardIndex = target.hand.indexOf(defendCard);
+        
+        if (cardIndex !== -1) {
+            target.hand.splice(cardIndex, 1);
+            log(`${target.name} 打出【${defendCard}】，抵消伤害`, "skill");
         } else {
             target.hp--;
             log(`${target.name} 受到伤害`, "damage");
@@ -430,7 +491,7 @@
                 if (taoIndex !== -1) {
                     target.hand.splice(taoIndex, 1);
                     target.hp++;
-                    log(`${target.name} 濒死吃桃`, "skill");
+                    log(`${target.name} 濒死吃【桃】复活`, "skill");
                 } else {
                     handleDeath(source, target);
                 }
@@ -468,16 +529,28 @@
     function aiAction(ai) {
         if (ai.isDead || !gameActive) return;
 
-        // 吃桃
+        // 1. 无中生有 (优先)
+        if (ai.hand.includes('无中')) {
+            useCard(ai, ai.hand.indexOf('无中'), null);
+            if (!gameActive) return;
+        }
+
+        // 2. 吃桃
         while (ai.hp < ai.maxHp && ai.hand.includes('桃')) {
             useCard(ai, ai.hand.indexOf('桃'), ai);
         }
-        // 万箭
+
+        // 3. AOE (万箭/南蛮)
         if (ai.hand.includes('万箭')) {
             useCard(ai, ai.hand.indexOf('万箭'), null);
             if (!gameActive) return;
         }
-        // 杀
+        if (ai.hand.includes('南蛮')) {
+            useCard(ai, ai.hand.indexOf('南蛮'), null);
+            if (!gameActive) return;
+        }
+
+        // 4. 杀
         let target = null;
         const alive = players.filter(p => !p.isDead && p !== ai);
         
@@ -523,7 +596,7 @@
         const t = document.getElementById('game-result-title');
         t.innerText = msg;
         t.className = win ? 'win' : 'lose';
-        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('result-overlay').style.display = 'flex';
     }
     function log(msg, type="") {
         const box = document.getElementById('log-zone');
@@ -545,7 +618,6 @@
         const container = document.getElementById('enemy-zone');
         container.innerHTML = '';
         
-        // 渲染 AI (ID 1, 2, 3)
         for(let i=1; i<=3; i++) {
             const p = players[i];
             const div = document.createElement('div');
@@ -561,12 +633,13 @@
             
             div.innerHTML = `
                 <div class="role-badge ${roleClass}">${roleText}</div>
-                <div class="general-info">
-                    <span class="general-name">${p.general.name}</span>
-                    <span class="skill-name">[${p.general.skill}]</span>
+                <div class="avatar-img" style="background:${p.general.color}">${p.general.avatar}</div>
+                <div class="info-block">
+                    <div class="general-name">${p.general.name}</div>
+                    <div class="skill-tag">${p.general.skill}</div>
+                    <div class="hp-bar" style="justify-content:center;">${getHpHtml(p.hp, p.maxHp)}</div>
+                    <div style="font-size:10px; color:#bdc3c7;">手牌: ${p.hand.length}</div>
                 </div>
-                <div class="hp-bar">${getHpHtml(p.hp, p.maxHp)}</div>
-                <div style="font-size:10px; color:#bdc3c7;">手牌: ${p.hand.length}</div>
             `;
             container.appendChild(div);
         }
@@ -601,6 +674,8 @@
             if(card==='闪') icon='💨';
             if(card==='桃') icon='🍑';
             if(card==='万箭') icon='🏹';
+            if(card==='南蛮') icon='🐘';
+            if(card==='无中') icon='🎁';
 
             el.innerHTML = `<div class="card-icon">${icon}</div><div class="card-text">${card}</div>`;
             container.appendChild(el);
@@ -618,10 +693,14 @@
         let canConfirm = false;
         if (isMyTurn && hasSelected) {
             if (card === '桃' && players[0].hp < players[0].maxHp) canConfirm = true;
-            if (card === '万箭') canConfirm = true;
+            if (['万箭', '南蛮', '无中'].includes(card)) canConfirm = true;
         }
         document.getElementById('btn-confirm').disabled = !canConfirm;
     }
+
+    // 帮助弹窗控制
+    function showHelp() { document.getElementById('help-overlay').style.display = 'flex'; }
+    function hideHelp() { document.getElementById('help-overlay').style.display = 'none'; }
 
     initGame();
 </script>
