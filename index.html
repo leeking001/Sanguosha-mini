@@ -133,9 +133,12 @@
         .card[data-type="杀"] { color: #8b0000; }
         .card[data-type="闪"] { color: #154360; }
         .card[data-type="桃"] { color: #d81b60; }
+        .card[data-type="酒"] { color: #a04000; }
         .card[data-type="万箭"] { color: #6c3483; }
         .card[data-type="南蛮"] { color: #d35400; }
         .card[data-type="无中"] { color: #1e8449; }
+        .card[data-type="顺手"] { color: #117864; }
+        .card[data-type="拆桥"] { color: #873600; }
 
         .card-icon { font-size: 28px; margin-bottom: 5px; }
         .card-text { font-family: var(--font-main); font-size: 16px; }
@@ -240,8 +243,11 @@
             ⚔️ 杀：攻击 (需闪)<br>
             💨 闪：防御<br>
             🍑 桃：回血<br>
+            🍶 酒：回血并可再出一张杀<br>
             🏹 万箭：全场需闪<br>
             🐘 南蛮：全场需杀<br>
+            🔗 顺手：顺手牵羊一张牌<br>
+            🪓 拆桥：过河拆桥弃一张牌<br>
             🎁 无中：摸2牌</p>
             <p style="text-align:center; color:#7f8c8d;">(点击任意处关闭)</p>
         </div>
@@ -302,12 +308,16 @@
         { name: '郭嘉', hp: 3, skill: '遗计', desc: '受伤摸2', avatar: '🔮', color: '#2980b9' },
         { name: '赵云', hp: 4, skill: '龙胆', desc: '攻守兼备', avatar: '🛡️', color: '#95a5a6' },
         { name: '吕布', hp: 5, skill: '无双', desc: '杀需2闪', avatar: '🔥', color: '#e74c3c' },
-        { name: '华佗', hp: 3, skill: '急救', desc: '回合外回血', avatar: '🌿', color: '#27ae60' }
+        { name: '华佗', hp: 3, skill: '急救', desc: '回合外回血', avatar: '🌿', color: '#27ae60' },
+        { name: '刘备', hp: 4, skill: '仁德', desc: '开局额外摸牌', avatar: '🐉', color: '#2ecc71' },
+        { name: '周瑜', hp: 4, skill: '业炎', desc: 'AOE后摸牌', avatar: '🔥', color: '#e67e22' },
+        { name: '许褚', hp: 4, skill: '裸衣', desc: '杀更难闪', avatar: '🛡️', color: '#7f8c8d' }
     ];
 
     const DECK_TEMPLATE = [
-        ...Array(20).fill('杀'), ...Array(10).fill('闪'), ...Array(8).fill('桃'),
-        ...Array(2).fill('万箭'), ...Array(2).fill('南蛮'), ...Array(3).fill('无中')
+        ...Array(20).fill('杀'), ...Array(10).fill('闪'), ...Array(8).fill('桃'), ...Array(4).fill('酒'),
+        ...Array(2).fill('万箭'), ...Array(2).fill('南蛮'), ...Array(3).fill('无中'),
+        ...Array(3).fill('顺手'), ...Array(3).fill('拆桥')
     ];
 
     let players = [];
@@ -316,6 +326,10 @@
     let selectedCardIndex = -1;
     let isTargetingMode = false;
     let gameActive = false;
+
+    function requiresTarget(card) {
+        return ['杀', '顺手', '拆桥'].includes(card);
+    }
 
     // --- 选将逻辑 ---
     function showSelection() {
@@ -361,13 +375,13 @@
         // 玩家
         players.push({
             id: 0, isUser: true, role: '主公', general: selectedHero,
-            hp: selectedHero.hp, maxHp: selectedHero.hp, hand: [], isDead: false, hasAttacked: false
+            hp: selectedHero.hp, maxHp: selectedHero.hp, hand: [], isDead: false, hasAttacked: false, berserk: false
         });
         // AI
         for(let i=0; i<3; i++) {
             players.push({
                 id: i+1, isUser: false, role: aiRoles[i], general: aiPool[i],
-                hp: aiPool[i].hp, maxHp: aiPool[i].hp, hand: [], isDead: false, hasAttacked: false, identityKnown: false
+                hp: aiPool[i].hp, maxHp: aiPool[i].hp, hand: [], isDead: false, hasAttacked: false, identityKnown: false, berserk: false
             });
         }
 
@@ -393,6 +407,8 @@
         if (p.isDead) { nextTurn(); return; }
 
         p.hasAttacked = false;
+        p.berserk = false;
+        if (p.general.name === '刘备') { log(`【仁德】${p.general.name} 仁心昭昭，再摸1牌`, 'skill'); drawCards(p, 1); }
         renderAll();
         log(`--- ${p.general.name} 回合 ---`, "turn");
         drawCards(p, 2);
@@ -421,7 +437,7 @@
         } else {
             selectedCardIndex = idx;
             const card = players[0].hand[idx];
-            isTargetingMode = (card === '杀');
+            isTargetingMode = requiresTarget(card);
             if (isTargetingMode) log("请点击上方头像选择目标");
             updateHandUI();
             updateButtons();
@@ -433,12 +449,16 @@
         if (!isTargetingMode || selectedCardIndex === -1) return;
         const target = players[id];
         if (target.isDead) return;
-        
+
         const p = players[0];
-        if (p.hand[selectedCardIndex] === '杀') {
+        const card = p.hand[selectedCardIndex];
+        if (card === '杀') {
             if (p.hasAttacked && p.general.name !== '张飞') {
                 log("本回合已出过杀"); cancelAction(); return;
             }
+            useCard(p, selectedCardIndex, target);
+            cancelAction();
+        } else if (['顺手', '拆桥'].includes(card)) {
             useCard(p, selectedCardIndex, target);
             cancelAction();
         }
@@ -447,7 +467,7 @@
     function confirmAction() {
         const p = players[0];
         const card = p.hand[selectedCardIndex];
-        if (card === '桃') useCard(p, selectedCardIndex, p);
+        if (card === '桃' || card === '酒') useCard(p, selectedCardIndex, p);
         else useCard(p, selectedCardIndex, null); // AOE or Draw
         cancelAction();
     }
@@ -470,22 +490,49 @@
             SFX.attack();
             source.hasAttacked = true;
             resolveAttack(source, target, 'sha');
+            if (source.berserk) { source.hasAttacked = false; source.berserk = false; log(`【酒劲】${source.general.name} 仍可再出杀`, 'skill'); }
         } else if (card === '桃') {
             if (target.hp < target.maxHp) {
                 target.hp++;
                 log(`${source.general.name} 吃【桃】回血`, "skill");
                 SFX.heal();
             } else log(`${source.general.name} 满血吃桃无效`);
+        } else if (card === '酒') {
+            if (target.hp < target.maxHp) {
+                target.hp++;
+                log(`${source.general.name} 饮【酒】回复体力`, 'skill');
+                SFX.heal();
+            }
+            source.berserk = true;
+            log(`${source.general.name} 酒气上涌，杀势更猛`, 'skill');
         } else if (card === '万箭' || card === '南蛮') {
             log(`${source.general.name} 释放【${card}】`, "skill");
             SFX.aoe();
             players.forEach(p => {
                 if (p !== source && !p.isDead) resolveAttack(source, p, card === '万箭' ? 'wanjian' : 'nanman');
             });
+            if (source.general.name === '周瑜') { log(`【业炎】${source.general.name} AOE后神采奕奕，摸1牌`, 'skill'); drawCards(source, 1); }
         } else if (card === '无中') {
             log(`${source.general.name} 【无中生有】`, "skill");
             SFX.heal();
             drawCards(source, 2);
+        } else if (card === '顺手') {
+            if (target.hand.length > 0) {
+                const stealIdx = Math.floor(Math.random() * target.hand.length);
+                const got = target.hand.splice(stealIdx, 1)[0];
+                source.hand.push(got);
+                log(`${source.general.name} 使出【顺手牵羊】，获得 ${target.general.name} 的一张牌`, 'skill');
+            } else {
+                log(`${target.general.name} 空手，顺手无功`);
+            }
+        } else if (card === '拆桥') {
+            if (target.hand.length > 0) {
+                const discardIdx = Math.floor(Math.random() * target.hand.length);
+                target.hand.splice(discardIdx, 1);
+                log(`${source.general.name} 施展【过河拆桥】，弃置 ${target.general.name} 一张牌`, 'skill');
+            } else {
+                log(`${target.general.name} 空手，拆桥落空`);
+            }
         }
         renderAll();
     }
@@ -495,9 +542,10 @@
         let idx = target.hand.indexOf(need);
 
         // 吕布技能：无双 (简单模拟：如果源是吕布，且是杀，需要2张闪，这里简化为对方很难闪)
-        if (source.general.name === '吕布' && type === 'sha') {
+        // 许褚技能：裸衣 (使对方更难闪)
+        if ((source.general.name === '吕布' || source.general.name === '许褚') && type === 'sha') {
             // 简化：吕布的杀有50%概率无视闪
-            if (Math.random() > 0.5) idx = -1; 
+            if (Math.random() > 0.5) idx = -1;
         }
 
         // 赵云技能：龙胆 (杀当闪，闪当杀)
@@ -549,18 +597,32 @@
         if (ai.hand.includes('无中')) { useCard(ai, ai.hand.indexOf('无中'), null); if(!gameActive) return; }
         // 2. 桃
         while (ai.hp < ai.maxHp && ai.hand.includes('桃')) useCard(ai, ai.hand.indexOf('桃'), ai);
-        // 3. AOE
+        // 3. 酒
+        if (ai.hand.includes('酒') && (ai.hp < ai.maxHp || (ai.hand.includes('杀') && ai.hasAttacked))) { useCard(ai, ai.hand.indexOf('酒'), ai); }
+        // 4. AOE
         if (ai.hand.includes('万箭')) { useCard(ai, ai.hand.indexOf('万箭'), null); if(!gameActive) return; }
         if (ai.hand.includes('南蛮')) { useCard(ai, ai.hand.indexOf('南蛮'), null); if(!gameActive) return; }
-        // 4. 杀
-        let target = null;
+
         const alive = players.filter(p => !p.isDead && p !== ai);
+        let target = null;
         if (ai.role === '反贼') target = players[0];
         else if (ai.role === '忠臣') {
             const enemies = alive.filter(p => p.role !== '主公');
             if (enemies.length) target = enemies[Math.floor(Math.random()*enemies.length)];
         } else target = alive[Math.floor(Math.random()*alive.length)];
 
+        // 5. 顺手/拆桥
+        const stealTarget = alive.filter(p => p.hand.length > 0 && p !== ai);
+        if (ai.hand.includes('顺手') && stealTarget.length) {
+            const t = stealTarget[Math.floor(Math.random()*stealTarget.length)];
+            useCard(ai, ai.hand.indexOf('顺手'), t);
+        }
+        if (ai.hand.includes('拆桥') && stealTarget.length) {
+            const t = stealTarget[Math.floor(Math.random()*stealTarget.length)];
+            useCard(ai, ai.hand.indexOf('拆桥'), t);
+        }
+
+        // 6. 杀
         if (target && !target.isDead && ai.hand.includes('杀')) {
             if (!ai.hasAttacked || ai.general.name === '张飞') useCard(ai, ai.hand.indexOf('杀'), target);
         }
@@ -635,8 +697,9 @@
             el.setAttribute('data-type', card);
             el.onclick = () => selectCard(i);
             let icon = '';
-            if(card==='杀') icon='⚔️'; if(card==='闪') icon='💨'; if(card==='桃') icon='🍑';
+            if(card==='杀') icon='⚔️'; if(card==='闪') icon='💨'; if(card==='桃') icon='🍑'; if(card==='酒') icon='🍶';
             if(card==='万箭') icon='🏹'; if(card==='南蛮') icon='🐘'; if(card==='无中') icon='🎁';
+            if(card==='顺手') icon='🔗'; if(card==='拆桥') icon='🪓';
             el.innerHTML = `<div class="card-icon">${icon}</div><div class="card-text">${card}</div>`;
             c.appendChild(el);
         });
@@ -650,6 +713,7 @@
         let can = false;
         if (isMyTurn && hasSel) {
             if (card === '桃' && players[0].hp < players[0].maxHp) can = true;
+            if (card === '酒') can = true;
             if (['万箭', '南蛮', '无中'].includes(card)) can = true;
         }
         document.getElementById('btn-confirm').disabled = !can;
