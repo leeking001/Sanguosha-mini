@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>三国杀 Lite - 武侠终极版</title>
+    <title>三国杀 Lite - 侠义江湖版</title>
     <style>
         :root {
-            --bg-color: #1a1a1a; /* 水墨黑 */
-            --panel-bg: rgba(44, 62, 80, 0.85);
-            --paper-color: #f3e5ab; /* 羊皮纸色 */
+            --bg-color: #1a1a1a;
+            --panel-bg: rgba(44, 62, 80, 0.9);
+            --paper-color: #f3e5ab;
             --gold: #d4af37;
             --red: #c0392b;
             --blue: #2980b9;
             --green: #27ae60;
             --text-color: #ecf0f1;
-            --font-main: "Kaiti", "STKaiti", "KaiTi", "Georgia", serif; /* 楷体/宋体 */
+            --font-main: "Kaiti", "STKaiti", "KaiTi", "Georgia", serif;
         }
 
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -29,27 +29,21 @@
             overflow: hidden;
         }
 
-        /* --- 通用样式 --- */
-        button {
-            font-family: var(--font-main);
-            border: 1px solid var(--gold);
-            background: #34495e; color: var(--gold);
-            cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        button:active { transform: scale(0.95); background: #2c3e50; }
-        button:disabled { opacity: 0.4; border-color: #7f8c8d; color: #bdc3c7; cursor: not-allowed; }
-
         /* --- 顶部栏 --- */
         #top-bar {
-            height: 40px; display: flex; justify-content: space-between; align-items: center;
+            height: 45px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: rgba(0,0,0,0.6); border-bottom: 1px solid var(--gold);
+            z-index: 10;
         }
-        .game-title { font-size: 18px; font-weight: bold; color: var(--gold); letter-spacing: 2px; }
+        .game-title { font-size: 18px; font-weight: bold; color: var(--gold); letter-spacing: 2px; text-shadow: 0 0 5px #000; }
         .top-btns { display: flex; gap: 10px; }
-        .icon-btn { width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; justify-content: center; align-items: center; }
+        .icon-btn { 
+            width: 32px; height: 32px; border-radius: 50%; font-size: 16px; 
+            display: flex; justify-content: center; align-items: center; 
+            background: #34495e; border: 1px solid var(--gold); color: var(--gold);
+        }
 
-        /* --- 敌方区域 --- */
+        /* --- 战场区域 --- */
         #enemy-zone {
             flex: 0 0 28%; display: flex; justify-content: space-around; align-items: center;
             padding: 10px 5px; border-bottom: 1px solid #555;
@@ -65,6 +59,7 @@
         .enemy-card.active-turn { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); transform: scale(1.05); z-index: 2; }
         .enemy-card.dead { opacity: 0.4; filter: grayscale(100%); border-style: dashed; }
         .enemy-card.targetable { border-color: var(--red); box-shadow: 0 0 15px var(--red); animation: shake 0.5s infinite; }
+        .enemy-card.lord-border { border: 2px solid #f1c40f; }
 
         .avatar-frame {
             width: 100%; height: 55%;
@@ -73,37 +68,42 @@
             position: relative;
         }
         .role-badge { 
-            position: absolute; top: 2px; right: 2px; font-size: 10px; padding: 1px 4px; 
-            background: #000; border: 1px solid #777; color: #fff;
+            position: absolute; top: 2px; right: 2px; font-size: 10px; padding: 2px 5px; 
+            background: #000; border: 1px solid #777; color: #fff; border-radius: 3px;
         }
 
         .info-block { width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding: 2px; }
         .general-name { font-size: 14px; font-weight: bold; color: var(--paper-color); text-shadow: 1px 1px 2px black; }
         
-        /* --- 日志区域 (卷轴风格) --- */
+        /* --- 日志区域 --- */
         #log-zone {
             flex: 1; background: rgba(0, 0, 0, 0.4);
             overflow-y: auto; padding: 10px 15px;
             font-size: 14px; color: #bdc3c7;
             border-bottom: 1px solid #555;
-            font-family: "Courier New", Courier, monospace; /* 打字机风格 */
+            font-family: "Courier New", Courier, monospace;
         }
-        .log-line { margin-bottom: 5px; }
+        .log-line { margin-bottom: 5px; line-height: 1.4; }
         .log-turn { color: var(--gold); margin-top: 8px; border-top: 1px dashed #555; padding-top: 4px; font-weight: bold; }
-        .log-damage { color: var(--red); }
+        .log-damage { color: var(--red); font-weight: bold; }
         .log-skill { color: var(--blue); }
+        .log-system { color: #27ae60; font-style: italic; }
 
         /* --- 玩家区域 --- */
         #player-zone {
             flex: 0 0 40%; display: flex; flex-direction: column;
-            background: rgba(20, 20, 20, 0.9); padding: 5px;
+            background: rgba(20, 20, 20, 0.95); padding: 5px;
             border-top: 2px solid var(--gold);
         }
 
-        #player-status { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; height: 35px; }
+        #player-status { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; height: 40px; }
         .my-info { display: flex; align-items: center; gap: 10px; }
-        .my-name { font-size: 18px; color: var(--gold); font-weight: bold; }
-        
+        .my-role { font-size: 12px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .role-lord { background: #f1c40f; color: #000; }
+        .role-loyal { background: #e67e22; color: #fff; }
+        .role-rebel { background: #2ecc71; color: #fff; }
+        .role-spy { background: #9b59b6; color: #fff; }
+
         .hp-bar { display: flex; gap: 3px; }
         .hp-point { 
             width: 14px; height: 14px; border-radius: 50%; 
@@ -112,7 +112,7 @@
         }
         .hp-lost { background: #444; border-color: #666; }
 
-        /* 手牌 (横向) */
+        /* 手牌 */
         #hand-scroll-container {
             flex: 1; overflow-x: auto; white-space: nowrap;
             padding: 10px 5px; display: flex; align-items: center;
@@ -120,35 +120,35 @@
 
         .card {
             display: inline-flex; flex-direction: column; justify-content: center; align-items: center;
-            width: 70px; height: 100px;
+            width: 75px; height: 105px;
             background: var(--paper-color); 
-            border-radius: 4px; margin-right: 8px; flex-shrink: 0;
+            border-radius: 5px; margin-right: 8px; flex-shrink: 0;
             position: relative;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.6);
             transition: transform 0.2s;
             color: #333; font-weight: bold; border: 1px solid #d7ccc8;
         }
-        .card.selected { transform: translateY(-15px); border: 2px solid var(--red); box-shadow: 0 0 15px var(--red); }
+        .card.selected { transform: translateY(-20px); border: 2px solid var(--red); box-shadow: 0 0 15px var(--red); }
 
         .card[data-type="杀"] { color: #8b0000; }
         .card[data-type="闪"] { color: #154360; }
         .card[data-type="桃"] { color: #d81b60; }
         .card[data-type="酒"] { color: #a04000; }
-        .card[data-type="万箭"] { color: #6c3483; }
-        .card[data-type="南蛮"] { color: #d35400; }
-        .card[data-type="无中"] { color: #1e8449; }
-        .card[data-type="顺手"] { color: #117864; }
-        .card[data-type="拆桥"] { color: #873600; }
+        .card[data-type="万箭"], .card[data-type="南蛮"] { color: #6c3483; }
+        .card[data-type="无中"], .card[data-type="五谷"] { color: #1e8449; }
+        .card[data-type="顺手"], .card[data-type="拆桥"] { color: #117864; }
+        .card[data-type="决斗"] { color: #000; border: 1px solid #000; }
+        .card[data-type="火攻"] { color: #e74c3c; }
 
-        .card-icon { font-size: 28px; margin-bottom: 5px; }
+        .card-icon { font-size: 30px; margin-bottom: 5px; }
         .card-text { font-family: var(--font-main); font-size: 16px; }
 
         /* 底部按钮 */
         #controls { height: 50px; display: flex; gap: 10px; padding: 5px; }
-        .btn-action { flex: 1; font-size: 16px; font-weight: bold; border-radius: 4px; color: white; }
-        #btn-confirm { background: #d35400; border-color: #e67e22; }
-        #btn-end { background: #27ae60; border-color: #2ecc71; }
-        #btn-cancel { background: #7f8c8d; border-color: #95a5a6; }
+        .btn-action { flex: 1; font-size: 16px; font-weight: bold; border-radius: 4px; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        #btn-confirm { background: #d35400; }
+        #btn-end { background: #27ae60; }
+        #btn-cancel { background: #7f8c8d; }
 
         /* --- 弹窗 --- */
         .overlay {
@@ -157,10 +157,19 @@
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
 
-        /* 选将界面 */
-        #select-screen { display: flex; }
-        .select-title { font-size: 24px; color: var(--gold); margin-bottom: 30px; text-align: center; }
-        .hero-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        /* 选将/选身份界面 */
+        .select-container { width: 90%; max-width: 600px; text-align: center; }
+        .select-title { font-size: 24px; color: var(--gold); margin-bottom: 20px; }
+        
+        .role-options, .hero-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        
+        .role-card {
+            width: 80px; height: 100px; background: #34495e; border: 2px solid #7f8c8d;
+            display: flex; justify-content: center; align-items: center; font-size: 20px;
+            cursor: pointer; color: white; border-radius: 8px;
+        }
+        .role-card:hover { border-color: var(--gold); background: #2c3e50; }
+
         .hero-option {
             width: 100px; height: 140px;
             background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
@@ -187,6 +196,7 @@
     <div id="top-bar">
         <div class="game-title">三国杀·侠义篇</div>
         <div class="top-btns">
+            <button class="icon-btn" onclick="toggleBGM()" id="btn-bgm">🎵</button>
             <button class="icon-btn" onclick="toggleSound()" id="btn-sound">🔊</button>
             <button class="icon-btn" onclick="showHelp()">?</button>
         </div>
@@ -197,13 +207,14 @@
 
     <!-- 日志 -->
     <div id="log-zone">
-        <div class="log-line">请选择你的武将开始游戏...</div>
+        <div class="log-line">欢迎来到侠义江湖...</div>
     </div>
 
     <!-- 玩家区域 -->
     <div id="player-zone">
         <div id="player-status">
             <div class="my-info">
+                <span id="my-role-badge" class="my-role"></span>
                 <span id="my-avatar" style="font-size:24px;"></span>
                 <span id="my-name" class="my-name"></span>
                 <span id="my-skill" style="font-size:12px; color:#bdc3c7;"></span>
@@ -220,11 +231,22 @@
         </div>
     </div>
 
-    <!-- 选将弹窗 -->
-    <div id="select-screen" class="overlay">
-        <div class="select-title">请选择主公武将</div>
-        <div class="hero-container" id="hero-selection">
-            <!-- JS生成 -->
+    <!-- 流程弹窗 -->
+    <div id="setup-screen" class="overlay" style="display:flex;">
+        <!-- 步骤1：选身份 -->
+        <div id="step-role" class="select-container">
+            <div class="select-title">第一步：选择你的身份</div>
+            <div class="role-options">
+                <div class="role-card" onclick="selectRole('主公')" style="border-color:#f1c40f">主公</div>
+                <div class="role-card" onclick="selectRole('忠臣')" style="border-color:#e67e22">忠臣</div>
+                <div class="role-card" onclick="selectRole('反贼')" style="border-color:#2ecc71">反贼</div>
+                <div class="role-card" onclick="selectRole('内奸')" style="border-color:#9b59b6">内奸</div>
+            </div>
+        </div>
+        <!-- 步骤2：选武将 -->
+        <div id="step-hero" class="select-container" style="display:none;">
+            <div class="select-title">第二步：选择你的武将</div>
+            <div class="hero-options" id="hero-selection"></div>
         </div>
     </div>
 
@@ -238,29 +260,85 @@
     <div id="help-overlay" class="overlay" onclick="this.style.display='none'">
         <div style="background:var(--paper-color); color:#333; padding:20px; border-radius:5px; max-width:80%; max-height:80%; overflow-y:auto;">
             <h2 style="text-align:center; margin-top:0;">江湖规矩</h2>
-            <p><b>主公(你)</b>：击败所有反贼与内奸。</p>
-            <p><b>卡牌</b>：<br>
-            ⚔️ 杀：攻击 (需闪)<br>
-            💨 闪：防御<br>
-            🍑 桃：回血<br>
-            🍶 酒：回血并可再出一张杀<br>
-            🏹 万箭：全场需闪<br>
-            🐘 南蛮：全场需杀<br>
-            🔗 顺手：顺手牵羊一张牌<br>
-            🪓 拆桥：过河拆桥弃一张牌<br>
-            🎁 无中：摸2牌</p>
+            <p><b>胜利条件</b>：<br>
+            👑 主公：消灭反贼和内奸。<br>
+            🛡️ 忠臣：保护主公，消灭反贼内奸。<br>
+            🗡️ 反贼：击杀主公。<br>
+            🎭 内奸：先灭反贼忠臣，最后单挑主公。</p>
+            <hr>
+            <p><b>新增卡牌</b>：<br>
+            ⚔️ <b>决斗</b>：指定一名目标，对方需出【杀】，否则受1点伤害；若出杀，则你需出【杀】，循环直到一方受损。<br>
+            🌾 <b>五谷</b>：全场每人摸一张牌。<br>
+            🔥 <b>火攻</b>：弃置一张手牌，对目标造成1点伤害（目标可弃置一张牌抵消）。</p>
             <p style="text-align:center; color:#7f8c8d;">(点击任意处关闭)</p>
         </div>
     </div>
 
 <script>
-    // --- 音效系统 (Web Audio API) ---
+    // --- 音效与BGM系统 (Web Audio API) ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let soundEnabled = true;
+    let bgmEnabled = false;
+    let bgmOscillators = [];
+    let bgmInterval;
 
     function toggleSound() {
         soundEnabled = !soundEnabled;
         document.getElementById('btn-sound').innerText = soundEnabled ? '🔊' : '🔇';
+    }
+
+    // BGM 生成器：五声音阶古风氛围
+    function toggleBGM() {
+        bgmEnabled = !bgmEnabled;
+        document.getElementById('btn-bgm').innerText = bgmEnabled ? '🎵' : '✖️';
+        if (bgmEnabled) startBGM();
+        else stopBGM();
+    }
+
+    function startBGM() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        // 简单的五声音阶随机生成
+        const scale = [196.00, 220.00, 261.63, 293.66, 329.63, 392.00]; // G A C D E G
+        
+        function playNote() {
+            if (!bgmEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const freq = scale[Math.floor(Math.random() * scale.length)] * (Math.random() > 0.8 ? 0.5 : 1);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            // 柔和的包络
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 1); // 淡入
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4); // 长尾淡出
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 4);
+        }
+        
+        // 启动背景低音 Drone
+        const drone = audioCtx.createOscillator();
+        const droneGain = audioCtx.createGain();
+        drone.type = 'triangle';
+        drone.frequency.value = 98.00; // Low G
+        droneGain.gain.value = 0.02;
+        drone.connect(droneGain);
+        droneGain.connect(audioCtx.destination);
+        drone.start();
+        bgmOscillators.push(drone);
+
+        playNote();
+        bgmInterval = setInterval(playNote, 2500); // 每2.5秒弹一个音
+    }
+
+    function stopBGM() {
+        clearInterval(bgmInterval);
+        bgmOscillators.forEach(o => o.stop());
+        bgmOscillators = [];
     }
 
     function playTone(freq, type, duration, vol=0.1) {
@@ -278,25 +356,15 @@
     }
 
     const SFX = {
-        card: () => { // 纸张声 (白噪音模拟)
+        card: () => { 
             if (!soundEnabled) return;
-            const bufferSize = audioCtx.sampleRate * 0.1;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-            const noise = audioCtx.createBufferSource();
-            noise.buffer = buffer;
-            const gain = audioCtx.createGain();
-            gain.gain.value = 0.1;
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            noise.connect(gain);
-            gain.connect(audioCtx.destination);
-            noise.start();
+            playTone(800, 'triangle', 0.05, 0.05);
         },
-        attack: () => playTone(600, 'sawtooth', 0.1, 0.1), // 锐利
-        damage: () => playTone(100, 'square', 0.3, 0.2),   // 低沉
-        heal: () => playTone(800, 'sine', 0.5, 0.1),       // 清脆
+        attack: () => playTone(600, 'sawtooth', 0.1, 0.1),
+        damage: () => playTone(100, 'square', 0.3, 0.2),
+        heal: () => playTone(800, 'sine', 0.5, 0.1),
         aoe: () => { playTone(200, 'sawtooth', 0.4, 0.1); setTimeout(()=>playTone(150, 'sawtooth', 0.4, 0.1), 100); },
+        duel: () => { playTone(400, 'square', 0.1); setTimeout(()=>playTone(400, 'square', 0.1), 150); },
         win: () => { playTone(400, 'triangle', 0.2); setTimeout(()=>playTone(600, 'triangle', 0.4), 200); },
         lose: () => { playTone(300, 'sawtooth', 0.5); setTimeout(()=>playTone(200, 'sawtooth', 0.5), 400); }
     };
@@ -311,13 +379,16 @@
         { name: '华佗', hp: 3, skill: '急救', desc: '回合外回血', avatar: '🌿', color: '#27ae60' },
         { name: '刘备', hp: 4, skill: '仁德', desc: '开局额外摸牌', avatar: '🐉', color: '#2ecc71' },
         { name: '周瑜', hp: 4, skill: '业炎', desc: 'AOE后摸牌', avatar: '🔥', color: '#e67e22' },
-        { name: '许褚', hp: 4, skill: '裸衣', desc: '杀更难闪', avatar: '🛡️', color: '#7f8c8d' }
+        { name: '许褚', hp: 4, skill: '裸衣', desc: '杀更难闪', avatar: '🛡️', color: '#7f8c8d' },
+        { name: '孙尚香', hp: 4, skill: '结姻', desc: '装备多', avatar: '🎀', color: '#e91e63' }
     ];
 
+    // 扩充牌堆
     const DECK_TEMPLATE = [
-        ...Array(20).fill('杀'), ...Array(10).fill('闪'), ...Array(8).fill('桃'), ...Array(4).fill('酒'),
+        ...Array(24).fill('杀'), ...Array(12).fill('闪'), ...Array(8).fill('桃'), ...Array(4).fill('酒'),
         ...Array(2).fill('万箭'), ...Array(2).fill('南蛮'), ...Array(3).fill('无中'),
-        ...Array(3).fill('顺手'), ...Array(3).fill('拆桥')
+        ...Array(3).fill('顺手'), ...Array(3).fill('拆桥'),
+        ...Array(3).fill('决斗'), ...Array(2).fill('五谷'), ...Array(3).fill('火攻')
     ];
 
     let players = [];
@@ -326,15 +397,22 @@
     let selectedCardIndex = -1;
     let isTargetingMode = false;
     let gameActive = false;
+    let userRole = '';
 
     function requiresTarget(card) {
-        return ['杀', '顺手', '拆桥'].includes(card);
+        return ['杀', '顺手', '拆桥', '决斗', '火攻'].includes(card);
     }
 
-    // --- 选将逻辑 ---
-    function showSelection() {
+    // --- 游戏初始化流程 ---
+    
+    function selectRole(role) {
+        userRole = role;
+        document.getElementById('step-role').style.display = 'none';
+        showHeroSelection();
+    }
+
+    function showHeroSelection() {
         const container = document.getElementById('hero-selection');
-        // 随机取4个供选择
         let pool = [...GENERALS_DATA];
         shuffle(pool);
         const options = pool.slice(0, 4);
@@ -350,38 +428,52 @@
             el.onclick = () => startGame(hero);
             container.appendChild(el);
         });
-        document.getElementById('select-screen').style.display = 'flex';
+        document.getElementById('step-hero').style.display = 'block';
     }
 
     function startGame(selectedHero) {
-        document.getElementById('select-screen').style.display = 'none';
+        document.getElementById('setup-screen').style.display = 'none';
         gameActive = true;
-        SFX.win(); // 开局音效
+        SFX.win();
 
         // 1. 初始化牌堆
         deck = [...DECK_TEMPLATE];
         shuffle(deck);
 
-        // 2. 角色分配
-        let aiRoles = ['反贼', '忠臣', '内奸'];
-        shuffle(aiRoles);
-        
-        // 3. 武将分配 (排除玩家选的)
+        // 2. 角色分配逻辑
+        // 标准局：1主 1忠 1反 1内
+        let roles = ['主公', '忠臣', '反贼', '内奸'];
+        // 移除玩家选的身份
+        const roleIdx = roles.indexOf(userRole);
+        roles.splice(roleIdx, 1);
+        shuffle(roles); // 打乱剩下的给AI
+
+        // 3. 武将分配
         let aiPool = GENERALS_DATA.filter(g => g.name !== selectedHero.name);
         shuffle(aiPool);
 
-        // 4. 构建玩家
+        // 4. 构建玩家 (玩家固定在索引0，方便UI，但行动顺序由主公决定)
         players = [];
-        // 玩家
+        
+        // 玩家 (Index 0)
         players.push({
-            id: 0, isUser: true, role: '主公', general: selectedHero,
-            hp: selectedHero.hp, maxHp: selectedHero.hp, hand: [], isDead: false, hasAttacked: false, berserk: false
+            id: 0, isUser: true, role: userRole, general: selectedHero,
+            hp: selectedHero.hp + (userRole==='主公'?1:0), // 主公+1血
+            maxHp: selectedHero.hp + (userRole==='主公'?1:0), 
+            hand: [], isDead: false, hasAttacked: false, berserk: false,
+            identityKnown: userRole === '主公' // 主公亮身份
         });
-        // AI
+
+        // AI (Index 1-3)
         for(let i=0; i<3; i++) {
+            let r = roles[i];
+            let g = aiPool[i];
             players.push({
-                id: i+1, isUser: false, role: aiRoles[i], general: aiPool[i],
-                hp: aiPool[i].hp, maxHp: aiPool[i].hp, hand: [], isDead: false, hasAttacked: false, identityKnown: false, berserk: false
+                id: i+1, isUser: false, role: r, general: g,
+                hp: g.hp + (r==='主公'?1:0), 
+                maxHp: g.hp + (r==='主公'?1:0), 
+                hand: [], isDead: false, hasAttacked: false, berserk: false,
+                identityKnown: r === '主公'
             });
         }
 
@@ -392,10 +484,16 @@
         document.getElementById('my-avatar').innerText = selectedHero.avatar;
         document.getElementById('my-name').innerText = selectedHero.name;
         document.getElementById('my-skill').innerText = `[${selectedHero.skill}]`;
+        const badge = document.getElementById('my-role-badge');
+        badge.innerText = userRole;
+        badge.className = `my-role role-${userRole==='主公'?'lord':(userRole==='忠臣'?'loyal':(userRole==='反贼'?'rebel':'spy'))}`;
         
         renderAll();
-        log(`江湖风起云涌，${selectedHero.name} 踏入战场！`, "turn");
-        startTurn(0);
+        
+        // 7. 确定先手 (主公先手)
+        let lordIndex = players.findIndex(p => p.role === '主公');
+        log(`江湖风起云涌，${players[lordIndex].general.name} (主公) 率先行动！`, "system");
+        startTurn(lordIndex);
     }
 
     // --- 核心流程 ---
@@ -408,9 +506,11 @@
 
         p.hasAttacked = false;
         p.berserk = false;
-        if (p.general.name === '刘备') { log(`【仁德】${p.general.name} 仁心昭昭，再摸1牌`, 'skill'); drawCards(p, 1); }
+        
+        // 摸牌阶段
+        if (p.general.name === '刘备') { log(`【仁德】${p.general.name} 仁心昭昭，额外摸1牌`, 'skill'); drawCards(p, 1); }
         renderAll();
-        log(`--- ${p.general.name} 回合 ---`, "turn");
+        log(`--- ${p.general.name} (${p.identityKnown?p.role:'???'}) 回合 ---`, "turn");
         drawCards(p, 2);
 
         if (p.isUser) {
@@ -452,16 +552,14 @@
 
         const p = players[0];
         const card = p.hand[selectedCardIndex];
-        if (card === '杀') {
-            if (p.hasAttacked && p.general.name !== '张飞') {
-                log("本回合已出过杀"); cancelAction(); return;
-            }
-            useCard(p, selectedCardIndex, target);
-            cancelAction();
-        } else if (['顺手', '拆桥'].includes(card)) {
-            useCard(p, selectedCardIndex, target);
-            cancelAction();
+        
+        // 目标合法性检查
+        if (card === '杀' && p.hasAttacked && p.general.name !== '张飞') {
+            log("本回合已出过杀"); cancelAction(); return;
         }
+        
+        useCard(p, selectedCardIndex, target);
+        cancelAction();
     }
 
     function confirmAction() {
@@ -479,7 +577,7 @@
 
     function endTurn() { if (currentTurnIndex === 0) nextTurn(); }
 
-    // --- 战斗逻辑 ---
+    // --- 卡牌逻辑 ---
     function useCard(source, idx, target) {
         const card = source.hand[idx];
         source.hand.splice(idx, 1);
@@ -491,47 +589,86 @@
             source.hasAttacked = true;
             resolveAttack(source, target, 'sha');
             if (source.berserk) { source.hasAttacked = false; source.berserk = false; log(`【酒劲】${source.general.name} 仍可再出杀`, 'skill'); }
-        } else if (card === '桃') {
+        } 
+        else if (card === '桃') {
             if (target.hp < target.maxHp) {
                 target.hp++;
                 log(`${source.general.name} 吃【桃】回血`, "skill");
                 SFX.heal();
-            } else log(`${source.general.name} 满血吃桃无效`);
-        } else if (card === '酒') {
-            if (target.hp < target.maxHp) {
-                target.hp++;
-                log(`${source.general.name} 饮【酒】回复体力`, 'skill');
-                SFX.heal();
             }
+        } 
+        else if (card === '酒') {
+            if (target.hp < target.maxHp) { target.hp++; log(`${source.general.name} 饮【酒】回复体力`, 'skill'); SFX.heal(); }
             source.berserk = true;
             log(`${source.general.name} 酒气上涌，杀势更猛`, 'skill');
-        } else if (card === '万箭' || card === '南蛮') {
+        } 
+        else if (card === '万箭' || card === '南蛮') {
             log(`${source.general.name} 释放【${card}】`, "skill");
             SFX.aoe();
             players.forEach(p => {
                 if (p !== source && !p.isDead) resolveAttack(source, p, card === '万箭' ? 'wanjian' : 'nanman');
             });
             if (source.general.name === '周瑜') { log(`【业炎】${source.general.name} AOE后神采奕奕，摸1牌`, 'skill'); drawCards(source, 1); }
-        } else if (card === '无中') {
+        } 
+        else if (card === '无中') {
             log(`${source.general.name} 【无中生有】`, "skill");
             SFX.heal();
             drawCards(source, 2);
-        } else if (card === '顺手') {
+        } 
+        else if (card === '五谷') {
+            log(`${source.general.name} 开启【五谷丰登】`, "skill");
+            SFX.heal();
+            players.forEach(p => { if(!p.isDead) drawCards(p, 1); });
+            log("全场各摸一张牌", "system");
+        }
+        else if (card === '顺手') {
             if (target.hand.length > 0) {
                 const stealIdx = Math.floor(Math.random() * target.hand.length);
                 const got = target.hand.splice(stealIdx, 1)[0];
                 source.hand.push(got);
-                log(`${source.general.name} 使出【顺手牵羊】，获得 ${target.general.name} 的一张牌`, 'skill');
-            } else {
-                log(`${target.general.name} 空手，顺手无功`);
-            }
-        } else if (card === '拆桥') {
+                log(`${source.general.name} 【顺手牵羊】获得 ${target.general.name} 一张牌`, 'skill');
+            } else log(`${target.general.name} 空手，顺手无功`);
+        } 
+        else if (card === '拆桥') {
             if (target.hand.length > 0) {
                 const discardIdx = Math.floor(Math.random() * target.hand.length);
                 target.hand.splice(discardIdx, 1);
-                log(`${source.general.name} 施展【过河拆桥】，弃置 ${target.general.name} 一张牌`, 'skill');
+                log(`${source.general.name} 【过河拆桥】弃置 ${target.general.name} 一张牌`, 'skill');
+            } else log(`${target.general.name} 空手，拆桥落空`);
+        }
+        else if (card === '决斗') {
+            log(`${source.general.name} 向 ${target.general.name} 发起【决斗】`, "skill");
+            SFX.duel();
+            // 简化逻辑：目标需出杀，否则受伤。若出杀，源需出杀，否则受伤。
+            // 简单实现：只判定一轮。目标没杀->受伤；目标有杀->源没杀->源受伤；都有->平局(简化)
+            let tHasSha = target.hand.indexOf('杀');
+            if (tHasSha === -1) {
+                log(`${target.general.name} 无杀可出，决斗失败`, "damage");
+                damage(source, target);
             } else {
-                log(`${target.general.name} 空手，拆桥落空`);
+                target.hand.splice(tHasSha, 1);
+                log(`${target.general.name} 打出【杀】回击`, "skill");
+                let sHasSha = source.hand.indexOf('杀');
+                if (sHasSha === -1) {
+                    log(`${source.general.name} 无杀招架，决斗反噬`, "damage");
+                    damage(target, source);
+                } else {
+                    source.hand.splice(sHasSha, 1);
+                    log(`${source.general.name} 再次出【杀】，双方拉开距离`, "skill");
+                }
+            }
+        }
+        else if (card === '火攻') {
+            log(`${source.general.name} 对 ${target.general.name} 发动【火攻】`, "skill");
+            // 简化：目标弃一张牌，否则受伤
+            if (target.hand.length > 0) {
+                // AI/Target 简单逻辑：有牌就弃，保命
+                const discardIdx = Math.floor(Math.random() * target.hand.length);
+                target.hand.splice(discardIdx, 1);
+                log(`${target.general.name} 弃置一张牌抵消火攻`, "skill");
+            } else {
+                log(`${target.general.name} 无牌可弃，烈火焚身`, "damage");
+                damage(source, target);
             }
         }
         renderAll();
@@ -541,14 +678,10 @@
         let need = type === 'nanman' ? '杀' : '闪';
         let idx = target.hand.indexOf(need);
 
-        // 吕布技能：无双 (简单模拟：如果源是吕布，且是杀，需要2张闪，这里简化为对方很难闪)
-        // 许褚技能：裸衣 (使对方更难闪)
+        // 技能判定
         if ((source.general.name === '吕布' || source.general.name === '许褚') && type === 'sha') {
-            // 简化：吕布的杀有50%概率无视闪
-            if (Math.random() > 0.5) idx = -1;
+            if (Math.random() > 0.5) idx = -1; // 简单模拟强命
         }
-
-        // 赵云技能：龙胆 (杀当闪，闪当杀)
         if (target.general.name === '赵云' && idx === -1) {
             if (need === '闪') idx = target.hand.indexOf('杀');
             else idx = target.hand.indexOf('闪');
@@ -559,19 +692,23 @@
             log(`${target.general.name} 打出【${need}】抵消`, "skill");
             SFX.card();
         } else {
-            target.hp--;
-            log(`${target.general.name} 受到伤害`, "damage");
-            SFX.damage();
-            triggerDamageSkill(target);
-            if (target.hp <= 0) {
-                const tao = target.hand.indexOf('桃');
-                if (tao !== -1) {
-                    target.hand.splice(tao, 1);
-                    target.hp++;
-                    log(`${target.general.name} 濒死吃桃`, "skill");
-                    SFX.heal();
-                } else handleDeath(source, target);
-            }
+            damage(source, target);
+        }
+    }
+
+    function damage(source, target) {
+        target.hp--;
+        log(`${target.general.name} 受到伤害`, "damage");
+        SFX.damage();
+        triggerDamageSkill(target);
+        if (target.hp <= 0) {
+            const tao = target.hand.indexOf('桃');
+            if (tao !== -1) {
+                target.hand.splice(tao, 1);
+                target.hp++;
+                log(`${target.general.name} 濒死吃桃`, "skill");
+                SFX.heal();
+            } else handleDeath(source, target);
         }
     }
 
@@ -584,48 +721,69 @@
     function handleDeath(killer, dead) {
         dead.isDead = true; dead.identityKnown = true;
         log(`${dead.general.name} 阵亡! 身份: ${dead.role}`, "damage");
-        if (dead.role === '反贼') drawCards(killer, 3);
-        else if (dead.role === '忠臣' && killer.role === '主公') killer.hand = [];
+        
+        // 奖惩机制
+        if (dead.role === '反贼') {
+            log(`${killer.general.name} 击杀反贼，摸3张牌`, "system");
+            drawCards(killer, 3);
+        }
+        else if (dead.role === '忠臣' && killer.role === '主公') {
+            log("主公误杀忠臣，弃置所有牌", "damage");
+            killer.hand = [];
+        }
         checkWin();
     }
 
-    // --- AI ---
+    // --- AI 逻辑 ---
     function aiAction(ai) {
         if (ai.isDead || !gameActive) return;
         
-        // 1. 无中
+        // 1. 回复/增益
         if (ai.hand.includes('无中')) { useCard(ai, ai.hand.indexOf('无中'), null); if(!gameActive) return; }
-        // 2. 桃
+        if (ai.hand.includes('五谷')) { useCard(ai, ai.hand.indexOf('五谷'), null); if(!gameActive) return; }
         while (ai.hp < ai.maxHp && ai.hand.includes('桃')) useCard(ai, ai.hand.indexOf('桃'), ai);
-        // 3. 酒
         if (ai.hand.includes('酒') && (ai.hp < ai.maxHp || (ai.hand.includes('杀') && ai.hasAttacked))) { useCard(ai, ai.hand.indexOf('酒'), ai); }
-        // 4. AOE
+        
+        // 2. AOE
         if (ai.hand.includes('万箭')) { useCard(ai, ai.hand.indexOf('万箭'), null); if(!gameActive) return; }
         if (ai.hand.includes('南蛮')) { useCard(ai, ai.hand.indexOf('南蛮'), null); if(!gameActive) return; }
 
+        // 3. 确定目标
         const alive = players.filter(p => !p.isDead && p !== ai);
         let target = null;
-        if (ai.role === '反贼') target = players[0];
-        else if (ai.role === '忠臣') {
-            const enemies = alive.filter(p => p.role !== '主公');
-            if (enemies.length) target = enemies[Math.floor(Math.random()*enemies.length)];
-        } else target = alive[Math.floor(Math.random()*alive.length)];
+        
+        // 简单AI策略
+        if (ai.role === '反贼') {
+            // 优先打主公，其次打已亮明的忠臣
+            target = alive.find(p => p.role === '主公');
+            if (!target) target = alive.find(p => p.identityKnown && p.role === '忠臣');
+        } else if (ai.role === '忠臣') {
+            // 打反贼
+            target = alive.find(p => p.identityKnown && p.role === '反贼');
+        } else if (ai.role === '主公') {
+            // 打反贼或内奸
+            target = alive.find(p => p.identityKnown && (p.role === '反贼' || p.role === '内奸'));
+        } else { // 内奸
+            // 随机打，或者打主公以外的人
+            target = alive.find(p => p.role !== '主公');
+        }
+        
+        // 如果找不到明确目标，随机选一个非队友（简化）
+        if (!target) target = alive[Math.floor(Math.random()*alive.length)];
 
-        // 5. 顺手/拆桥
-        const stealTarget = alive.filter(p => p.hand.length > 0 && p !== ai);
-        if (ai.hand.includes('顺手') && stealTarget.length) {
-            const t = stealTarget[Math.floor(Math.random()*stealTarget.length)];
-            useCard(ai, ai.hand.indexOf('顺手'), t);
-        }
-        if (ai.hand.includes('拆桥') && stealTarget.length) {
-            const t = stealTarget[Math.floor(Math.random()*stealTarget.length)];
-            useCard(ai, ai.hand.indexOf('拆桥'), t);
+        // 4. 攻击性锦囊
+        if (target && !target.isDead) {
+            if (ai.hand.includes('顺手')) useCard(ai, ai.hand.indexOf('顺手'), target);
+            if (ai.hand.includes('拆桥')) useCard(ai, ai.hand.indexOf('拆桥'), target);
+            if (ai.hand.includes('火攻') && ai.hand.length > 2) useCard(ai, ai.hand.indexOf('火攻'), target);
+            if (ai.hand.includes('决斗')) useCard(ai, ai.hand.indexOf('决斗'), target);
+            
+            // 5. 杀
+            if (ai.hand.includes('杀')) {
+                if (!ai.hasAttacked || ai.general.name === '张飞') useCard(ai, ai.hand.indexOf('杀'), target);
+            }
         }
 
-        // 6. 杀
-        if (target && !target.isDead && ai.hand.includes('杀')) {
-            if (!ai.hasAttacked || ai.general.name === '张飞') useCard(ai, ai.hand.indexOf('杀'), target);
-        }
         setTimeout(nextTurn, 800);
     }
 
@@ -640,40 +798,63 @@
     function log(msg, type="") {
         const box = document.getElementById('log-zone');
         const div = document.createElement('div');
-        div.className = `log-line ${type==='turn'?'log-turn':(type==='damage'?'log-damage':(type==='skill'?'log-skill':''))}`;
+        div.className = `log-line ${type==='turn'?'log-turn':(type==='damage'?'log-damage':(type==='skill'?'log-skill':(type==='system'?'log-system':'')))}`;
         div.innerText = msg;
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
     }
+    
     function checkWin() {
-        const lord = players[0];
+        const lord = players.find(p => p.role === '主公');
         const rebels = players.filter(p => p.role === '反贼' && !p.isDead);
         const traitor = players.filter(p => p.role === '内奸' && !p.isDead);
-        if (lord.isDead) gameOver(false, "主公阵亡，霸业成空！");
-        else if (rebels.length === 0 && traitor.length === 0) gameOver(true, "逆贼全灭，天下大定！");
+        const loyalists = players.filter(p => p.role === '忠臣' && !p.isDead);
+
+        if (!lord) return; // Should not happen
+
+        if (lord.isDead) {
+            // 主公死，反贼赢（除非只剩内奸）
+            if (rebels.length === 0 && loyalists.length === 0 && traitor.length > 0) {
+                gameOver(userRole === '内奸', "内奸篡位，天下归一！");
+            } else {
+                gameOver(userRole === '反贼', "主公阵亡，反贼起义成功！");
+            }
+        } else {
+            // 主公活
+            if (rebels.length === 0 && traitor.length === 0) {
+                gameOver(userRole === '主公' || userRole === '忠臣', "逆贼全灭，天下大定！");
+            }
+        }
     }
+
     function gameOver(win, msg) {
         gameActive = false;
         const t = document.getElementById('result-title');
         t.innerText = msg; t.className = win ? 'win' : 'lose';
         document.getElementById('result-overlay').style.display = 'flex';
         win ? SFX.win() : SFX.lose();
+        stopBGM();
     }
+
+    function showHelp() { document.getElementById('help-overlay').style.display = 'flex'; }
 
     // --- 渲染 ---
     function renderAll() {
         const container = document.getElementById('enemy-zone');
         container.innerHTML = '';
+        // 渲染除了玩家以外的人 (1, 2, 3)
         for(let i=1; i<=3; i++) {
             const p = players[i];
             const div = document.createElement('div');
             let roleText = p.identityKnown ? p.role : "???";
             let classes = `enemy-card ${p.isDead ? 'dead' : ''} ${currentTurnIndex === i ? 'active-turn' : ''}`;
             if (isTargetingMode && !p.isDead) classes += ' targetable';
+            if (p.role === '主公') classes += ' lord-border'; // 主公金框
+            
             div.className = classes;
             div.onclick = () => selectTarget(i);
             div.innerHTML = `
-                <div class="role-badge" style="background:${p.identityKnown?(p.role==='反贼'?'#2ecc71':(p.role==='忠臣'?'#e67e22':'#9b59b6')):'#333'}">${roleText}</div>
+                <div class="role-badge" style="background:${p.identityKnown?(p.role==='反贼'?'#2ecc71':(p.role==='忠臣'?'#e67e22':(p.role==='主公'?'#f1c40f':'#9b59b6'))):'#333'}; color:${p.role==='主公'?'#000':'#fff'}">${roleText}</div>
                 <div class="avatar-frame" style="color:${p.general.color}">${p.general.avatar}</div>
                 <div class="info-block">
                     <div class="general-name">${p.general.name}</div>
@@ -700,6 +881,7 @@
             if(card==='杀') icon='⚔️'; if(card==='闪') icon='💨'; if(card==='桃') icon='🍑'; if(card==='酒') icon='🍶';
             if(card==='万箭') icon='🏹'; if(card==='南蛮') icon='🐘'; if(card==='无中') icon='🎁';
             if(card==='顺手') icon='🔗'; if(card==='拆桥') icon='🪓';
+            if(card==='决斗') icon='⚔️'; if(card==='五谷') icon='🌾'; if(card==='火攻') icon='🔥';
             el.innerHTML = `<div class="card-icon">${icon}</div><div class="card-text">${card}</div>`;
             c.appendChild(el);
         });
@@ -714,13 +896,10 @@
         if (isMyTurn && hasSel) {
             if (card === '桃' && players[0].hp < players[0].maxHp) can = true;
             if (card === '酒') can = true;
-            if (['万箭', '南蛮', '无中'].includes(card)) can = true;
+            if (['万箭', '南蛮', '无中', '五谷'].includes(card)) can = true;
         }
         document.getElementById('btn-confirm').disabled = !can;
     }
-
-    // 启动选将
-    showSelection();
 
 </script>
 </body>
