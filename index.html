@@ -95,7 +95,6 @@
             position: absolute; top: 2px; right: 2px; font-size: 10px; padding: 2px 5px; 
             background: #000; border: 1px solid #777; color: #fff; border-radius: 3px;
         }
-        /* 状态图标容器 */
         .status-icons {
             position: absolute; bottom: 2px; left: 2px; display: flex; gap: 2px;
         }
@@ -189,10 +188,14 @@
         }
 
         /* 选将/选身份界面 */
-        .select-container { width: 90%; max-width: 600px; text-align: center; }
-        .select-title { font-size: 24px; color: var(--gold); margin-bottom: 20px; }
+        .select-container { width: 90%; max-width: 800px; text-align: center; max-height: 90vh; display: flex; flex-direction: column; }
+        .select-title { font-size: 24px; color: var(--gold); margin-bottom: 20px; flex-shrink: 0; }
         
-        .role-options, .hero-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .role-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .hero-options { 
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; 
+            overflow-y: auto; padding: 10px; flex: 1;
+        }
         
         .role-card {
             width: 80px; height: 100px; background: #34495e; border: 2px solid #7f8c8d;
@@ -205,18 +208,43 @@
             width: 100px; height: 140px;
             background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s;
+            cursor: pointer; transition: transform 0.2s; flex-shrink: 0;
         }
-        .hero-option:hover { transform: scale(1.1); border-color: var(--gold); box-shadow: 0 0 20px var(--gold); }
+        .hero-option:hover { transform: scale(1.1); border-color: var(--gold); box-shadow: 0 0 20px var(--gold); z-index: 10; }
         .hero-avatar { font-size: 40px; margin-bottom: 10px; }
         .hero-name { font-weight: bold; color: white; }
         .hero-skill { font-size: 12px; color: #bdc3c7; margin-top: 5px; }
 
-        /* 帮助与结算 */
-        #result-title { font-size: 40px; margin-bottom: 20px; font-family: var(--font-main); }
+        /* 结算界面 */
+        #result-title { font-size: 40px; margin-bottom: 10px; font-family: var(--font-main); }
         .win { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
         .lose { color: var(--red); text-shadow: 0 0 10px var(--red); }
+        
+        .result-table {
+            width: 90%; max-width: 600px; background: rgba(0,0,0,0.6); 
+            border: 1px solid var(--gold); border-radius: 5px; padding: 10px;
+            margin-bottom: 20px; font-size: 14px;
+        }
+        .result-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px dashed #555; align-items: center; }
+        .result-row:last-child { border-bottom: none; }
+        .result-header { font-weight: bold; color: var(--gold); border-bottom: 2px solid var(--gold); }
+        .res-role { width: 15%; }
+        .res-name { width: 25%; text-align: left; }
+        .res-stat { width: 20%; text-align: center; }
 
+        /* 再战江湖按钮优化 */
+        .btn-restart {
+            padding: 15px 50px; font-size: 22px; font-weight: bold; color: #fff;
+            background: linear-gradient(45deg, #c0392b, #d35400);
+            border: 2px solid #f1c40f; border-radius: 30px;
+            cursor: pointer; box-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+            transition: all 0.3s; animation: pulse 2s infinite;
+            text-shadow: 1px 1px 2px black;
+        }
+        .btn-restart:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(241, 196, 15, 0.8); background: linear-gradient(45deg, #e74c3c, #e67e22); }
+        @keyframes pulse { 0% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.3); } 50% { box-shadow: 0 0 25px rgba(241, 196, 15, 0.7); } 100% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.3); } }
+
+        /* 帮助 */
         .help-content {
             background: var(--paper-color); color: #333; padding: 20px; 
             border-radius: 5px; width: 90%; height: 85%; overflow-y: auto;
@@ -295,7 +323,10 @@
     <!-- 结算弹窗 -->
     <div id="result-overlay" class="overlay">
         <div id="result-title"></div>
-        <button class="btn-action" style="flex:0; padding:10px 30px;" onclick="location.reload()">再战江湖</button>
+        <div id="result-list" class="result-table">
+            <!-- JS生成 -->
+        </div>
+        <button class="btn-restart" onclick="location.reload()">再战江湖</button>
     </div>
 
     <!-- 帮助弹窗 -->
@@ -431,15 +462,13 @@
         el.innerText = text;
         el.className = `fx-text ${type==='damage'?'fx-damage':(type==='skill'?'fx-skill':'')}`;
         
-        // 简单定位：如果是玩家(0)，在下方；如果是敌人，在上方对应位置
-        // 这里简化为屏幕中央显示，或者根据ID微调
         if (targetId === 0) el.style.bottom = '20%';
         else if (targetId === 1) { el.style.top = '20%'; el.style.right = '10%'; }
         else if (targetId === 2) { el.style.top = '20%'; }
         else if (targetId === 3) { el.style.top = '20%'; el.style.left = '10%'; }
         
         layer.appendChild(el);
-        await sleep(1000); // 等待动画
+        await sleep(1000); 
         el.remove();
     }
 
@@ -454,7 +483,11 @@
         { name: '刘备', hp: 4, skill: '仁德', avatar: '🐉', color: '#2ecc71' },
         { name: '周瑜', hp: 4, skill: '英姿', avatar: '🔥', color: '#e67e22' },
         { name: '许褚', hp: 4, skill: '裸衣', avatar: '🛡️', color: '#7f8c8d' },
-        { name: '孙尚香', hp: 4, skill: '枭姬', avatar: '🎀', color: '#e91e63' }
+        { name: '孙尚香', hp: 4, skill: '枭姬', avatar: '🎀', color: '#e91e63' },
+        { name: '黄盖', hp: 4, skill: '苦肉', avatar: '👴', color: '#c0392b' },
+        { name: '陆逊', hp: 3, skill: '谦逊', avatar: '📜', color: '#e67e22' },
+        { name: '甄姬', hp: 3, skill: '洛神', avatar: '💃', color: '#8e44ad' },
+        { name: '司马懿', hp: 3, skill: '鬼才', avatar: '⚡', color: '#2980b9' }
     ];
 
     const DECK_TEMPLATE = [
@@ -486,9 +519,8 @@
 
     function showHeroSelection() {
         const container = document.getElementById('hero-selection');
-        let pool = [...GENERALS_DATA];
-        shuffle(pool);
-        pool.slice(0, 4).forEach(hero => {
+        // 显示所有武将
+        GENERALS_DATA.forEach(hero => {
             const el = document.createElement('div');
             el.className = 'hero-option';
             el.innerHTML = `<div class="hero-avatar" style="color:${hero.color}">${hero.avatar}</div><div class="hero-name">${hero.name}</div><div class="hero-skill">${hero.skill}</div>`;
@@ -542,7 +574,9 @@
             hp: general.hp + (role==='主公'?1:0), maxHp: general.hp + (role==='主公'?1:0),
             hand: [], isDead: false, hasAttacked: false, berserk: false,
             identityKnown: role === '主公',
-            lebu: false, chained: false
+            lebu: false, chained: false,
+            // 统计数据
+            stats: { damageDealt: 0, healed: 0, kills: 0 }
         };
     }
 
@@ -563,9 +597,8 @@
         if (p.lebu) {
             log(`${p.general.name} 判定【乐不思蜀】...`, "system");
             await showEffect(p.id, "判定中...", "skill");
-            // 简单判定：50%概率
             let success = Math.random() > 0.5; 
-            p.lebu = false; // 移除状态
+            p.lebu = false; 
             if (!success) {
                 log(`判定失败！${p.general.name} 跳过出牌阶段`, "damage");
                 await showEffect(p.id, "乐不思蜀生效", "damage");
@@ -581,7 +614,7 @@
 
         // 2. 摸牌阶段
         if (p.general.name === '周瑜') { log(`【英姿】摸3牌`, 'skill'); drawCards(p, 3); }
-        else if (p.general.name === '许褚') { log(`【裸衣】摸1牌，伤害+1`, 'skill'); drawCards(p, 1); p.berserk = true; } // 简化裸衣逻辑
+        else if (p.general.name === '许褚') { log(`【裸衣】摸1牌，伤害+1`, 'skill'); drawCards(p, 1); p.berserk = true; } 
         else drawCards(p, 2);
         
         if (p.general.name === '刘备') { log(`【仁德】额外摸1牌`, 'skill'); drawCards(p, 1); }
@@ -654,7 +687,7 @@
         SFX.card();
         renderAll();
 
-        await showEffect(source.id, card); // 展示出牌特效
+        await showEffect(source.id, card); 
 
         if (card === '杀') {
             log(`${source.general.name} 对 ${target.general.name} 出【杀】`);
@@ -665,13 +698,14 @@
         else if (card === '桃') {
             if (target.hp < target.maxHp) {
                 target.hp++;
+                source.stats.healed++; // 统计
                 log(`${source.general.name} 吃【桃】回血`, "skill");
                 SFX.heal();
                 await showEffect(target.id, "+1 体力", "skill");
             }
         } 
         else if (card === '酒') {
-            if (target.hp < target.maxHp) { target.hp++; SFX.heal(); }
+            if (target.hp < target.maxHp) { target.hp++; source.stats.healed++; SFX.heal(); }
             source.berserk = true;
             log(`${source.general.name} 饮【酒】`, 'skill');
             await showEffect(source.id, "酒劲大发", "skill");
@@ -713,7 +747,6 @@
         else if (card === '决斗') {
             log(`${source.general.name} 决斗 ${target.general.name}`, "skill");
             SFX.duel();
-            // 简化决斗：目标无杀则伤，有杀则源伤 (只判定一轮)
             await sleep(500);
             let tHasSha = target.hand.indexOf('杀');
             if (tHasSha === -1) {
@@ -754,14 +787,13 @@
             await showEffect(target.id, target.chained?"连环":"解除", "skill");
         }
         renderAll();
-        if (!source.isUser) await sleep(800); // AI pause
+        if (!source.isUser) await sleep(800); 
     }
 
     async function resolveAttack(source, target, type) {
         let need = type === 'nanman' ? '杀' : '闪';
         let idx = target.hand.indexOf(need);
 
-        // 技能判定
         if ((source.general.name === '吕布' || source.general.name === '许褚') && type === 'sha') {
             if (Math.random() > 0.5) idx = -1; 
         }
@@ -782,16 +814,17 @@
 
     async function damage(source, target) {
         let dmg = 1;
-        if (source.berserk) dmg++; // 酒/裸衣
+        if (source.berserk) dmg++; 
         
         target.hp -= dmg;
+        source.stats.damageDealt += dmg; // 统计
+
         log(`${target.general.name} 受到 ${dmg} 点伤害`, "damage");
         SFX.damage();
         await showEffect(target.id, `-${dmg} 体力`, "damage");
         
-        // 铁索连环逻辑 (简化：只要受伤就传导)
         if (target.chained) {
-            target.chained = false; // 重置
+            target.chained = false; 
             log("【铁索连环】触发！", "skill");
             for (let p of players) {
                 if (p !== target && p.chained && !p.isDead) {
@@ -808,6 +841,7 @@
             if (tao !== -1) {
                 target.hand.splice(tao, 1);
                 target.hp++;
+                target.stats.healed++; // 统计
                 log(`${target.general.name} 濒死吃桃`, "skill");
                 SFX.heal();
                 await showEffect(target.id, "濒死回血", "skill");
@@ -824,6 +858,7 @@
 
     function handleDeath(killer, dead) {
         dead.isDead = true; dead.identityKnown = true;
+        killer.stats.kills++; // 统计
         log(`${dead.general.name} 阵亡!`, "damage");
         
         if (dead.role === '反贼') {
@@ -840,13 +875,11 @@
     async function aiAction(ai) {
         if (ai.isDead || !gameActive) return;
         
-        // 1. 救命/增益
         if (ai.hand.includes('无中')) await confirmUseCard(ai, ai.hand.indexOf('无中'), null);
         if (ai.hand.includes('五谷')) await confirmUseCard(ai, ai.hand.indexOf('五谷'), null);
         while (ai.hp < ai.maxHp && ai.hand.includes('桃')) await confirmUseCard(ai, ai.hand.indexOf('桃'), ai);
         if (ai.hand.includes('酒') && ai.hp < ai.maxHp) await confirmUseCard(ai, ai.hand.indexOf('酒'), ai);
 
-        // 2. 确定目标
         const alive = players.filter(p => !p.isDead && p !== ai);
         let target = null;
         if (ai.role === '反贼') target = alive.find(p => p.role === '主公') || alive.find(p => p.identityKnown && p.role === '忠臣');
@@ -854,7 +887,6 @@
         else if (ai.role === '主公') target = alive.find(p => p.identityKnown && (p.role === '反贼' || p.role === '内奸'));
         if (!target) target = alive[Math.floor(Math.random()*alive.length)];
 
-        // 3. 攻击
         if (target && !target.isDead) {
             if (ai.hand.includes('乐不') && !target.lebu) await confirmUseCard(ai, ai.hand.indexOf('乐不'), target);
             if (ai.hand.includes('顺手')) await confirmUseCard(ai, ai.hand.indexOf('顺手'), target);
@@ -892,14 +924,43 @@
         if (lord.isDead) gameOver(false, "主公阵亡，霸业成空！");
         else if (rebels.length === 0 && traitor.length === 0) gameOver(true, "逆贼全灭，天下大定！");
     }
+    
     function gameOver(win, msg) {
         gameActive = false;
         document.getElementById('result-title').innerText = msg;
         document.getElementById('result-title').className = win ? 'win' : 'lose';
+        
+        // 生成结算清单
+        const list = document.getElementById('result-list');
+        let html = `
+            <div class="result-row result-header">
+                <span class="res-role">身份</span>
+                <span class="res-name">武将</span>
+                <span class="res-stat">伤害</span>
+                <span class="res-stat">回复</span>
+                <span class="res-stat">击杀</span>
+            </div>
+        `;
+        
+        players.forEach(p => {
+            let roleColor = p.role==='主公'?'#f1c40f':(p.role==='忠臣'?'#e67e22':(p.role==='反贼'?'#2ecc71':'#9b59b6'));
+            html += `
+                <div class="result-row">
+                    <span class="res-role" style="color:${roleColor}">${p.role}</span>
+                    <span class="res-name">${p.general.avatar} ${p.general.name}</span>
+                    <span class="res-stat" style="color:#e74c3c">${p.stats.damageDealt}</span>
+                    <span class="res-stat" style="color:#2ecc71">${p.stats.healed}</span>
+                    <span class="res-stat" style="color:#f1c40f">${p.stats.kills}</span>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+
         document.getElementById('result-overlay').style.display = 'flex';
         win ? SFX.win() : SFX.lose();
         stopBGM();
     }
+    
     function showHelp() { document.getElementById('help-overlay').style.display = 'flex'; }
 
     // --- 渲染 ---
