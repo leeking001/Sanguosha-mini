@@ -34,23 +34,22 @@
         #fx-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 50;
-            display: flex; justify-content: center; align-items: center;
         }
         .fx-text {
             position: absolute;
-            font-size: 40px; font-weight: bold;
-            color: #fff; text-shadow: 0 0 10px #000, 0 0 20px var(--gold);
-            opacity: 0;
+            font-size: 32px; font-weight: bold; white-space: nowrap;
+            color: #fff; text-shadow: 0 0 5px #000, 0 0 10px var(--gold);
+            opacity: 0; transform: translate(-50%, -50%); /* 居中定位 */
             animation: zoomFade 1.2s ease-out forwards;
         }
-        .fx-damage { color: var(--red); text-shadow: 0 0 10px #000; font-size: 50px; }
-        .fx-skill { color: var(--blue); font-size: 30px; border: 2px solid var(--blue); padding: 5px 15px; background: rgba(0,0,0,0.7); }
+        .fx-damage { color: var(--red); font-size: 40px; text-shadow: 2px 2px 0 #000; }
+        .fx-skill { color: var(--blue); font-size: 24px; background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 4px; border: 1px solid var(--blue); }
         
         @keyframes zoomFade {
-            0% { transform: scale(0.5); opacity: 0; }
-            20% { transform: scale(1.2); opacity: 1; }
-            80% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
         }
 
         /* --- 顶部栏 --- */
@@ -83,6 +82,7 @@
         .enemy-card.active-turn { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); transform: scale(1.05); z-index: 2; }
         .enemy-card.dead { opacity: 0.4; filter: grayscale(100%); border-style: dashed; }
         .enemy-card.targetable { border-color: var(--red); box-shadow: 0 0 15px var(--red); animation: shake 0.5s infinite; }
+        .enemy-card.selected-chain { border-color: var(--purple); box-shadow: 0 0 15px var(--purple); } /* 铁索选中态 */
         .enemy-card.lord-border { border: 2px solid #f1c40f; }
 
         .avatar-frame {
@@ -122,6 +122,7 @@
             flex: 0 0 40%; display: flex; flex-direction: column;
             background: rgba(20, 20, 20, 0.95); padding: 5px;
             border-top: 2px solid var(--gold);
+            position: relative; /* 用于定位 */
         }
 
         #player-status { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; height: 40px; }
@@ -188,13 +189,15 @@
         }
 
         /* 选将/选身份界面 */
-        .select-container { width: 90%; max-width: 800px; text-align: center; max-height: 90vh; display: flex; flex-direction: column; }
-        .select-title { font-size: 24px; color: var(--gold); margin-bottom: 20px; flex-shrink: 0; }
+        .select-container { width: 95%; max-width: 600px; text-align: center; max-height: 95vh; display: flex; flex-direction: column; }
+        .select-title { font-size: 24px; color: var(--gold); margin-bottom: 15px; flex-shrink: 0; }
         
         .role-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        
+        /* 12个武将，3列布局 */
         .hero-options { 
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; 
-            overflow-y: auto; padding: 10px; flex: 1;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            overflow-y: auto; padding: 5px; flex: 1;
         }
         
         .role-card {
@@ -205,15 +208,15 @@
         .role-card:hover { border-color: var(--gold); background: #2c3e50; }
 
         .hero-option {
-            width: 100px; height: 140px;
+            height: 130px;
             background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s; flex-shrink: 0;
+            cursor: pointer; transition: transform 0.2s;
         }
-        .hero-option:hover { transform: scale(1.1); border-color: var(--gold); box-shadow: 0 0 20px var(--gold); z-index: 10; }
-        .hero-avatar { font-size: 40px; margin-bottom: 10px; }
-        .hero-name { font-weight: bold; color: white; }
-        .hero-skill { font-size: 12px; color: #bdc3c7; margin-top: 5px; }
+        .hero-option:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 10; }
+        .hero-avatar { font-size: 36px; margin-bottom: 5px; }
+        .hero-name { font-weight: bold; color: white; font-size: 14px; }
+        .hero-skill { font-size: 10px; color: #bdc3c7; margin-top: 2px; }
 
         /* 结算界面 */
         #result-title { font-size: 40px; margin-bottom: 10px; font-family: var(--font-main); }
@@ -221,20 +224,20 @@
         .lose { color: var(--red); text-shadow: 0 0 10px var(--red); }
         
         .result-table {
-            width: 90%; max-width: 600px; background: rgba(0,0,0,0.6); 
+            width: 95%; max-width: 600px; background: rgba(0,0,0,0.6); 
             border: 1px solid var(--gold); border-radius: 5px; padding: 10px;
-            margin-bottom: 20px; font-size: 14px;
+            margin-bottom: 20px; font-size: 12px;
         }
-        .result-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px dashed #555; align-items: center; }
+        .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #555; align-items: center; }
         .result-row:last-child { border-bottom: none; }
         .result-header { font-weight: bold; color: var(--gold); border-bottom: 2px solid var(--gold); }
-        .res-role { width: 15%; }
-        .res-name { width: 25%; text-align: left; }
+        .res-role { width: 15%; text-align: center; }
+        .res-name { width: 25%; text-align: left; padding-left: 5px; }
         .res-stat { width: 20%; text-align: center; }
 
-        /* 再战江湖按钮优化 */
+        /* 再战江湖按钮 */
         .btn-restart {
-            padding: 15px 50px; font-size: 22px; font-weight: bold; color: #fff;
+            padding: 12px 40px; font-size: 20px; font-weight: bold; color: #fff;
             background: linear-gradient(45deg, #c0392b, #d35400);
             border: 2px solid #f1c40f; border-radius: 30px;
             cursor: pointer; box-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
@@ -244,15 +247,22 @@
         .btn-restart:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(241, 196, 15, 0.8); background: linear-gradient(45deg, #e74c3c, #e67e22); }
         @keyframes pulse { 0% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.3); } 50% { box-shadow: 0 0 25px rgba(241, 196, 15, 0.7); } 100% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.3); } }
 
-        /* 帮助 */
+        /* 帮助界面优化 */
         .help-content {
             background: var(--paper-color); color: #333; padding: 20px; 
             border-radius: 5px; width: 90%; height: 85%; overflow-y: auto;
             font-size: 14px; line-height: 1.6;
         }
         .help-section { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-        .help-item { display: flex; align-items: center; margin-bottom: 8px; }
-        .help-icon { width: 30px; font-size: 20px; text-align: center; margin-right: 10px; }
+        .help-item { 
+            display: flex; align-items: flex-start; /* 顶部对齐 */
+            margin-bottom: 10px; 
+        }
+        .help-icon { 
+            width: 30px; font-size: 20px; text-align: center; margin-right: 10px; flex-shrink: 0; 
+            padding-top: 2px;
+        }
+        .help-text { flex: 1; }
 
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(2deg); } 75% { transform: rotate(-2deg); } 100% { transform: rotate(0deg); } }
 
@@ -323,9 +333,7 @@
     <!-- 结算弹窗 -->
     <div id="result-overlay" class="overlay">
         <div id="result-title"></div>
-        <div id="result-list" class="result-table">
-            <!-- JS生成 -->
-        </div>
+        <div id="result-list" class="result-table"></div>
         <button class="btn-restart" onclick="location.reload()">再战江湖</button>
     </div>
 
@@ -336,24 +344,24 @@
             
             <div class="help-section">
                 <h3>🎴 基础牌</h3>
-                <div class="help-item"><span class="help-icon">⚔️</span> <b>杀</b>：攻击范围内的一名角色，需用【闪】抵消。</div>
-                <div class="help-item"><span class="help-icon">💨</span> <b>闪</b>：抵消【杀】或【万箭齐发】的效果。</div>
-                <div class="help-item"><span class="help-icon">🍑</span> <b>桃</b>：回合内回复1点体力；濒死时可救自己或他人。</div>
-                <div class="help-item"><span class="help-icon">🍶</span> <b>酒</b>：回合内使用，本回合下一张杀伤害+1；或濒死时自救。</div>
+                <div class="help-item"><span class="help-icon">⚔️</span><div class="help-text"><b>杀</b>：攻击范围内的一名角色，需用【闪】抵消。</div></div>
+                <div class="help-item"><span class="help-icon">💨</span><div class="help-text"><b>闪</b>：抵消【杀】或【万箭齐发】的效果。</div></div>
+                <div class="help-item"><span class="help-icon">🍑</span><div class="help-text"><b>桃</b>：回合内回复1点体力；濒死时可救自己或他人。</div></div>
+                <div class="help-item"><span class="help-icon">🍶</span><div class="help-text"><b>酒</b>：回合内使用，本回合下一张杀伤害+1；或濒死时自救。</div></div>
             </div>
 
             <div class="help-section">
                 <h3>📜 锦囊牌</h3>
-                <div class="help-item"><span class="help-icon">🏹</span> <b>万箭齐发</b>：所有其他角色需打出一张【闪】，否则受1点伤害。</div>
-                <div class="help-item"><span class="help-icon">🐘</span> <b>南蛮入侵</b>：所有其他角色需打出一张【杀】，否则受1点伤害。</div>
-                <div class="help-item"><span class="help-icon">🎁</span> <b>无中生有</b>：摸2张牌。</div>
-                <div class="help-item"><span class="help-icon">🌾</span> <b>五谷丰登</b>：全场每人摸1张牌。</div>
-                <div class="help-item"><span class="help-icon">🔗</span> <b>顺手牵羊</b>：获得距离1以内的一名角色一张牌。</div>
-                <div class="help-item"><span class="help-icon">🪓</span> <b>过河拆桥</b>：弃置任意一名角色一张牌。</div>
-                <div class="help-item"><span class="help-icon">⚔️</span> <b>决斗</b>：与目标轮流出【杀】，不出者受1点伤害。</div>
-                <div class="help-item"><span class="help-icon">🔥</span> <b>火攻</b>：弃置一张手牌，目标需弃置一张牌，否则受1点伤害。</div>
-                <div class="help-item"><span class="help-icon">⛓️</span> <b>铁索连环</b>：指定1-2名角色横置/重置。处于连环状态的角色受伤害时，其他连环角色同受伤害。</div>
-                <div class="help-item"><span class="help-icon">🤐</span> <b>乐不思蜀</b>：延时锦囊。判定阶段若判定不为红桃，则跳过出牌阶段。</div>
+                <div class="help-item"><span class="help-icon">🏹</span><div class="help-text"><b>万箭齐发</b>：所有其他角色需打出一张【闪】，否则受1点伤害。</div></div>
+                <div class="help-item"><span class="help-icon">🐘</span><div class="help-text"><b>南蛮入侵</b>：所有其他角色需打出一张【杀】，否则受1点伤害。</div></div>
+                <div class="help-item"><span class="help-icon">🎁</span><div class="help-text"><b>无中生有</b>：摸2张牌。</div></div>
+                <div class="help-item"><span class="help-icon">🌾</span><div class="help-text"><b>五谷丰登</b>：全场每人摸1张牌。</div></div>
+                <div class="help-item"><span class="help-icon">🔗</span><div class="help-text"><b>顺手牵羊</b>：获得距离1以内的一名角色一张牌。</div></div>
+                <div class="help-item"><span class="help-icon">🪓</span><div class="help-text"><b>过河拆桥</b>：弃置任意一名角色一张牌。</div></div>
+                <div class="help-item"><span class="help-icon">⚔️</span><div class="help-text"><b>决斗</b>：与目标轮流出【杀】，不出者受1点伤害。</div></div>
+                <div class="help-item"><span class="help-icon">🔥</span><div class="help-text"><b>火攻</b>：弃置一张手牌，目标需弃置一张牌，否则受1点伤害。</div></div>
+                <div class="help-item"><span class="help-icon">⛓️</span><div class="help-text"><b>铁索连环</b>：选择两名角色。处于连环状态的角色受伤害时，其他连环角色同受伤害。</div></div>
+                <div class="help-item"><span class="help-icon">🤐</span><div class="help-text"><b>乐不思蜀</b>：延时锦囊。判定阶段若判定不为红桃，则跳过出牌阶段。</div></div>
             </div>
 
             <div class="help-section">
@@ -363,11 +371,13 @@
                 <div class="help-item"><b>赵云【龙胆】</b>：【杀】可当【闪】，【闪】可当【杀】。</div>
                 <div class="help-item"><b>郭嘉【遗计】</b>：受到1点伤害后，可摸2张牌。</div>
                 <div class="help-item"><b>吕布【无双】</b>：使用【杀】需2张【闪】抵消；决斗时对方需出2张【杀】。</div>
-                <div class="help-item"><b>华佗【急救】</b>：回合外，可将红色牌当【桃】使用（自动触发）。</div>
+                <div class="help-item"><b>华佗【急救】</b>：回合结束时若已受伤，回复1点体力（简化版）。</div>
                 <div class="help-item"><b>刘备【仁德】</b>：出牌阶段开始时，额外摸1张牌（简化版）。</div>
-                <div class="help-item"><b>周瑜【英姿】</b>：摸牌阶段多摸1张牌（简化版）。</div>
+                <div class="help-item"><b>周瑜【英姿】</b>：摸牌阶段多摸1张牌。</div>
                 <div class="help-item"><b>许褚【裸衣】</b>：摸牌阶段少摸1张，本回合【杀】或【决斗】伤害+1。</div>
-                <div class="help-item"><b>孙尚香【枭姬】</b>：失去装备区或手牌中的装备牌时，摸2张牌（简化为手牌数少于血量时补牌）。</div>
+                <div class="help-item"><b>甄姬【洛神】</b>：回合开始时判定，若为黑色则摸1张牌（简化版）。</div>
+                <div class="help-item"><b>黄盖【苦肉】</b>：出牌阶段，可流失1点体力摸2张牌（每回合限一次）。</div>
+                <div class="help-item"><b>孙权【制衡】</b>：出牌阶段，可弃置1张牌摸1张牌（每回合限一次）。</div>
             </div>
             
             <button class="btn-action" style="width:100%; margin-top:20px;" onclick="document.getElementById('help-overlay').style.display='none'">关闭</button>
@@ -375,8 +385,20 @@
     </div>
 
 <script>
-    // --- 工具函数：异步等待 ---
+    // --- 工具函数 ---
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    // 获取元素中心坐标，用于特效定位
+    function getCenterPosition(elementId) {
+        let el;
+        if (elementId === 0) el = document.getElementById('player-status'); // 玩家位置
+        else el = document.querySelector(`#enemy-zone .enemy-card:nth-child(${elementId})`); // 敌人位置
+        
+        if (!el) return { x: window.innerWidth/2, y: window.innerHeight/2 };
+        
+        const rect = el.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
 
     // --- 音效与BGM系统 ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -462,17 +484,17 @@
         el.innerText = text;
         el.className = `fx-text ${type==='damage'?'fx-damage':(type==='skill'?'fx-skill':'')}`;
         
-        if (targetId === 0) el.style.bottom = '20%';
-        else if (targetId === 1) { el.style.top = '20%'; el.style.right = '10%'; }
-        else if (targetId === 2) { el.style.top = '20%'; }
-        else if (targetId === 3) { el.style.top = '20%'; el.style.left = '10%'; }
+        // 动态计算位置
+        const pos = getCenterPosition(targetId);
+        el.style.left = pos.x + 'px';
+        el.style.top = pos.y + 'px';
         
         layer.appendChild(el);
         await sleep(1000); 
         el.remove();
     }
 
-    // --- 游戏数据 ---
+    // --- 游戏数据 (12个武将) ---
     const GENERALS_DATA = [
         { name: '曹操', hp: 5, skill: '奸雄', avatar: '👑', color: '#8e44ad' },
         { name: '张飞', hp: 4, skill: '咆哮', avatar: '👹', color: '#c0392b' },
@@ -483,11 +505,9 @@
         { name: '刘备', hp: 4, skill: '仁德', avatar: '🐉', color: '#2ecc71' },
         { name: '周瑜', hp: 4, skill: '英姿', avatar: '🔥', color: '#e67e22' },
         { name: '许褚', hp: 4, skill: '裸衣', avatar: '🛡️', color: '#7f8c8d' },
-        { name: '孙尚香', hp: 4, skill: '枭姬', avatar: '🎀', color: '#e91e63' },
-        { name: '黄盖', hp: 4, skill: '苦肉', avatar: '👴', color: '#c0392b' },
-        { name: '陆逊', hp: 3, skill: '谦逊', avatar: '📜', color: '#e67e22' },
         { name: '甄姬', hp: 3, skill: '洛神', avatar: '💃', color: '#8e44ad' },
-        { name: '司马懿', hp: 3, skill: '鬼才', avatar: '⚡', color: '#2980b9' }
+        { name: '黄盖', hp: 4, skill: '苦肉', avatar: '👴', color: '#c0392b' },
+        { name: '孙权', hp: 4, skill: '制衡', avatar: '⚔️', color: '#27ae60' }
     ];
 
     const DECK_TEMPLATE = [
@@ -505,6 +525,9 @@
     let isTargetingMode = false;
     let gameActive = false;
     let userRole = '';
+    
+    // 铁索连环多选逻辑
+    let pendingChainTargets = []; 
 
     function requiresTarget(card) {
         return ['杀', '顺手', '拆桥', '决斗', '火攻', '乐不', '铁索'].includes(card);
@@ -519,7 +542,6 @@
 
     function showHeroSelection() {
         const container = document.getElementById('hero-selection');
-        // 显示所有武将
         GENERALS_DATA.forEach(hero => {
             const el = document.createElement('div');
             el.className = 'hero-option';
@@ -546,14 +568,11 @@
         shuffle(aiPool);
 
         players = [];
-        // 玩家
         players.push(createPlayer(0, true, userRole, selectedHero));
-        // AI
         for(let i=0; i<3; i++) players.push(createPlayer(i+1, false, roles[i], aiPool[i]));
 
         players.forEach(p => drawCards(p, 4));
 
-        // UI Setup
         document.getElementById('my-avatar').innerText = selectedHero.avatar;
         document.getElementById('my-name').innerText = selectedHero.name;
         document.getElementById('my-skill').innerText = `[${selectedHero.skill}]`;
@@ -575,7 +594,7 @@
             hand: [], isDead: false, hasAttacked: false, berserk: false,
             identityKnown: role === '主公',
             lebu: false, chained: false,
-            // 统计数据
+            skillUsed: false, // 用于限次技能
             stats: { damageDealt: 0, healed: 0, kills: 0 }
         };
     }
@@ -590,10 +609,11 @@
 
         p.hasAttacked = false;
         p.berserk = false;
+        p.skillUsed = false; // 重置技能使用
         renderAll();
         log(`--- ${p.general.name} 回合 ---`, "turn");
 
-        // 1. 判定阶段 (乐不思蜀)
+        // 1. 判定阶段
         if (p.lebu) {
             log(`${p.general.name} 判定【乐不思蜀】...`, "system");
             await showEffect(p.id, "判定中...", "skill");
@@ -604,6 +624,10 @@
                 await showEffect(p.id, "乐不思蜀生效", "damage");
                 renderAll();
                 await sleep(1000);
+                // 甄姬洛神判定（回合开始）
+                if (p.general.name === '甄姬') await triggerLuoShen(p);
+                // 华佗急救（回合结束）
+                if (p.general.name === '华佗') await triggerJiJiu(p);
                 nextTurn();
                 return;
             } else {
@@ -611,6 +635,9 @@
                 await showEffect(p.id, "判定成功", "skill");
             }
         }
+
+        // 甄姬洛神
+        if (p.general.name === '甄姬') await triggerLuoShen(p);
 
         // 2. 摸牌阶段
         if (p.general.name === '周瑜') { log(`【英姿】摸3牌`, 'skill'); drawCards(p, 3); }
@@ -624,11 +651,42 @@
 
         // 3. 出牌阶段
         if (p.isUser) {
+            // 黄盖/孙权 主动技能按钮逻辑可在此扩展，Lite版简化为自动或特定卡牌触发
+            // 这里简化：黄盖点击自己头像触发苦肉？太复杂。
+            // 简化方案：黄盖/孙权在出牌阶段开始时自动询问？
+            // Lite版：黄盖点击“酒”时若无酒可视为苦肉？不，太隐晦。
+            // 妥协：Lite版暂不设主动技能按钮，仅被动或回合开始触发。
+            // 修正：黄盖苦肉改为：出牌阶段若点击自己头像，扣1血摸2牌（限一次）
             updateHandUI();
             updateButtons();
         } else {
             updateButtons();
             await aiAction(p);
+        }
+
+        // 回合结束阶段
+        if (p.general.name === '华佗') await triggerJiJiu(p);
+    }
+
+    async function triggerLuoShen(p) {
+        log(`【洛神】判定...`, "skill");
+        await showEffect(p.id, "洛神判定", "skill");
+        if (Math.random() > 0.4) { // 60% 黑
+            log("判定为黑，摸1牌", "skill");
+            drawCards(p, 1);
+        } else {
+            log("判定为红，失效", "system");
+        }
+    }
+
+    async function triggerJiJiu(p) {
+        if (p.hp < p.maxHp) {
+            log(`【急救】回合结束回复1体力`, "skill");
+            p.hp++;
+            p.stats.healed++;
+            SFX.heal();
+            await showEffect(p.id, "+1 体力", "skill");
+            renderAll();
         }
     }
 
@@ -647,23 +705,79 @@
             selectedCardIndex = idx;
             const card = players[0].hand[idx];
             isTargetingMode = requiresTarget(card);
-            if (isTargetingMode) log("请选择目标...");
+            pendingChainTargets = []; // 重置铁索目标
+            
+            if (isTargetingMode) {
+                if (card === '铁索') log("请选择两名角色进行连环...");
+                else log("请选择目标...");
+            }
             updateHandUI(); updateButtons(); renderEnemies();
         }
     }
 
     function selectTarget(id) {
+        // 特殊：黄盖苦肉 (点击自己)
+        if (players[0].general.name === '黄盖' && id === 0 && currentTurnIndex === 0 && !players[0].skillUsed && selectedCardIndex === -1) {
+            if (players[0].hp > 1) {
+                players[0].hp--;
+                drawCards(players[0], 2);
+                players[0].skillUsed = true;
+                log("【苦肉】流失1点体力，摸2张牌", "skill");
+                showEffect(0, "苦肉", "skill");
+                renderAll();
+                updateHandUI();
+                return;
+            }
+        }
+        // 特殊：孙权制衡 (点击自己) - 简化为弃1摸1
+        if (players[0].general.name === '孙权' && id === 0 && currentTurnIndex === 0 && !players[0].skillUsed && selectedCardIndex === -1) {
+             if (players[0].hand.length > 0) {
+                players[0].hand.pop(); // 随机弃一张
+                drawCards(players[0], 1);
+                players[0].skillUsed = true;
+                log("【制衡】弃1摸1", "skill");
+                showEffect(0, "制衡", "skill");
+                renderAll();
+                updateHandUI();
+                return;
+             }
+        }
+
         if (!isTargetingMode || selectedCardIndex === -1) return;
         const target = players[id];
         if (target.isDead) return;
         const p = players[0];
         const card = p.hand[selectedCardIndex];
         
+        // 铁索连环特殊逻辑
+        if (card === '铁索') {
+            if (pendingChainTargets.includes(id)) return; // 已选过
+            pendingChainTargets.push(id);
+            
+            // 视觉反馈
+            if (id !== 0) {
+                const el = document.querySelector(`#enemy-zone .enemy-card:nth-child(${id})`);
+                if(el) el.classList.add('selected-chain');
+            } else {
+                // 玩家自己被选中特效暂略
+            }
+
+            if (pendingChainTargets.length < 2) {
+                log("已选择1名，请选择第2名...");
+                return;
+            } else {
+                // 选满2人，触发
+                confirmUseCard(p, selectedCardIndex, pendingChainTargets);
+                cancelAction();
+                return;
+            }
+        }
+
+        // 常规单目标逻辑
         if (card === '杀' && p.hasAttacked && p.general.name !== '张飞') {
             log("本回合已出过杀"); cancelAction(); return;
         }
         if (card === '乐不' && target.lebu) { log("目标已有乐不思蜀"); return; }
-        if (card === '铁索' && target.id === p.id) { /* Allow self chain */ }
 
         confirmUseCard(p, selectedCardIndex, target);
         cancelAction();
@@ -677,6 +791,7 @@
 
     function cancelAction() {
         selectedCardIndex = -1; isTargetingMode = false;
+        pendingChainTargets = [];
         updateHandUI(); updateButtons(); renderEnemies();
     }
 
@@ -698,7 +813,7 @@
         else if (card === '桃') {
             if (target.hp < target.maxHp) {
                 target.hp++;
-                source.stats.healed++; // 统计
+                source.stats.healed++; 
                 log(`${source.general.name} 吃【桃】回血`, "skill");
                 SFX.heal();
                 await showEffect(target.id, "+1 体力", "skill");
@@ -782,9 +897,13 @@
             await showEffect(target.id, "乐不思蜀", "skill");
         }
         else if (card === '铁索') {
-            target.chained = !target.chained;
-            log(`${target.general.name} ${target.chained?'进入':'解除'}连环状态`, "skill");
-            await showEffect(target.id, target.chained?"连环":"解除", "skill");
+            // target 是数组 [id1, id2]
+            let targets = Array.isArray(target) ? target.map(id => players[id]) : [target];
+            for (let t of targets) {
+                t.chained = !t.chained;
+                log(`${t.general.name} ${t.chained?'进入':'解除'}连环`, "skill");
+                await showEffect(t.id, t.chained?"连环":"解除", "skill");
+            }
         }
         renderAll();
         if (!source.isUser) await sleep(800); 
@@ -817,7 +936,7 @@
         if (source.berserk) dmg++; 
         
         target.hp -= dmg;
-        source.stats.damageDealt += dmg; // 统计
+        source.stats.damageDealt += dmg; 
 
         log(`${target.general.name} 受到 ${dmg} 点伤害`, "damage");
         SFX.damage();
@@ -841,7 +960,7 @@
             if (tao !== -1) {
                 target.hand.splice(tao, 1);
                 target.hp++;
-                target.stats.healed++; // 统计
+                target.stats.healed++; 
                 log(`${target.general.name} 濒死吃桃`, "skill");
                 SFX.heal();
                 await showEffect(target.id, "濒死回血", "skill");
@@ -858,7 +977,7 @@
 
     function handleDeath(killer, dead) {
         dead.isDead = true; dead.identityKnown = true;
-        killer.stats.kills++; // 统计
+        killer.stats.kills++; 
         log(`${dead.general.name} 阵亡!`, "damage");
         
         if (dead.role === '反贼') {
@@ -892,6 +1011,11 @@
             if (ai.hand.includes('顺手')) await confirmUseCard(ai, ai.hand.indexOf('顺手'), target);
             if (ai.hand.includes('拆桥')) await confirmUseCard(ai, ai.hand.indexOf('拆桥'), target);
             if (ai.hand.includes('决斗')) await confirmUseCard(ai, ai.hand.indexOf('决斗'), target);
+            if (ai.hand.includes('铁索')) {
+                // AI 简单逻辑：连自己和目标，或者连两个敌人
+                let t2 = alive.find(p => p !== target && p !== ai);
+                if (t2) await confirmUseCard(ai, ai.hand.indexOf('铁索'), [target.id, t2.id]);
+            }
             if (ai.hand.includes('杀')) {
                 if (!ai.hasAttacked || ai.general.name === '张飞') await confirmUseCard(ai, ai.hand.indexOf('杀'), target);
             }
@@ -930,7 +1054,6 @@
         document.getElementById('result-title').innerText = msg;
         document.getElementById('result-title').className = win ? 'win' : 'lose';
         
-        // 生成结算清单
         const list = document.getElementById('result-list');
         let html = `
             <div class="result-row result-header">
@@ -973,6 +1096,7 @@
             let roleText = p.identityKnown ? p.role : "???";
             let classes = `enemy-card ${p.isDead ? 'dead' : ''} ${currentTurnIndex === i ? 'active-turn' : ''}`;
             if (isTargetingMode && !p.isDead) classes += ' targetable';
+            if (pendingChainTargets.includes(i)) classes += ' selected-chain';
             if (p.role === '主公') classes += ' lord-border';
             
             let statusHtml = '';
