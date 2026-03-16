@@ -100,7 +100,14 @@ const EffectSystem = {
         
         const card = document.createElement('div');
         card.className = 'fx-flying-card';
-        card.innerText = CardUtils?.getCardIcon(cardName) || '🎴';
+        // 使用简单的卡牌图标，避免依赖CardUtils
+        const cardIcons = {
+            '杀': '⚔️', '闪': '💨', '桃': '🍑', '酒': '🍶',
+            '万箭': '🏹', '南蛮': '🐘', '无中': '🎁', '五谷': '🌾',
+            '顺手': '🔗', '拆桥': '🪓', '决斗': '⚔️', '火攻': '🔥',
+            '乐不': '🤐', '铁索': '⛓️'
+        };
+        card.innerText = cardIcons[cardName] || '🎴';
         card.style.cssText = `
             position: absolute;
             font-size: 40px;
