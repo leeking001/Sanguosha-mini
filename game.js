@@ -479,7 +479,8 @@ const Game = {
                 targetInfo.lebu = true;
                 events.push({ 
                     type: 'delay', 
-                    card: '乐不', 
+                    card: '乐不',
+                    source: sourceIdx,
                     target: targetInfo.id 
                 });
                 break;
@@ -489,7 +490,8 @@ const Game = {
                 targets.forEach(t => {
                     t.chained = !t.chained;
                     events.push({ 
-                        type: 'chain', 
+                        type: 'chain',
+                        source: sourceIdx,
                         target: t.id, 
                         chained: t.chained 
                     });
