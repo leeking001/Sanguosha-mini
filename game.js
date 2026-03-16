@@ -110,10 +110,10 @@ const Game = {
             }
         });
 
-        // 初始发牌 - 主公额外加1血
+        // 初始发牌 - 主公额外加1血，所以额外多摸1张牌
         GameState.players.forEach(p => {
-            const extraHp = p.role === '主公' ? 1 : 0;
-            this.drawCards(p, 4 + extraHp);
+            const extraCards = p.role === '主公' ? 1 : 0;
+            this.drawCards(p, 4 + extraCards);
         });
 
         // 玩家第一个行动！（index 0），这样不会还没出牌就结束
