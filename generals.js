@@ -70,7 +70,5 @@ function getGeneralByName(name) {
     return GENERALS_DATA.find(g => g.name === name);
 }
 
-// 导出
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { GENERALS_DATA, getRandomGenerals, getGeneralByName };
-}
+// ES6 导出
+export { GENERALS_DATA, getRandomGenerals, getGeneralByName };

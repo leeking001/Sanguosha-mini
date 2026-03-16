@@ -137,7 +137,5 @@ const CardUtils = {
     }
 };
 
-// 导出
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { CARD_TYPES, DECK_TEMPLATE, CardUtils };
-}
+// ES6 导出
+export { CARD_TYPES, DECK_TEMPLATE, CardUtils };

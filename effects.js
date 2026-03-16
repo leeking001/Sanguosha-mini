@@ -264,7 +264,5 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// 导出
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { EffectSystem };
-}
+// ES6 导出
+export { EffectSystem };

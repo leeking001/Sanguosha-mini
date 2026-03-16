@@ -158,7 +158,5 @@ const AudioSystem = {
     }
 };
 
-// 导出
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { AudioSystem };
-}
+// ES6 导出
+export { AudioSystem };

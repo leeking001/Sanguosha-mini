@@ -255,7 +255,5 @@ const StorageSystem = {
     }
 };
 
-// 导出
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { StorageSystem };
-}
+// ES6 导出
+export { StorageSystem };
