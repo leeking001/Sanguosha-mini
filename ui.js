@@ -134,16 +134,27 @@ const UI = {
     
     // 显示武将选择界面
     showHeroSelection(generals, onSelect) {
+        console.log('showHeroSelection called, generals count:', generals.length);
+        
         const stepRole = document.getElementById('step-role');
         const stepHero = document.getElementById('step-hero');
         const heroSelection = document.getElementById('hero-selection');
         
-        if (stepRole) stepRole.style.display = 'none';
-        if (stepHero) stepHero.style.display = 'block';
+        console.log('Elements:', { stepRole, stepHero, heroSelection });
+        
+        if (stepRole) {
+            stepRole.style.display = 'none';
+            console.log('step-role hidden');
+        }
+        if (stepHero) {
+            stepHero.style.display = 'block';
+            console.log('step-hero shown');
+        }
         
         // 清空并填充武将选项
         if (heroSelection) {
             heroSelection.innerHTML = '';
+            console.log('Populating heroes...');
             generals.forEach(hero => {
                 const el = document.createElement('div');
                 el.className = 'hero-option';
@@ -154,6 +165,7 @@ const UI = {
                     <div class="hero-hp">${hero.hp}HP</div>
                 `;
                 el.onclick = () => {
+                    console.log('Hero selected:', hero.name);
                     if (onSelect) onSelect(hero);
                 };
                 heroSelection.appendChild(el);
