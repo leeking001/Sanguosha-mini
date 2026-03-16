@@ -241,8 +241,8 @@
             // 记录日志
             UI.log(result.message, 'system');
             
-            // 开始主公回合
-            await startTurn(result.lordIndex);
+            // 玩家先手！这样玩家至少能出一轮牌
+            await startTurn(result.firstIndex);
         }
 
         // 获取角色类名

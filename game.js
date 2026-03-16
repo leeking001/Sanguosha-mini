@@ -96,23 +96,37 @@ const Game = {
         let aiPool = generalsData.filter(g => g.name !== selectedHero.name);
         aiPool = CardUtils.shuffle(aiPool);
 
-        // 创建玩家
+        // 创建玩家 - 玩家永远是第一个（index 0）
         GameState.players = [];
         GameState.players.push(this.createPlayer(0, true, GameState.userRole, selectedHero));
         for (let i = 0; i < 3; i++) {
             GameState.players.push(this.createPlayer(i + 1, false, roles[i], aiPool[i]));
         }
 
-        // 初始发牌
-        GameState.players.forEach(p => this.drawCards(p, 4));
+        // 主公身份公开 - 所有人都知道主公是谁
+        GameState.players.forEach(p => {
+            if (p.role === '主公') {
+                p.identityKnown = true;
+            }
+        });
 
-        // 找到主公开始游戏
-        let lordIndex = GameState.players.findIndex(p => p.role === '主公');
+        // 初始发牌 - 主公额外加1血
+        GameState.players.forEach(p => {
+            const extraHp = p.role === '主公' ? 1 : 0;
+            this.drawCards(p, 4 + extraHp);
+        });
+
+        // 玩家第一个行动！（index 0），这样不会还没出牌就结束
+        let firstIndex = 0;
+        
+        // 如果玩家选了主公，那还是玩家先手
+        // 如果玩家没选主公，主公已经公开身份但还是玩家先手，这样玩家至少能出一轮牌
         
         return {
             players: GameState.players,
-            lordIndex,
-            message: `游戏开始，${GameState.players[lordIndex].general.name} (主公) 先手！`
+            lordIndex: GameState.players.findIndex(p => p.role === '主公'),
+            firstIndex,
+            message: `游戏开始！主公是 ${GameState.players[GameState.players.findIndex(p => p.role === '主公')].general.name}，你先手！`
         };
     },
 
