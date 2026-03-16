@@ -117,9 +117,17 @@ const UI = {
         // 绑定身份选择事件
         const roleCards = document.querySelectorAll('.role-card');
         roleCards.forEach(card => {
-            card.onclick = () => {
-                const role = card.innerText;
-                if (onSelect) onSelect(role);
+            // 移除旧的事件监听器
+            card.onclick = null;
+            // 添加新的事件监听器
+            card.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const role = card.textContent.trim();
+                console.log('Role selected:', role);
+                if (onSelect && typeof onSelect === 'function') {
+                    onSelect(role);
+                }
             };
         });
     },
