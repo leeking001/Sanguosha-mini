@@ -737,6 +737,18 @@
 
         // 启动游戏
         init();
+        
+        // 浏览器要求音频上下文必须由用户交互启动
+        // 所以第一次点击任意位置启动音频和bgm
+        let bgmStarted = false;
+        document.addEventListener('click', function() {
+            if (!bgmStarted) {
+                bgmStarted = true;
+                AudioSystem.init();
+                if (AudioSystem.bgmEnabled) {
+                    AudioSystem.startBGM();
+            }
+        }, { once: true });
     </script>
 </body>
 </html>

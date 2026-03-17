@@ -3,7 +3,7 @@
 const AudioSystem = {
     ctx: null,
     soundEnabled: true,
-    bgmEnabled: false,
+    bgmEnabled: true,
     bgmOscillators: [],
     bgmInterval: null,
     

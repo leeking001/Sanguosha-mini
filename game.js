@@ -240,19 +240,62 @@ const Game = {
         return null;
     },
 
-    // 结束回合
+    // 结束回合 - 自动弃牌，手牌不超过当前hp
     async endTurn() {
         const player = GameState.players[GameState.currentTurnIndex];
+        const events = [];
         
         // 华佗急救
         if (player.general.name === '华佗') {
             const jiJiuResult = await this.triggerJiJiu(player);
             if (jiJiuResult) {
-                return { type: 'end_turn', player: player.id, skill: jiJiuResult };
+                events.push({ type: 'end_turn', player: player.id, skill: jiJiuResult });
             }
         }
         
-        return { type: 'end_turn', player: player.id };
+        // 自动弃牌：手牌数量不能超过当前血量
+        const maxCards = player.hp;
+        while (player.hand.length > maxCards) {
+            // 找优先级最低的牌丢弃
+            // 优先级评分越低越值得保留，越高越值得扔
+            let discardIdx = -1;
+            let highestPriority = 0;
+            
+            for (let i = 0; i < player.hand.length; i++) {
+                const card = player.hand[i];
+                let priority = 0;
+                
+                // 优先级：需要扔的排优先级高
+                // 桃酒 > 闪 > 杀 > 无懈 > 决斗火攻 > 顺手拆桥 > AOE > 延时锦囊
+                if (card === '桃') priority = 10;
+                else if (card === '酒') priority = 15;
+                else if (card === '闪') priority = 20;
+                else if (card === '杀') priority = 30;
+                else if (card === '无懈') priority = 35;
+                else if (card === '决斗' || card === '火攻') priority = 40;
+                else if (card === '顺手' || card === '拆桥') priority = 45;
+                else if (card === '万箭' || card === '南蛮') priority = 50;
+                else if (card === '五谷' || card === '无中') priority = 55;
+                else if (card === '乐不' || card === '兵粮' || card === '闪电') priority = 60;
+                
+                if (priority > highestPriority) {
+                    highestPriority = priority;
+                    discardIdx = i;
+                }
+            }
+            
+            if (discardIdx >= 0) {
+                const discarded = player.hand.splice(discardIdx, 1)[0];
+                events.push({ 
+                    type: 'discard', 
+                    source: player.id, 
+                    card: discarded, 
+                    reason: 'overlap' 
+                });
+            }
+        }
+        
+        return { type: 'end_turn', player: player.id, events };
     },
 
     // 下一回合

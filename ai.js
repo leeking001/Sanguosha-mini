@@ -23,16 +23,20 @@ const AI = {
 
         switch (ai.role) {
             case '反贼':
-                // 优先攻击主公
-                target = alive.find(p => p.role === '主公');
+                // 优先攻击已知的忠臣，最后才打主公
+                target = alive.find(p => p.identityKnown && p.role === '忠臣');
                 if (!target) {
-                    // 其次攻击已知的忠臣
-                    target = alive.find(p => p.identityKnown && p.role === '忠臣');
+                    // 其次攻击已知的内奸
+                    target = alive.find(p => p.identityKnown && p.role === '内奸');
+                }
+                if (!target) {
+                    // 最后才攻击主公 - 不要上来就集火主公
+                    target = alive.find(p => p.role === '主公');
                 }
                 break;
                 
             case '忠臣':
-                // 攻击已知的反贼
+                // 攻击已知的反贼 - 绝对不攻击主公
                 target = alive.find(p => p.identityKnown && p.role === '反贼');
                 break;
                 
@@ -42,13 +46,14 @@ const AI = {
                 break;
                 
             case '内奸':
-                // 内奸策略：平衡局势，优先攻击强势方
-                const rebels = alive.filter(p => p.role === '反贼' || (p.identityKnown && p.role === '反贼'));
+                // 内奸策略：平衡局势，优先攻击已知忠臣，最后才打主公
+                const rebels = alive.filter(p => p.identityKnown && p.role === '忠臣');
                 const lords = alive.filter(p => p.role === '主公');
                 
-                if (rebels.length > lords.length) {
-                    target = alive.find(p => p.role === '反贼');
+                if (rebels.length > 0) {
+                    target = alive.find(p => p.role === '忠臣');
                 } else {
+                    // 只有主公了才打主公
                     target = alive.find(p => p.role === '主公');
                 }
                 break;
