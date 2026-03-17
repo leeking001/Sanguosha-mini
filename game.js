@@ -259,10 +259,10 @@ const Game = {
             }
         }
         
-        // 自动弃牌：手牌数量不能超过当前血量
+        // 自动弃牌：手牌数量不能超过当前hp
         const maxCards = player.hp;
         while (player.hand.length > maxCards) {
-            // 找出优先级最低（最该扔）的牌
+            // 找出优先级最高（最该扔）的牌
             // 优先级评分：分数越高越该扔
             let discardIdx = -1;
             let highestPriority = 0;
@@ -271,7 +271,7 @@ const Game = {
                 const card = player.hand[i];
                 let priority = 0;
                 
-                // 优先级：桃酒 < 闪 < 杀 < 无懈 < 决斗火攻 < 顺手拆桥 < AOE < 五谷无中 < 延时锦囊
+                // 优先级：桃酒 < 闪 < 杀 < 无懈 < 决斗火攻 < 顺手拆桥 < 群伤 < 五谷无中 < 延时锦囊
                 if (card === '桃') priority = 10;
                 else if (card === '酒') priority = 15;
                 else if (card === '闪') priority = 20;
@@ -410,17 +410,21 @@ const Game = {
             return { success: false, reason: 'already_attacked' };
         }
         
-        if (card === '乐不' && target.lebu) {
-            return { success: false, reason: 'already_has_lebu' };
+        // 执行出牌
+        const useResult = await this.useCard(
+            0,
+            GameState.selectedCardIndex,
+            GameState.pendingChainTargets ? GameState.pendingChainTargets.map(id => GameState.players[id]) : GameState.players[targetId]
+        );
+        
+        // 处理事件
+        for (const event of useResult.events) {
+            // no-op
         }
 
-        return { 
-            success: true, 
-            action: 'target_selected', 
-            cardIndex: GameState.selectedCardIndex,
-            targetId,
-            chainTargets: card === '铁索' ? GameState.pendingChainTargets : null
-        };
+        Game.cancelAction();
+        UI.renderAll();
+        return { success: true };
     },
 
     // 使用卡牌
@@ -558,10 +562,7 @@ const Game = {
         }
 
         // 清除选择状态
-        GameState.selectedCardIndex = -1;
-        GameState.isTargetingMode = false;
-        GameState.pendingChainTargets = [];
-
+        Game.cancelAction();
         return { success: true, events, card };
     },
 
@@ -592,6 +593,61 @@ const Game = {
         };
     },
 
+    // 解析决斗
+    async resolveDuel(source, target) {
+        const events = [];
+        
+        // 目标出杀
+        let tIdx = target.hand.indexOf('杀');
+        if (target.general.name === '赵云' && tIdx === -1) {
+            tIdx = target.hand.indexOf('闪');
+        }
+
+        if (tIdx !== -1) {
+            target.hand.splice(tIdx, 1);
+            events.push({ type: 'duel_response', player: target.id, card: '杀' });
+        } else {
+            // 目标没杀，受伤
+            const damageResult = await this.dealDamage(source, target, 1);
+            events.push(...damageResult.events);
+        }
+
+        // 源出杀
+        let sIdx = source.hand.indexOf('杀');
+        if (source.general.name === '赵云' && sIdx === -1) {
+            sIdx = source.hand.indexOf('闪');
+        }
+
+        if (sIdx !== -1) {
+            source.hand.splice(sIdx, 1);
+            events.push({ type: 'duel_response', player: source.id, card: '杀' });
+        }
+
+        return { success: true, events };
+    },
+
+    // 火攻处理
+    async resolveFireAttack(source, target) {
+        const events = [];
+        
+        if (target.hand.length > 0) {
+            const discardIdx = Math.floor(Math.random() * target.hand.length);
+            const discarded = target.hand.splice(discardIdx, 1)[0];
+            events.push({ 
+                type: 'discard', 
+                source: source.id, 
+                target: target.id,
+                card: discarded,
+                reason: 'fire_attack_defense'
+            });
+        } else {
+            const damageResult = await this.dealDamage(source, target, 1);
+            events.push(...damageResult.events);
+        }
+        
+        return { success: true, events };
+    },
+
     // 造成伤害
     async dealDamage(source, target, baseDamage = 1) {
         let damage = baseDamage;
@@ -616,8 +672,8 @@ const Game = {
             for (let p of GameState.players) {
                 if (p !== target && p.chained && !p.isDead) {
                     p.chained = false;
-                    const chainDamageResult = await this.dealDamage(source, p, damage);
-                    events.push(...chainDamageResult.events);
+                    const chainDamage = await this.dealDamage(source, p, damage);
+                    events.push(...chainDamage.events);
                 }
             }
         }
@@ -628,6 +684,7 @@ const Game = {
 
         // 濒死处理
         if (target.hp <= 0) {
+            // 找桃
             const taoIdx = target.hand.indexOf('桃');
             if (taoIdx !== -1) {
                 target.hand.splice(taoIdx, 1);
@@ -647,7 +704,7 @@ const Game = {
         return { success: true, events, targetHp: target.hp };
     },
 
-    // 受伤技能触发
+    // 触发受伤技能
     triggerDamageSkill(player) {
         if (player.isDead) return null;
         
