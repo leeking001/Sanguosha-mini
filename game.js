@@ -302,6 +302,7 @@ const Game = {
         }
         
         return { type: 'end_turn', player: player.id, events };
+
     },
 
     // 下一回合
