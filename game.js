@@ -75,15 +75,19 @@ const Game = {
         for (let i = 0; i < 3; i++) {
             GameState.players.push(this.createPlayer(i + 1, false, roles[i], aiPool[i]));
         }
+        // 标记主公身份可见
         GameState.players.forEach(p => { if (p.role === '主公') p.identityKnown = true; });
+        // 发牌，主公多摸一张
         GameState.players.forEach(p => {
             const extraCards = p.role === '主公' ? 1 : 0;
             this.drawCards(p, 4 + extraCards);
         });
+        // 找到主公的索引
+        const lordIndex = GameState.players.findIndex(p => p.role === '主公');
         return {
             players: GameState.players,
-            lordIndex: GameState.players.findIndex(p => p.role === '主公'),
-            firstIndex: 0,
+            lordIndex: lordIndex,
+            firstIndex: lordIndex,  // 改为主公先手
             message: '游戏开始！'
         };
     },

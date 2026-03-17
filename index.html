@@ -229,31 +229,37 @@
         // 处理武将选择
         async function handleHeroSelect(hero) {
             UI.hideSetupScreen();
-            
+
             // 开始游戏
             const result = Game.startGame(hero, GENERALS_DATA);
-            
+
             // 播放开始音效
             AudioSystem.SFX.win();
-            
+
             // 初始化玩家显示
             const player = GameState.players[0];
             document.getElementById('my-avatar').innerText = hero.avatar;
             document.getElementById('my-name').innerText = hero.name;
             document.getElementById('my-skill').innerText = `[${hero.skill}]`;
-            
+
             const badge = document.getElementById('my-role-badge');
             badge.innerText = GameState.userRole;
             badge.className = `my-role role-${getRoleClass(GameState.userRole)}`;
-            
+
             // 渲染初始界面
             UI.renderAll();
-            
+
             // 记录日志
             UI.log(result.message, 'system');
-            
-            // 玩家先手！这样玩家至少能出一轮牌
-            await startTurn(result.firstIndex);
+
+            // 显示主公身份
+            const lordPlayer = GameState.players[result.lordIndex];
+            if (lordPlayer) {
+                UI.log(`主公是：${lordPlayer.general.name}【${lordPlayer.general.skill}】`, 'system');
+            }
+
+            // 主公先手！
+            await startTurn(result.lordIndex);
         }
 
         // 获取角色类名
@@ -494,11 +500,13 @@
         async function resolveAttack(sourceIdx, targetIdx, type) {
             const source = GameState.players[sourceIdx];
             const target = GameState.players[targetIdx];
-            
+
+            if (!source || !target) return;
+
             const response = await Game.respondAttack(target, type);
-            
+
             if (response.responded) {
-                UI.log(`${target.general.name} 打出【${response.card}】`, 'skill');
+                UI.log(`${getPlayerName(targetIdx)} 打出【${response.card}】`, 'skill');
                 AudioSystem.SFX.card();
                 await UI.showEffect(targetIdx, response.card);
             } else {
@@ -525,16 +533,18 @@
         function handleGameOver(result) {
             const win = result.win;
             const message = result.message;
-            
+
             // 记录统计
             const player = GameState.players[0];
-            const duration = Date.now(); // 简化处理
-            StorageSystem.recordGameResult(
-                win ? 'win' : 'loss',
-                player.general.name,
-                duration
-            );
-            
+            if (player && player.general) {
+                const duration = Date.now(); // 简化处理
+                StorageSystem.recordGameResult(
+                    win ? 'win' : 'loss',
+                    player.general.name,
+                    duration
+                );
+            }
+
             // 显示结果
             UI.showGameResult(win, message, GameState.players);
         }
