@@ -161,12 +161,53 @@ const Game = {
 
     selectTarget(targetId) {
         const player = GameState.players[0];
-        if (!GameState.isTargetingMode || GameState.selectedCardIndex === -1) return { success: false };
+
+        // 检查是否在出牌阶段
+        if (GameState.selectedCardIndex === -1) {
+            // 可能是在使用技能
+            if (player.general.name === '黄盖' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
+                if (player.hp > 1) {
+                    player.hp--;
+                    this.drawCards(player, 2);
+                    player.skillUsed = true;
+                    return { success: true, action: 'skill', skill: '苦肉', player: 0, hp: player.hp };
+                }
+            }
+            if (player.general.name === '孙权' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
+                if (player.hand.length > 0) {
+                    player.hand.pop();
+                    this.drawCards(player, 1);
+                    player.skillUsed = true;
+                    return { success: true, action: 'skill', skill: '制衡', player: 0 };
+                }
+            }
+            return { success: false };
+        }
+
         const card = player.hand[GameState.selectedCardIndex];
-        if (card === '杀' && player.hasAttacked && player.general.name !== '张飞') return { success: false };
+        if (!card) return { success: false };
+
+        // 检查出牌限制
+        if (card === '杀' && player.hasAttacked && player.general.name !== '张飞') {
+            return { success: false, reason: 'already_attacked' };
+        }
+
+        // 铁索连环特殊逻辑
+        if (card === '铁索') {
+            if (!GameState.pendingChainTargets) GameState.pendingChainTargets = [];
+            if (GameState.pendingChainTargets.includes(targetId)) {
+                return { success: false, reason: 'already_selected' };
+            }
+            GameState.pendingChainTargets.push(targetId);
+            if (GameState.pendingChainTargets.length < 2) {
+                return { success: true, action: 'chain_select', selected: GameState.pendingChainTargets };
+            }
+        }
+
+        // 有目标卡牌，返回目标信息
         GameState.isTargetingMode = false;
         GameState.selectedCardIndex = -1;
-        return { success: true };
+        return { success: true, action: 'target_selected', targetId: targetId };
     },
 
     async useCard(sourceIdx, cardIndex, targetInfo) {
@@ -237,62 +278,6 @@ const Game = {
         GameState.isTargetingMode = false;
         GameState.pendingChainTargets = [];
         return { success: true };
-    }
-};
-
-export { Game, GameState };
-export default Game;
-
-// ===== 补充缺失的方法 =====
-
-    // 选择目标 - 修复返回值
-    selectTarget(targetId) {
-        const player = GameState.players[0];
-        
-        // 检查是否在出牌阶段
-        if (GameState.selectedCardIndex === -1) {
-            // 可能是在使用技能
-            if (player.general.name === '黄盖' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
-                if (player.hp > 1) {
-                    player.hp--;
-                    this.drawCards(player, 2);
-                    player.skillUsed = true;
-                    return { success: true, action: 'skill', skill: '苦肉', player: 0, hp: player.hp };
-                }
-            }
-            if (player.general.name === '孙权' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
-                if (player.hand.length > 0) {
-                    player.hand.pop();
-                    this.drawCards(player, 1);
-                    player.skillUsed = true;
-                    return { success: true, action: 'skill', skill: '制衡', player: 0 };
-                }
-            }
-            return { success: false };
-        }
-        
-        const card = player.hand[GameState.selectedCardIndex];
-        if (!card) return { success: false };
-        
-        // 检查出牌限制
-        if (card === '杀' && player.hasAttacked && player.general.name !== '张飞') {
-            return { success: false, reason: 'already_attacked' };
-        }
-        
-        // 铁索连环特殊逻辑
-        if (card === '铁索') {
-            if (!GameState.pendingChainTargets) GameState.pendingChainTargets = [];
-            if (GameState.pendingChainTargets.includes(targetId)) {
-                return { success: false, reason: 'already_selected' };
-            }
-            GameState.pendingChainTargets.push(targetId);
-            if (GameState.pendingChainTargets.length < 2) {
-                return { success: true, action: 'chain_select', selected: GameState.pendingChainTargets };
-            }
-        }
-        
-        // 有目标卡牌，返回目标信息
-        return { success: true, action: 'target_selected', targetId: targetId };
     },
 
     // 解析决斗
@@ -319,3 +304,7 @@ export default Game;
         }
         return { success: true, events };
     }
+};
+
+export { Game, GameState };
+export default Game;
