@@ -259,10 +259,10 @@ const Game = {
             }
         }
         
-        // 自动弃牌：手牌数量不能超过当前hp
+        // 自动弃牌：手牌数量不能超过当前血量
         const maxCards = player.hp;
         while (player.hand.length > maxCards) {
-            // 找出优先级最高（最该扔）的牌
+            // 找到优先级最高（最该扔）的牌扔掉
             // 优先级评分：分数越高越该扔
             let discardIdx = -1;
             let highestPriority = 0;
@@ -271,7 +271,7 @@ const Game = {
                 const card = player.hand[i];
                 let priority = 0;
                 
-                // 优先级：桃酒 < 闪 < 杀 < 无懈 < 决斗火攻 < 顺手拆桥 < 群伤 < 五谷无中 < 延时锦囊
+                // 优先级：桃酒 < 闪 < 杀 < 无懈 < 决斗火攻 < 顺手拆桥 < AOE < 五谷无中 < 延时锦囊
                 if (card === '桃') priority = 10;
                 else if (card === '酒') priority = 15;
                 else if (card === '闪') priority = 20;
@@ -410,6 +410,11 @@ const Game = {
             return { success: false, reason: 'already_attacked' };
         }
         
+        // 已经有乐不思蜀不能再放
+        if (card === '乐不' && target.lebu) {
+            return { success: false, reason: 'already_has_lebu' };
+        }
+
         // 执行出牌
         const useResult = await this.useCard(
             0,
@@ -566,7 +571,7 @@ const Game = {
         return { success: true, events, card };
     },
 
-    // 响应攻击
+    // 响应攻击（闪/杀）
     async respondAttack(target, attackType) {
         const need = attackType === 'nanman' ? '杀' : '闪';
         let idx = target.hand.indexOf(need);
@@ -593,7 +598,7 @@ const Game = {
         };
     },
 
-    // 解析决斗
+    // 处理决斗
     async resolveDuel(source, target) {
         const events = [];
         
