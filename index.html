@@ -372,9 +372,12 @@
         async function handleAIEvent(event) {
             switch (event.type) {
                 case 'use_card':
-                    UI.log(`${getPlayerName(event.source)} 使用【${event.card}】`);
-                    AudioSystem.SFX.card();
-                    await UI.showEffect(event.source, event.card);
+                    // AOE卡牌、决斗、火攻在对应事件中显示，避免重复日志
+                    if (!['万箭', '南蛮', '决斗', '火攻'].includes(event.card)) {
+                        UI.log(`${getPlayerName(event.source)} 使用【${event.card}】`);
+                        AudioSystem.SFX.card();
+                        await UI.showEffect(event.source, event.card);
+                    }
                     break;
 
                 case 'attack':
@@ -630,9 +633,12 @@
         async function handlePlayerEvent(event) {
             switch (event.type) {
                 case 'use_card':
-                    UI.log(`你使用【${event.card}】`);
-                    AudioSystem.SFX.card();
-                    await UI.showEffect(0, event.card);
+                    // AOE卡牌、决斗、火攻在对应事件中显示，避免重复日志
+                    if (!['万箭', '南蛮', '决斗', '火攻'].includes(event.card)) {
+                        UI.log(`你使用【${event.card}】`);
+                        AudioSystem.SFX.card();
+                        await UI.showEffect(0, event.card);
+                    }
                     break;
                     
                 case 'attack':
