@@ -181,6 +181,16 @@
         // 工具函数
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+        // 安全获取玩家信息
+        const getPlayerName = (playerId) => {
+            const player = GameState.players[playerId];
+            return player?.general?.name || `玩家${playerId}`;
+        };
+
+        const getPlayer = (playerId) => {
+            return GameState.players[playerId];
+        };
+
         // 初始化游戏
         async function init() {
             // 初始化游戏核心
@@ -298,27 +308,27 @@
         async function handleEvent(event) {
             switch (event.type) {
                 case 'judgment':
-                    UI.log(`${GameState.players[event.player].general.name} 判定【${event.card}】...`, 'system');
+                    UI.log(`${getPlayerName(event.player)} 判定【${event.card}】...`, 'system');
                     await UI.showEffect(event.player, '判定中...', 'skill');
                     break;
-                    
+
                 case 'judgment_fail':
-                    UI.log(`判定失败！${GameState.players[event.player].general.name} 跳过出牌阶段`, 'damage');
+                    UI.log(`判定失败！${getPlayerName(event.player)} 跳过出牌阶段`, 'damage');
                     await UI.showEffect(event.player, `${event.card}生效`, 'damage');
                     break;
-                    
+
                 case 'judgment_success':
                     UI.log('判定成功，天命眷顾！', 'skill');
                     await UI.showEffect(event.player, '判定成功', 'skill');
                     break;
-                    
+
                 case 'skill':
                     UI.log(`【${event.name}】${event.success !== false ? '' : '失效'}`, 'skill');
                     if (event.name !== '洛神' || event.success) {
                         await UI.showEffect(event.player, event.name, 'skill');
                     }
                     break;
-                    
+
                 case 'draw':
                     AudioSystem.SFX.card();
                     break;
@@ -355,18 +365,18 @@
         async function handleAIEvent(event) {
             switch (event.type) {
                 case 'use_card':
-                    UI.log(`${GameState.players[event.source].general.name} 使用【${event.card}】`);
+                    UI.log(`${getPlayerName(event.source)} 使用【${event.card}】`);
                     AudioSystem.SFX.card();
                     await UI.showEffect(event.source, event.card);
                     break;
-                    
+
                 case 'attack':
                     AudioSystem.SFX.attack();
                     await resolveAttack(event.source, event.target, event.attackType);
                     break;
-                    
+
                 case 'aoe':
-                    UI.log(`${GameState.players[event.source].general.name} 释放【${event.card}】`, 'skill');
+                    UI.log(`${getPlayerName(event.source)} 释放【${event.card}】`, 'skill');
                     AudioSystem.SFX.aoe();
                     for (const p of GameState.players) {
                         if (p.id !== event.source && !p.isDead) {
@@ -374,78 +384,82 @@
                         }
                     }
                     break;
-                    
+
                 case 'duel':
-                    UI.log(`${GameState.players[event.source].general.name} 决斗 ${GameState.players[event.target].general.name}`, 'skill');
+                    const sourcePlayer = getPlayer(event.source);
+                    const targetPlayer = getPlayer(event.target);
+                    if (!sourcePlayer || !targetPlayer) break;
+
+                    UI.log(`${getPlayerName(event.source)} 决斗 ${getPlayerName(event.target)}`, 'skill');
                     AudioSystem.SFX.duel();
                     await sleep(500);
-                    const duelResult = await Game.resolveDuel(
-                        GameState.players[event.source],
-                        GameState.players[event.target]
-                    );
+                    const duelResult = await Game.resolveDuel(sourcePlayer, targetPlayer);
                     for (const e of duelResult.events) {
                         await handleAIEvent(e);
                     }
                     break;
-                    
+
                 case 'fire_attack':
-                    UI.log(`${GameState.players[event.source].general.name} 火攻 ${GameState.players[event.target].general.name}`, 'skill');
-                    const fireResult = await Game.resolveFireAttack(
-                        GameState.players[event.source],
-                        GameState.players[event.target]
-                    );
+                    const fireSource = getPlayer(event.source);
+                    const fireTarget = getPlayer(event.target);
+                    if (!fireSource || !fireTarget) break;
+
+                    UI.log(`${getPlayerName(event.source)} 火攻 ${getPlayerName(event.target)}`, 'skill');
+                    const fireResult = await Game.resolveFireAttack(fireSource, fireTarget);
                     for (const e of fireResult.events) {
                         await handleAIEvent(e);
                     }
                     break;
-                    
+
                 case 'steal':
-                    UI.log(`${GameState.players[event.source].general.name} 顺走 ${GameState.players[event.target].general.name} 一张牌`, 'skill');
+                    UI.log(`${getPlayerName(event.source)} 顺走 ${getPlayerName(event.target)} 一张牌`, 'skill');
                     await UI.showEffect(event.target, '被顺手', 'damage');
                     break;
-                    
+
                 case 'discard':
                     if (event.reason === 'fire_attack_defense') {
-                        UI.log(`${GameState.players[event.source].general.name} 弃牌抵消火攻`, 'skill');
+                        UI.log(`${getPlayerName(event.source)} 弃牌抵消火攻`, 'skill');
                     } else {
-                        UI.log(`${GameState.players[event.source].general.name} 拆掉 ${GameState.players[event.target].general.name} 一张牌`, 'skill');
+                        UI.log(`${getPlayerName(event.source)} 拆掉 ${getPlayerName(event.target)} 一张牌`, 'skill');
                     }
                     await UI.showEffect(event.target, '被拆桥', 'damage');
                     break;
-                    
+
                 case 'delay':
-                    UI.log(`${GameState.players[event.source].general.name} 对 ${GameState.players[event.target].general.name} 使用【${event.card}】`, 'skill');
+                    UI.log(`${getPlayerName(event.source)} 对 ${getPlayerName(event.target)} 使用【${event.card}】`, 'skill');
                     await UI.showEffect(event.target, event.card, 'skill');
                     break;
-                    
+
                 case 'chain':
-                    UI.log(`${GameState.players[event.target].general.name} ${event.chained ? '进入' : '解除'}连环`, 'skill');
+                    UI.log(`${getPlayerName(event.target)} ${event.chained ? '进入' : '解除'}连环`, 'skill');
                     await UI.showEffect(event.target, event.chained ? '连环' : '解除', 'skill');
                     break;
-                    
+
                 case 'damage':
                     AudioSystem.SFX.damage();
                     await UI.showDamage(event.target, event.damage);
-                    UI.log(`${GameState.players[event.target].general.name} 受到 ${event.damage} 点伤害`, 'damage');
+                    UI.log(`${getPlayerName(event.target)} 受到 ${event.damage} 点伤害`, 'damage');
                     break;
-                    
+
                 case 'heal':
                     AudioSystem.SFX.heal();
                     await UI.showEffect(event.target, `+${event.amount || 1}`, 'heal');
                     break;
-                    
+
                 case 'save':
-                    UI.log(`${GameState.players[event.target].general.name} 濒死吃桃`, 'skill');
+                    UI.log(`${getPlayerName(event.target)} 濒死吃桃`, 'skill');
                     AudioSystem.SFX.heal();
                     await UI.showEffect(event.target, '濒死回血', 'skill');
                     break;
-                    
+
                 case 'death':
-                    const dead = GameState.players[event.player];
-                    dead.isDead = true;
-                    dead.identityKnown = true;
-                    UI.log(`${dead.general.name} 阵亡!`, 'damage');
-                    
+                    const dead = getPlayer(event.player);
+                    if (dead) {
+                        dead.isDead = true;
+                        dead.identityKnown = true;
+                        UI.log(`${dead.general.name} 阵亡!`, 'damage');
+                    }
+
                     if (event.reward) {
                         UI.log('击杀反贼，摸3张牌', 'system');
                     }
@@ -460,7 +474,7 @@
                     break;
                     
                 case 'duel_response':
-                    UI.log(`${GameState.players[event.player].general.name} 打出【${event.card}】`, 'skill');
+                    UI.log(`${getPlayerName(event.player)} 打出【${event.card}】`, 'skill');
                     break;
                     
                 case 'duel_draw':
@@ -641,41 +655,43 @@
                     break;
                     
                 case 'steal':
-                    UI.log(`你顺走 ${GameState.players[event.target].general.name} 一张牌`, 'skill');
+                    UI.log(`你顺走 ${getPlayerName(event.target)} 一张牌`, 'skill');
                     break;
-                    
+
                 case 'discard':
-                    UI.log(`你拆掉 ${GameState.players[event.target].general.name} 一张牌`, 'skill');
+                    UI.log(`你拆掉 ${getPlayerName(event.target)} 一张牌`, 'skill');
                     break;
-                    
+
                 case 'delay':
-                    UI.log(`你对 ${GameState.players[event.target].general.name} 使用【${event.card}】`, 'skill');
+                    UI.log(`你对 ${getPlayerName(event.target)} 使用【${event.card}】`, 'skill');
                     await UI.showEffect(event.target, event.card, 'skill');
                     break;
-                    
+
                 case 'chain':
-                    UI.log(`${GameState.players[event.target].general.name} ${event.chained ? '进入' : '解除'}连环`, 'skill');
+                    UI.log(`${getPlayerName(event.target)} ${event.chained ? '进入' : '解除'}连环`, 'skill');
                     await UI.showEffect(event.target, event.chained ? '连环' : '解除', 'skill');
                     break;
-                    
+
                 case 'duel':
-                    UI.log(`你决斗 ${GameState.players[event.target].general.name}`, 'skill');
+                    const duelSourceP = getPlayer(event.source);
+                    const duelTargetP = getPlayer(event.target);
+                    if (!duelSourceP || !duelTargetP) break;
+
+                    UI.log(`你决斗 ${getPlayerName(event.target)}`, 'skill');
                     AudioSystem.SFX.duel();
-                    const duelResult = await Game.resolveDuel(
-                        GameState.players[event.source],
-                        GameState.players[event.target]
-                    );
+                    const duelResult = await Game.resolveDuel(duelSourceP, duelTargetP);
                     for (const e of duelResult.events) {
                         await handlePlayerEvent(e);
                     }
                     break;
-                    
+
                 case 'fire_attack':
-                    UI.log(`你火攻 ${GameState.players[event.target].general.name}`, 'skill');
-                    const fireResult = await Game.resolveFireAttack(
-                        GameState.players[event.source],
-                        GameState.players[event.target]
-                    );
+                    const fireSourceP = getPlayer(event.source);
+                    const fireTargetP = getPlayer(event.target);
+                    if (!fireSourceP || !fireTargetP) break;
+
+                    UI.log(`你火攻 ${getPlayerName(event.target)}`, 'skill');
+                    const fireResult = await Game.resolveFireAttack(fireSourceP, fireTargetP);
                     for (const e of fireResult.events) {
                         await handlePlayerEvent(e);
                     }
