@@ -213,7 +213,9 @@ body {
 
 .hero-options { 
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-    overflow-y: auto; padding: 5px; flex: 1;
+    overflow-y: auto; 
+    max-height: 60vh;
+    padding: 5px; flex: 1;
 }
 
 .role-card {
