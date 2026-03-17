@@ -116,7 +116,7 @@ const Game = {
             this.drawCards(p, 4 + extraCards);
         });
 
-        // 玩家第一个行动！（index 0），这样不会还没出牌就结束
+        // 玩家第一个行动！（index 0），这样玩家至少能出一轮牌
         let firstIndex = 0;
         
         // 如果玩家选了主公，那还是玩家先手
@@ -138,7 +138,9 @@ const Game = {
     },
 
     // 开始回合
-    async startTurn(idx, callbacks = {}) {
+    async startTurn(idx, callbacks = {
+        onEffect: async (effect) => {},
+    }) {
         if (!GameState.gameActive) return { success: false, reason: 'game_not_active' };
         
         GameState.currentTurnIndex = idx;
@@ -168,13 +170,17 @@ const Game = {
                 // 甄姬洛神判定（回合开始）
                 if (player.general.name === '甄姬') {
                     const luoShenResult = await this.triggerLuoShen(player);
-                    events.push(luoShenResult);
+                    if (luoShenResult) {
+                        events.push(luoShenResult);
+                    }
                 }
                 
                 // 华佗急救（回合结束）
                 if (player.general.name === '华佗') {
                     const jiJiuResult = await this.triggerJiJiu(player);
-                    events.push(jiJiuResult);
+                    if (jiJiuResult) {
+                        events.push(jiJiuResult);
+                    }
                 }
                 
                 return { success: true, events, skipPlay: true };
@@ -256,8 +262,8 @@ const Game = {
         // 自动弃牌：手牌数量不能超过当前血量
         const maxCards = player.hp;
         while (player.hand.length > maxCards) {
-            // 找优先级最低的牌丢弃
-            // 优先级评分越低越值得保留，越高越值得扔
+            // 找优先级最低的牌丢弃（优先级越高越该扔）
+            // 优先级：桃酒 < 闪 < 杀 < 无懈 < 决斗火攻 < 顺手拆桥 < AOE < 五谷无中 < 延时锦囊
             let discardIdx = -1;
             let highestPriority = 0;
             
@@ -265,8 +271,8 @@ const Game = {
                 const card = player.hand[i];
                 let priority = 0;
                 
-                // 优先级：需要扔的排优先级高
-                // 桃酒 > 闪 > 杀 > 无懈 > 决斗火攻 > 顺手拆桥 > AOE > 延时锦囊
+                // 优先级：需要扔的牌优先级高
+                // 桃酒 > 闪 > 杀 > 无懈 > 决斗火攻 > 顺手拆桥 > 群伤 > 五谷无中 > 延时锦囊
                 if (card === '桃') priority = 10;
                 else if (card === '酒') priority = 15;
                 else if (card === '闪') priority = 20;
@@ -381,9 +387,6 @@ const Game = {
             return { success: false };
         }
 
-        const target = GameState.players[targetId];
-        if (target.isDead) return { success: false, reason: 'target_dead' };
-
         const card = player.hand[GameState.selectedCardIndex];
 
         // 铁索连环特殊逻辑
@@ -391,7 +394,6 @@ const Game = {
             if (GameState.pendingChainTargets.includes(targetId)) {
                 return { success: false, reason: 'already_selected' };
             }
-            
             GameState.pendingChainTargets.push(targetId);
             
             if (GameState.pendingChainTargets.length < 2) {
@@ -408,17 +410,21 @@ const Game = {
             return { success: false, reason: 'already_attacked' };
         }
         
-        if (card === '乐不' && target.lebu) {
-            return { success: false, reason: 'already_has_lebu' };
+        // 执行出牌
+        const useResult = await this.useCard(
+            0,
+            GameState.selectedCardIndex,
+            GameState.pendingChainTargets ? GameState.pendingChainTargets.map(id => GameState.players[id]) : GameState.players[targetId]
+        );
+        
+        // 处理事件
+        for (const event of useResult.events) {
+            // no-op
         }
 
-        return { 
-            success: true, 
-            action: 'target_selected', 
-            cardIndex: GameState.selectedCardIndex,
-            targetId,
-            chainTargets: card === '铁索' ? GameState.pendingChainTargets : null
-        };
+        Game.cancelAction();
+        UI.renderAll();
+        return { success: true };
     },
 
     // 使用卡牌
@@ -459,10 +465,14 @@ const Game = {
                 if (targetInfo.hp < targetInfo.maxHp) {
                     targetInfo.hp++;
                     source.stats.healed++;
-                    events.push({ type: 'heal', target: targetInfo.id, hp: targetInfo.hp });
+                    events.push({ 
+                        type: 'heal', 
+                        target: targetInfo.id, 
+                        hp: targetInfo.hp 
+                    });
                 }
                 source.berserk = true;
-                events.push({ type: 'buff', buff: 'berserk', target: sourceIdx });
+                events.push({ type: 'buff', buff: 'berserk', source: sourceIdx });
                 break;
                 
             case '万箭':
@@ -470,8 +480,7 @@ const Game = {
                 events.push({ 
                     type: 'aoe', 
                     card, 
-                    source: sourceIdx,
-                    attackType: card === '万箭' ? 'wanjian' : 'nanman'
+                    source: sourceIdx
                 });
                 break;
                 
@@ -537,7 +546,7 @@ const Game = {
                 events.push({ 
                     type: 'delay', 
                     card: '乐不',
-                    source: sourceIdx,
+                    source: sourceIdx, 
                     target: targetInfo.id 
                 });
                 break;
@@ -547,8 +556,8 @@ const Game = {
                 targets.forEach(t => {
                     t.chained = !t.chained;
                     events.push({ 
-                        type: 'chain',
-                        source: sourceIdx,
+                        type: 'chain', 
+                        source: sourceIdx, 
                         target: t.id, 
                         chained: t.chained 
                     });
@@ -557,10 +566,7 @@ const Game = {
         }
 
         // 清除选择状态
-        GameState.selectedCardIndex = -1;
-        GameState.isTargetingMode = false;
-        GameState.pendingChainTargets = [];
-
+        Game.cancelAction();
         return { success: true, events, card };
     },
 
@@ -589,6 +595,61 @@ const Game = {
             responded: false, 
             player: target.id
         };
+    },
+
+    // 解析决斗
+    async resolveDuel(source, target) {
+        const events = [];
+        
+        // 目标出杀
+        let tIdx = target.hand.indexOf('杀');
+        if (target.general.name === '赵云' && tIdx === -1) {
+            tIdx = target.hand.indexOf('闪');
+        }
+
+        if (tIdx !== -1) {
+            target.hand.splice(tIdx, 1);
+            events.push({ type: 'duel_response', player: target.id, card: '杀' });
+        } else {
+            // 目标没杀，受伤
+            const damageResult = await this.dealDamage(source, target, 1);
+            events.push(...damageResult.events);
+        }
+
+        // 源出杀
+        let sIdx = source.hand.indexOf('杀');
+        if (source.general.name === '赵云' && sIdx === -1) {
+            sIdx = source.hand.indexOf('闪');
+        }
+
+        if (sIdx !== -1) {
+            source.hand.splice(sIdx, 1);
+            events.push({ type: 'duel_response', player: source.id, card: '杀' });
+        }
+
+        return { success: true, events };
+    },
+
+    // 火攻处理
+    async resolveFireAttack(source, target) {
+        const events = [];
+        
+        if (target.hand.length > 0) {
+            const discardIdx = Math.floor(Math.random() * target.hand.length);
+            const discarded = target.hand.splice(discardIdx, 1)[0];
+            events.push({ 
+                type: 'discard', 
+                source: source.id, 
+                target: target.id,
+                card: discarded,
+                reason: 'fire_attack_defense'
+            });
+        } else {
+            const damageResult = await this.dealDamage(source, target, 1);
+            events.push(...damageResult.events);
+        }
+        
+        return { success: true, events };
     },
 
     // 造成伤害
@@ -627,16 +688,16 @@ const Game = {
 
         // 濒死处理
         if (target.hp <= 0) {
+            // 找桃
             const taoIdx = target.hand.indexOf('桃');
             if (taoIdx !== -1) {
-                target.hand.splice(taoIdx, 1);
+                target.hand.splice(taoIdx, 1)[0];
                 target.hp++;
                 target.stats.healed++;
                 events.push({ 
                     type: 'save', 
                     target: target.id, 
-                    card: '桃',
-                    hp: target.hp
+                    card: '桃'
                 });
             } else {
                 const deathEvents = this.handleDeath(source, target);
@@ -647,7 +708,7 @@ const Game = {
         return { success: true, events, targetHp: target.hp };
     },
 
-    // 受伤技能触发
+    // 触发受伤技能
     triggerDamageSkill(player) {
         if (player.isDead) return null;
         
@@ -689,75 +750,12 @@ const Game = {
             killer.hand = [];
             events.push({ 
                 type: 'punish', 
-                player: killer.id, 
-                reason: 'lord_kill_loyal',
-                action: 'discard_all'
+                killer: killer.id, 
+                reason: 'lord_kill_loyal'
             });
         }
 
         return events;
-    },
-
-    // 决斗处理
-    async resolveDuel(source, target) {
-        const events = [];
-        
-        // 目标出杀
-        let tIdx = target.hand.indexOf('杀');
-        if (target.general.name === '赵云' && tIdx === -1) {
-            tIdx = target.hand.indexOf('闪');
-        }
-        
-        if (tIdx === -1) {
-            // 目标没有杀，受伤
-            const damageResult = await this.dealDamage(source, target, 1);
-            events.push(...damageResult.events);
-            return { success: true, events };
-        }
-
-        // 目标出杀反击
-        target.hand.splice(tIdx, 1);
-        events.push({ type: 'duel_response', player: target.id, card: '杀' });
-
-        // 源角色出杀
-        let sIdx = source.hand.indexOf('杀');
-        if (source.general.name === '赵云' && sIdx === -1) {
-            sIdx = source.hand.indexOf('闪');
-        }
-
-        if (sIdx === -1) {
-            // 源角色没有杀，受伤
-            const damageResult = await this.dealDamage(target, source, 1);
-            events.push(...damageResult.events);
-        } else {
-            // 源角色出杀，平局
-            source.hand.splice(sIdx, 1);
-            events.push({ type: 'duel_response', player: source.id, card: '杀' });
-            events.push({ type: 'duel_draw' });
-        }
-
-        return { success: true, events };
-    },
-
-    // 火攻处理
-    async resolveFireAttack(source, target) {
-        const events = [];
-        
-        if (target.hand.length > 0) {
-            const discardIdx = Math.floor(Math.random() * target.hand.length);
-            const discarded = target.hand.splice(discardIdx, 1)[0];
-            events.push({ 
-                type: 'discard', 
-                source: target.id, 
-                reason: 'fire_attack_defense',
-                card: discarded
-            });
-        } else {
-            const damageResult = await this.dealDamage(source, target, 1);
-            events.push(...damageResult.events);
-        }
-        
-        return { success: true, events };
     },
 
     // 胜负判定
@@ -779,28 +777,12 @@ const Game = {
             return { 
                 gameOver: true, 
                 win: true, 
-                message: '逆贼全灭，天下大定！',
+                message: '逆贼全灭，天下定矣！',
                 players: GameState.players
             };
         }
 
         return { gameOver: false };
-    },
-
-    // 游戏结束
-    gameOver(win, message) {
-        GameState.gameActive = false;
-        return {
-            win,
-            message,
-            players: GameState.players.map(p => ({
-                id: p.id,
-                role: p.role,
-                general: p.general,
-                isDead: p.isDead,
-                stats: p.stats
-            }))
-        };
     },
 
     // 获取存活玩家
