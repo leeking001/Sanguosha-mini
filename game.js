@@ -259,10 +259,10 @@ const Game = {
             }
         }
         
-        // 自动弃牌：手牌数量不能超过当前血量
+        // 自动弃牌：手牌数量不能超过当前hp
         const maxCards = player.hp;
         while (player.hand.length > maxCards) {
-            // 找到优先级最高（最该扔）的牌扔掉
+            // 找优先级最高（最该扔）的牌
             // 优先级评分：分数越高越该扔
             let discardIdx = -1;
             let highestPriority = 0;
@@ -271,7 +271,7 @@ const Game = {
                 const card = player.hand[i];
                 let priority = 0;
                 
-                // 优先级：桃酒 < 闪 < 杀 < 无懈 < 决斗火攻 < 顺手拆桥 < AOE < 五谷无中 < 延时锦囊
+                // 优先级：桃酒 < 闪 < 杀 < 无懈 < 决斗火攻 < 顺手牵羊过河拆桥 < 群伤 < 五谷无中 < 延时锦囊
                 if (card === '桃') priority = 10;
                 else if (card === '酒') priority = 15;
                 else if (card === '闪') priority = 20;
@@ -405,7 +405,7 @@ const Game = {
             }
         }
 
-        // 检查出牌限制
+        // 出牌限制
         if (card === '杀' && player.hasAttacked && player.general.name !== '张飞') {
             return { success: false, reason: 'already_attacked' };
         }
@@ -427,6 +427,7 @@ const Game = {
             // no-op
         }
 
+        // 清除选择状态
         Game.cancelAction();
         UI.renderAll();
         return { success: true };
@@ -475,6 +476,7 @@ const Game = {
                 source.berserk = true;
                 events.push({ type: 'buff', buff: 'berserk', target: sourceIdx });
                 break;
+                break;
                 
             case '万箭':
             case '南蛮':
@@ -489,6 +491,7 @@ const Game = {
                 this.drawCards(source, 2);
                 events.push({ type: 'draw', player: sourceIdx, count: 2 });
                 break;
+                break;
                 
             case '五谷':
                 GameState.players.forEach(p => {
@@ -497,6 +500,7 @@ const Game = {
                     }
                 });
                 events.push({ type: 'aoe_draw', card });
+                break;
                 break;
                 
             case '顺手':
@@ -512,6 +516,7 @@ const Game = {
                     });
                 }
                 break;
+                break;
                 
             case '拆桥':
                 if (targetInfo.hand.length > 0) {
@@ -525,6 +530,7 @@ const Game = {
                     });
                 }
                 break;
+                break;
                 
             case '决斗':
                 events.push({ 
@@ -532,6 +538,7 @@ const Game = {
                     source: sourceIdx, 
                     target: targetInfo.id 
                 });
+                break;
                 break;
                 
             case '火攻':
@@ -541,26 +548,29 @@ const Game = {
                     target: targetInfo.id 
                 });
                 break;
+                break;
                 
             case '乐不':
                 targetInfo.lebu = true;
                 events.push({ 
                     type: 'delay', 
                     card: '乐不',
-                    source: sourceIdx,
+                    source: sourceIdx, 
                     target: targetInfo.id 
                 });
+                break;
                 break;
                 
             case '铁索':
                 const targets = Array.isArray(targetInfo) ? targetInfo : [targetInfo];
                 targets.forEach(t => {
-                    t.chained = !t.chained;
+                    const targetPlayer = GameState.players[t];
+                    targetPlayer.chained = !targetPlayer.chained;
                     events.push({ 
                         type: 'chain', 
                         source: sourceIdx, 
-                        target: t.id, 
-                        chained: t.chained 
+                        target: t, 
+                        chained: targetPlayer.changed 
                     });
                 });
                 break;
@@ -571,7 +581,7 @@ const Game = {
         return { success: true, events, card };
     },
 
-    // 响应攻击（闪/杀）
+    // 响应攻击
     async respondAttack(target, attackType) {
         const need = attackType === 'nanman' ? '杀' : '闪';
         let idx = target.hand.indexOf(need);
@@ -598,7 +608,7 @@ const Game = {
         };
     },
 
-    // 处理决斗
+    // 解析决斗
     async resolveDuel(source, target) {
         const events = [];
         
@@ -677,13 +687,13 @@ const Game = {
             for (let p of GameState.players) {
                 if (p !== target && p.chained && !p.isDead) {
                     p.chained = false;
-                    const chainDamage = await this.dealDamage(source, p, damage);
-                    events.push(...chainDamage.events);
+                    const chainDamageResult = await this.dealDamage(source, p, damage);
+                    events.push(...chainDamageResult.events);
                 }
             }
         }
 
-        // 受伤技能触发
+        // 受伤触发技能
         const skillEvents = this.triggerDamageSkill(target);
         if (skillEvents) events.push(skillEvents);
 
