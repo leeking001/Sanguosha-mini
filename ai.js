@@ -151,12 +151,7 @@ const AI = {
                 if (target.hand.length <= 2 || ai.hand.filter(c => c === '杀').length >= 2) {
                     const result = await game.useCard(ai.id, juedouIdx, target);
                     events.push(...result.events);
-                    
-                    // 处理决斗结果
-                    if (result.events.find(e => e.type === 'duel')) {
-                        const duelResult = await game.resolveDuel(ai, target);
-                        events.push(...duelResult.events);
-                    }
+                    // 注意：决斗的具体处理由 handleAIEvent 统一处理
                 }
             }
 
@@ -179,18 +174,7 @@ const AI = {
                 if (!ai.hasAttacked || ai.general.name === '张飞') {
                     const result = await game.useCard(ai.id, shaIdx, target);
                     events.push(...result.events);
-                    
-                    // 处理攻击响应
-                    if (result.events.find(e => e.type === 'attack')) {
-                        const response = await game.respondAttack(target, 'sha');
-                        events.push(response);
-                        
-                        if (!response.responded) {
-                            // 目标无法响应，造成伤害
-                            const damageResult = await game.dealDamage(ai, target, 1);
-                            events.push(...damageResult.events);
-                        }
-                    }
+                    // 注意：攻击响应和伤害处理由 handleAIEvent 的 resolveAttack 统一处理
                 }
             }
         }
@@ -214,11 +198,11 @@ const AI = {
     // 评估并使用AOE
     async evaluateAndUseAOE(ai, cardIdx, cardType, game) {
         const others = GameState.players.filter(p => !p.isDead && p !== ai);
-        
+
         // 计算友军和敌军
         let allies = 0;
         let enemies = 0;
-        
+
         for (const p of others) {
             if (this.isAlly(ai, p)) {
                 allies++;
@@ -226,27 +210,14 @@ const AI = {
                 enemies++;
             }
         }
-        
+
         // 如果敌军多于友军，使用AOE
         if (enemies > allies) {
             const result = await game.useCard(ai.id, cardIdx, null);
-            
-            // 处理AOE效果
-            const aoeEvents = [...result.events];
-            for (const p of others) {
-                const attackType = cardType === '万箭' ? 'wanjian' : 'nanman';
-                const response = await game.respondAttack(p, attackType);
-                aoeEvents.push(response);
-                
-                if (!response.responded) {
-                    const damageResult = await game.dealDamage(ai, p, 1);
-                    aoeEvents.push(...damageResult.events);
-                }
-            }
-            
-            return { success: true, events: aoeEvents };
+            // 注意：AOE的攻击响应和伤害处理由 handleAIEvent 统一处理
+            return { success: true, events: result.events };
         }
-        
+
         return null;
     },
 

@@ -213,13 +213,27 @@ const Game = {
             GameState.pendingChainTargets.push(targetId);
             if (GameState.pendingChainTargets.length < 2) {
                 return { success: true, action: 'chain_select', selected: GameState.pendingChainTargets };
+            } else {
+                // 选择完成，返回铁索目标
+                const chainTargets = [...GameState.pendingChainTargets];
+                GameState.pendingChainTargets = [];
+                GameState.isTargetingMode = false;
+                const cardIndex = GameState.selectedCardIndex;
+                GameState.selectedCardIndex = -1;
+                return {
+                    success: true,
+                    action: 'target_selected',
+                    cardIndex,
+                    chainTargets
+                };
             }
         }
 
         // 有目标卡牌，返回目标信息
         GameState.isTargetingMode = false;
+        const cardIndex = GameState.selectedCardIndex;
         GameState.selectedCardIndex = -1;
-        return { success: true, action: 'target_selected', targetId: targetId };
+        return { success: true, action: 'target_selected', targetId: targetId, cardIndex };
     },
 
     async useCard(sourceIdx, cardIndex, targetInfo) {
@@ -227,7 +241,7 @@ const Game = {
         const card = source.hand[cardIndex];
         source.hand.splice(cardIndex, 1);
         const events = [{ type: 'use_card', card, source: sourceIdx }];
-        
+
         switch (card) {
             case '杀':
                 source.hasAttacked = true;
@@ -248,7 +262,8 @@ const Game = {
                 break;
             case '万箭':
             case '南蛮':
-                events.push({ type: 'aoe', card, source: sourceIdx });
+                const attackType = card === '万箭' ? 'wanjian' : 'nanman';
+                events.push({ type: 'aoe', card, source: sourceIdx, attackType });
                 break;
             case '无中':
                 this.drawCards(source, 2);
@@ -257,6 +272,34 @@ const Game = {
             case '乐不':
                 targetInfo.lebu = true;
                 events.push({ type: 'delay', card: '乐不', target: targetInfo.id });
+                break;
+            case '顺手':
+                if (targetInfo.hand.length > 0) {
+                    const stolen = targetInfo.hand.pop();
+                    source.hand.push(stolen);
+                    events.push({ type: 'steal', source: sourceIdx, target: targetInfo.id });
+                }
+                break;
+            case '拆桥':
+                if (targetInfo.hand.length > 0) {
+                    targetInfo.hand.pop();
+                    events.push({ type: 'discard', source: sourceIdx, target: targetInfo.id });
+                }
+                break;
+            case '决斗':
+                events.push({ type: 'duel', source: sourceIdx, target: targetInfo.id });
+                break;
+            case '火攻':
+                events.push({ type: 'fire_attack', source: sourceIdx, target: targetInfo.id });
+                break;
+            case '铁索':
+                // targetInfo 应该是数组
+                if (Array.isArray(targetInfo)) {
+                    for (const t of targetInfo) {
+                        t.chained = !t.chained;
+                        events.push({ type: 'chain', target: t.id, chained: t.chained });
+                    }
+                }
                 break;
         }
         return { success: true, events, card };
