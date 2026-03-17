@@ -170,7 +170,15 @@ const Game = {
                     player.hp--;
                     this.drawCards(player, 2);
                     player.skillUsed = true;
-                    return { success: true, action: 'skill', skill: '苦肉', player: 0, hp: player.hp };
+                    // 返回技能事件，包含流失生命和当前HP
+                    return {
+                        success: true,
+                        action: 'skill',
+                        skill: '苦肉',
+                        player: 0,
+                        hp: player.hp,
+                        loseHp: 1  // 标记为流失生命而非受到伤害
+                    };
                 }
             }
             if (player.general.name === '孙权' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
@@ -224,15 +232,15 @@ const Game = {
             case '桃':
                 if (targetInfo.hp < targetInfo.maxHp) {
                     targetInfo.hp++;
-                    events.push({ type: 'heal', target: targetInfo.id, hp: targetInfo.hp });
+                    events.push({ type: 'heal', target: targetInfo.id, hp: targetInfo.hp, amount: 1 });
                 }
                 break;
             case '酒':
-                if (targetInfo.hp < targetInfo.maxHp) {
-                    targetInfo.hp++;
-                    events.push({ type: 'heal', target: targetInfo.id });
-                }
                 source.berserk = true;
+                if (source.hp < source.maxHp) {
+                    source.hp++;
+                    events.push({ type: 'heal', target: sourceIdx, hp: source.hp, amount: 1 });
+                }
                 break;
             case '万箭':
             case '南蛮':
