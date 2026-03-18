@@ -224,7 +224,8 @@ const Game = {
                     success: true,
                     action: 'target_selected',
                     cardIndex,
-                    chainTargets
+                    chainTargets,
+                    targetId: targetId  // 添加 targetId，虽然铁索不使用单目标
                 };
             }
         }
@@ -245,10 +246,12 @@ const Game = {
         switch (card) {
             case '杀':
                 source.hasAttacked = true;
-                events.push({ type: 'attack', source: sourceIdx, target: targetInfo.id, attackType: 'sha' });
+                if (targetInfo && targetInfo.id !== undefined) {
+                    events.push({ type: 'attack', source: sourceIdx, target: targetInfo.id, attackType: 'sha' });
+                }
                 break;
             case '桃':
-                if (targetInfo.hp < targetInfo.maxHp) {
+                if (targetInfo && targetInfo.hp < targetInfo.maxHp) {
                     targetInfo.hp++;
                     events.push({ type: 'heal', target: targetInfo.id, hp: targetInfo.hp, amount: 1 });
                 }
@@ -270,27 +273,33 @@ const Game = {
                 events.push({ type: 'draw', count: 2 });
                 break;
             case '乐不':
-                targetInfo.lebu = true;
-                events.push({ type: 'delay', card: '乐不', target: targetInfo.id });
+                if (targetInfo && targetInfo.id !== undefined) {
+                    targetInfo.lebu = true;
+                    events.push({ type: 'delay', card: '乐不', target: targetInfo.id });
+                }
                 break;
             case '顺手':
-                if (targetInfo.hand.length > 0) {
+                if (targetInfo && targetInfo.hand && targetInfo.hand.length > 0) {
                     const stolen = targetInfo.hand.pop();
                     source.hand.push(stolen);
                     events.push({ type: 'steal', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
             case '拆桥':
-                if (targetInfo.hand.length > 0) {
+                if (targetInfo && targetInfo.hand && targetInfo.hand.length > 0) {
                     targetInfo.hand.pop();
                     events.push({ type: 'discard', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
             case '决斗':
-                events.push({ type: 'duel', source: sourceIdx, target: targetInfo.id });
+                if (targetInfo && targetInfo.id !== undefined) {
+                    events.push({ type: 'duel', source: sourceIdx, target: targetInfo.id });
+                }
                 break;
             case '火攻':
-                events.push({ type: 'fire_attack', source: sourceIdx, target: targetInfo.id });
+                if (targetInfo && targetInfo.id !== undefined) {
+                    events.push({ type: 'fire_attack', source: sourceIdx, target: targetInfo.id });
+                }
                 break;
             case '铁索':
                 // targetInfo 应该是数组

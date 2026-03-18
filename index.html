@@ -634,6 +634,7 @@
             switch (event.type) {
                 case 'use_card':
                     // AOE卡牌、决斗、火攻在对应事件中显示，避免重复日志
+                    // 顺手、拆桥需要显示"使用【X】"
                     if (!['万箭', '南蛮', '决斗', '火攻'].includes(event.card)) {
                         UI.log(`你使用【${event.card}】`);
                         AudioSystem.SFX.card();
@@ -673,10 +674,16 @@
                     
                 case 'steal':
                     UI.log(`你顺走 ${getPlayerName(event.target)} 一张牌`, 'skill');
+                    AudioSystem.SFX.card();
+                    await UI.showEffect(event.target, '被顺手', 'damage');
+                    UI.renderAll();
                     break;
 
                 case 'discard':
                     UI.log(`你拆掉 ${getPlayerName(event.target)} 一张牌`, 'skill');
+                    AudioSystem.SFX.card();
+                    await UI.showEffect(event.target, '被拆桥', 'damage');
+                    UI.renderAll();
                     break;
 
                 case 'delay':
