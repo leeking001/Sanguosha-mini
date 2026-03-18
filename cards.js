@@ -19,13 +19,10 @@ const CARD_TYPES = {
     HUOGONG: { name: '火攻', type: 'scroll', icon: '🔥', color: '#e74c3c' },
     TIESUO: { name: '铁索', fullName: '铁索连环', type: 'scroll', icon: '⛓️', color: '#555' },
     LEBU: { name: '乐不', fullName: '乐不思蜀', type: 'delay', icon: '🤐', color: '#2c3e50' },
-    BINGLIANG: { name: '兵粮', fullName: '兵粮寸断', type: 'delay', icon: '🍚', color: '#7f8c8d' },
     SHANDIAN: { name: '闪电', type: 'delay', icon: '⚡', color: '#9b59b6' },
 
     // 新增锦囊
-    WUXIE: { name: '无懈', fullName: '无懈可击', type: 'scroll', icon: '🛡️', color: '#3498db' },
-    JIEDAO: { name: '借刀', fullName: '借刀杀人', type: 'scroll', icon: '🔪', color: '#8e44ad' },
-    TAOYUAN: { name: '桃园', fullName: '桃园结义', type: 'scroll', icon: '🌸', color: '#e91e63' }
+    WUXIE: { name: '无懈', fullName: '无懈可击', type: 'scroll', icon: '🛡️', color: '#3498db' }
 };
 
 // 牌堆模板 - 标准牌堆配置
@@ -36,7 +33,7 @@ const DECK_TEMPLATE = [
     ...Array(10).fill('桃'),
     ...Array(6).fill('酒'),
 
-    // 锦囊牌 (40张)
+    // 锦囊牌 (30张)
     ...Array(3).fill('万箭'),
     ...Array(3).fill('南蛮'),
     ...Array(4).fill('无中'),
@@ -47,10 +44,8 @@ const DECK_TEMPLATE = [
     ...Array(3).fill('火攻'),
     ...Array(4).fill('铁索'),
     ...Array(3).fill('乐不'),
-    ...Array(2).fill('兵粮'),
-    ...Array(1).fill('闪电'),
     ...Array(2).fill('无懈'),
-    ...Array(1).fill('借刀')
+    ...Array(2).fill('桃园')
 ];
 
 // 卡牌工具函数
@@ -67,7 +62,7 @@ const CardUtils = {
 
     // 检查是否为延时锦囊
     isDelay(card) {
-        return ['乐不', '兵粮', '闪电'].includes(card);
+        return ['乐不'].includes(card);
     },
     
     // 获取卡牌信息

@@ -354,7 +354,19 @@ const Game = {
 
     // 火攻处理
     resolveFireAttack(source, target) {
-        return { success: true, events: [] };
+        const events = [];
+        // 火攻：目标需要弃一张牌，否则受1点伤害
+        if (target.hand.length > 0) {
+            // 目标有牌，弃掉一张
+            const discardIdx = Math.floor(Math.random() * target.hand.length);
+            const discardedCard = target.hand.splice(discardIdx, 1)[0];
+            events.push({ type: 'discard', source: source.id, target: target.id, card: discardedCard, reason: 'fire_attack_defense' });
+        } else {
+            // 目标没有牌，受伤害
+            const dmgResult = this.dealDamage(source, target, 1);
+            events.push(...dmgResult.events);
+        }
+        return { success: true, events };
     },
 
     // 解析AOE攻击
