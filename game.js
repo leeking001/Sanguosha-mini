@@ -43,13 +43,13 @@ const Game = {
             isUser,
             role,
             general,
-            hp: general.hp + (role === '主公' ? 1 : 0),
-            maxHp: general.hp + (role === '主公' ? 1 : 0),
+            hp: general.hp + (role === '领袖' ? 1 : 0),
+            maxHp: general.hp + (role === '领袖' ? 1 : 0),
             hand: [],
             isDead: false,
             hasAttacked: false,
             berserk: false,
-            identityKnown: role === '主公',
+            identityKnown: role === '领袖',
             lebu: false,
             chained: false,
             skillUsed: false,
@@ -65,7 +65,7 @@ const Game = {
     startGame(selectedHero, generalsData) {
         GameState.gameActive = true;
         this.initDeck();
-        let roles = ['主公', '忠臣', '反贼', '内奸'];
+        let roles = ['领袖', '护卫', '叛军', '间谍'];
         roles.splice(roles.indexOf(GameState.userRole), 1);
         roles = CardUtils.shuffle(roles);
         let aiPool = generalsData.filter(g => g.name !== selectedHero.name);
@@ -75,19 +75,19 @@ const Game = {
         for (let i = 0; i < 3; i++) {
             GameState.players.push(this.createPlayer(i + 1, false, roles[i], aiPool[i]));
         }
-        // 标记主公身份可见
-        GameState.players.forEach(p => { if (p.role === '主公') p.identityKnown = true; });
-        // 发牌，主公多摸一张
+        // 标记领袖身份可见
+        GameState.players.forEach(p => { if (p.role === '领袖') p.identityKnown = true; });
+        // 发牌，领袖多摸一张
         GameState.players.forEach(p => {
-            const extraCards = p.role === '主公' ? 1 : 0;
+            const extraCards = p.role === '领袖' ? 1 : 0;
             this.drawCards(p, 4 + extraCards);
         });
-        // 找到主公的索引
-        const lordIndex = GameState.players.findIndex(p => p.role === '主公');
+        // 找到领袖的索引
+        const lordIndex = GameState.players.findIndex(p => p.role === '领袖');
         return {
             players: GameState.players,
             lordIndex: lordIndex,
-            firstIndex: lordIndex,  // 改为主公先手
+            firstIndex: lordIndex,
             message: '游戏开始！'
         };
     },
@@ -137,10 +137,10 @@ const Game = {
     },
 
     checkWin() {
-        const lord = GameState.players.find(p => p.role === '主公' && !p.isDead);
-        const rebels = GameState.players.filter(p => p.role === '反贼' && !p.isDead);
-        const traitor = GameState.players.filter(p => p.role === '内奸' && !p.isDead);
-        if (!lord) return { gameOver: true, win: false, message: '主公阵亡！' };
+        const lord = GameState.players.find(p => p.role === '领袖' && !p.isDead);
+        const rebels = GameState.players.filter(p => p.role === '叛军' && !p.isDead);
+        const traitor = GameState.players.filter(p => p.role === '间谍' && !p.isDead);
+        if (!lord) return { gameOver: true, win: false, message: '领袖阵亡！' };
         if (rebels.length === 0 && traitor.length === 0) return { gameOver: true, win: true, message: '胜利！' };
         return { gameOver: false };
     },
@@ -169,7 +169,7 @@ const Game = {
         // 检查是否在出牌阶段
         if (GameState.selectedCardIndex === -1) {
             // 可能是在使用技能
-            if (player.general.name === '黄盖' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
+            if (player.general.name === '苦肉战将' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
                 if (player.hp > 1) {
                     player.hp--;
                     this.drawCards(player, 2);
@@ -185,7 +185,7 @@ const Game = {
                     };
                 }
             }
-            if (player.general.name === '孙权' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
+            if (player.general.name === '制衡帝王' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
                 if (player.hand.length > 0) {
                     player.hand.pop();
                     this.drawCards(player, 1);
@@ -200,12 +200,12 @@ const Game = {
         if (!card) return { success: false };
 
         // 检查出牌限制
-        if (card === '杀' && player.hasAttacked && player.general.name !== '张飞') {
+        if (card === '斩' && player.hasAttacked && player.general.name !== '狂战勇士') {
             return { success: false, reason: 'already_attacked' };
         }
 
         // 铁索连环特殊逻辑
-        if (card === '铁索') {
+        if (card === '锁链') {
             if (!GameState.pendingChainTargets) GameState.pendingChainTargets = [];
             if (GameState.pendingChainTargets.includes(targetId)) {
                 return { success: false, reason: 'already_selected' };
@@ -244,54 +244,54 @@ const Game = {
         const events = [{ type: 'use_card', card, source: sourceIdx }];
 
         switch (card) {
-            case '杀':
+            case '斩':
                 source.hasAttacked = true;
                 if (targetInfo && targetInfo.id !== undefined) {
                     events.push({ type: 'attack', source: sourceIdx, target: targetInfo.id, attackType: 'sha' });
                 }
                 break;
-            case '桃':
+            case '药':
                 if (targetInfo && targetInfo.hp < targetInfo.maxHp) {
                     targetInfo.hp++;
                     events.push({ type: 'heal', target: targetInfo.id, hp: targetInfo.hp, amount: 1 });
                 }
                 break;
-            case '酒':
+            case '怒':
                 source.berserk = true;
                 if (source.hp < source.maxHp) {
                     source.hp++;
                     events.push({ type: 'heal', target: sourceIdx, hp: source.hp, amount: 1 });
                 }
                 break;
-            case '万箭':
-            case '南蛮':
-                const attackType = card === '万箭' ? 'wanjian' : 'nanman';
+            case '箭雨':
+            case '兽潮':
+                const attackType = card === '箭雨' ? 'wanjian' : 'nanman';
                 events.push({ type: 'aoe', card, source: sourceIdx, attackType });
                 break;
-            case '无中':
+            case '幸运':
                 this.drawCards(source, 2);
                 events.push({ type: 'draw', count: 2 });
                 break;
-            case '乐不':
+            case '迷惑':
                 if (targetInfo && targetInfo.id !== undefined) {
                     targetInfo.lebu = true;
-                    events.push({ type: 'delay', card: '乐不', target: targetInfo.id });
+                    events.push({ type: 'delay', card: '迷惑', target: targetInfo.id });
                 }
                 break;
-            case '顺手':
+            case '偷袭':
                 if (targetInfo && targetInfo.hand && targetInfo.hand.length > 0) {
                     const stolen = targetInfo.hand.pop();
                     source.hand.push(stolen);
                     events.push({ type: 'steal', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
-            case '拆桥':
+            case '破坏':
                 if (targetInfo && targetInfo.hand && targetInfo.hand.length > 0) {
                     targetInfo.hand.pop();
                     events.push({ type: 'discard', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
-            case '决斗':
+            case '单挑':
                 if (targetInfo && targetInfo.id !== undefined) {
                     events.push({ type: 'duel', source: sourceIdx, target: targetInfo.id });
                 }
@@ -301,7 +301,7 @@ const Game = {
                     events.push({ type: 'fire_attack', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
-            case '铁索':
+            case '锁链':
                 // targetInfo 应该是数组
                 if (Array.isArray(targetInfo)) {
                     for (const t of targetInfo) {
@@ -315,7 +315,7 @@ const Game = {
     },
 
     async respondAttack(target, attackType) {
-        const need = attackType === 'nanman' ? '杀' : '闪';
+        const need = attackType === 'nanman' ? '斩' : '躲';
         const idx = target.hand.indexOf(need);
         if (idx !== -1) {
             target.hand.splice(idx, 1);

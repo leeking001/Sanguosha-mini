@@ -3,71 +3,71 @@
 // 卡牌类型定义
 const CARD_TYPES = {
     // 基本牌
-    SHA: { name: '杀', type: 'basic', icon: '⚔️', color: '#8b0000' },
-    SHAN: { name: '闪', type: 'basic', icon: '💨', color: '#154360' },
-    TAO: { name: '桃', type: 'basic', icon: '🍑', color: '#d81b60' },
-    JIU: { name: '酒', type: 'basic', icon: '🍶', color: '#a04000' },
-    
+    SHA: { name: '斩', type: 'basic', icon: '⚔️', color: '#8b0000' },
+    SHAN: { name: '躲', type: 'basic', icon: '💨', color: '#154360' },
+    TAO: { name: '药', type: 'basic', icon: '💊', color: '#d81b60' },
+    JIU: { name: '怒', type: 'basic', icon: '💢', color: '#a04000' },
+
     // 锦囊牌
-    WANJIAN: { name: '万箭', fullName: '万箭齐发', type: 'scroll', icon: '🏹', color: '#6c3483' },
-    NANMAN: { name: '南蛮', fullName: '南蛮入侵', type: 'scroll', icon: '🐘', color: '#6c3483' },
-    WUZHONG: { name: '无中', fullName: '无中生有', type: 'scroll', icon: '🎁', color: '#1e8449' },
-    WUGU: { name: '五谷', fullName: '五谷丰登', type: 'scroll', icon: '🌾', color: '#1e8449' },
-    SHUNSHOU: { name: '顺手', fullName: '顺手牵羊', type: 'scroll', icon: '🔗', color: '#117864' },
-    CHAIQIAO: { name: '拆桥', fullName: '过河拆桥', type: 'scroll', icon: '🪓', color: '#117864' },
-    JUEDOU: { name: '决斗', type: 'scroll', icon: '⚔️', color: '#000' },
+    WANJIAN: { name: '箭雨', fullName: '箭雨齐发', type: 'scroll', icon: '🏹', color: '#6c3483' },
+    NANMAN: { name: '兽潮', fullName: '兽潮入侵', type: 'scroll', icon: '🐘', color: '#6c3483' },
+    WUZHONG: { name: '幸运', fullName: '幸运之神', type: 'scroll', icon: '🎁', color: '#1e8449' },
+    WUGU: { name: '丰收', fullName: '丰收时节', type: 'scroll', icon: '🌾', color: '#1e8449' },
+    SHUNSHOU: { name: '偷袭', fullName: '偷袭行动', type: 'scroll', icon: '🔗', color: '#117864' },
+    CHAIQIAO: { name: '破坏', fullName: '破坏行动', type: 'scroll', icon: '🪓', color: '#117864' },
+    JUEDOU: { name: '单挑', type: 'scroll', icon: '⚔️', color: '#000' },
     HUOGONG: { name: '火攻', type: 'scroll', icon: '🔥', color: '#e74c3c' },
-    TIESUO: { name: '铁索', fullName: '铁索连环', type: 'scroll', icon: '⛓️', color: '#555' },
-    LEBU: { name: '乐不', fullName: '乐不思蜀', type: 'delay', icon: '🤐', color: '#2c3e50' },
-    BINGLIANG: { name: '兵粮', fullName: '兵粮寸断', type: 'delay', icon: '🍚', color: '#7f8c8d' },
+    TIESUO: { name: '锁链', fullName: '锁链连环', type: 'scroll', icon: '⛓️', color: '#555' },
+    LEBU: { name: '迷惑', fullName: '迷惑之术', type: 'delay', icon: '🤐', color: '#2c3e50' },
+    BINGLIANG: { name: '断粮', fullName: '断粮计策', type: 'delay', icon: '🍚', color: '#7f8c8d' },
     SHANDIAN: { name: '闪电', type: 'delay', icon: '⚡', color: '#9b59b6' },
-    
+
     // 新增锦囊
-    WUXIE: { name: '无懈', fullName: '无懈可击', type: 'scroll', icon: '🛡️', color: '#3498db' },
-    JIEDAO: { name: '借刀', fullName: '借刀杀人', type: 'scroll', icon: '🔪', color: '#8e44ad' },
-    TAOYUAN: { name: '桃园', fullName: '桃园结义', type: 'scroll', icon: '🌸', color: '#e91e63' }
+    WUXIE: { name: '无效', fullName: '无效化解', type: 'scroll', icon: '🛡️', color: '#3498db' },
+    JIEDAO: { name: '计谋', fullName: '借刀计谋', type: 'scroll', icon: '🔪', color: '#8e44ad' },
+    TAOYUAN: { name: '结义', fullName: '结义回血', type: 'scroll', icon: '🌸', color: '#e91e63' }
 };
 
 // 牌堆模板 - 标准牌堆配置
 const DECK_TEMPLATE = [
     // 基本牌 (60张)
-    ...Array(25).fill('杀'),
-    ...Array(15).fill('闪'),
-    ...Array(10).fill('桃'),
-    ...Array(6).fill('酒'),
-    
+    ...Array(25).fill('斩'),
+    ...Array(15).fill('躲'),
+    ...Array(10).fill('药'),
+    ...Array(6).fill('怒'),
+
     // 锦囊牌 (40张)
-    ...Array(3).fill('万箭'),
-    ...Array(3).fill('南蛮'),
-    ...Array(4).fill('无中'),
-    ...Array(2).fill('五谷'),
-    ...Array(4).fill('顺手'),
-    ...Array(5).fill('拆桥'),
-    ...Array(3).fill('决斗'),
+    ...Array(3).fill('箭雨'),
+    ...Array(3).fill('兽潮'),
+    ...Array(4).fill('幸运'),
+    ...Array(2).fill('丰收'),
+    ...Array(4).fill('偷袭'),
+    ...Array(5).fill('破坏'),
+    ...Array(3).fill('单挑'),
     ...Array(3).fill('火攻'),
-    ...Array(4).fill('铁索'),
-    ...Array(3).fill('乐不'),
-    ...Array(2).fill('兵粮'),
+    ...Array(4).fill('锁链'),
+    ...Array(3).fill('迷惑'),
+    ...Array(2).fill('断粮'),
     ...Array(1).fill('闪电'),
-    ...Array(2).fill('无懈'),
-    ...Array(1).fill('借刀')
+    ...Array(2).fill('无效'),
+    ...Array(1).fill('计谋')
 ];
 
 // 卡牌工具函数
 const CardUtils = {
     // 检查卡牌是否需要目标
     requiresTarget(card) {
-        return ['杀', '顺手', '拆桥', '决斗', '火攻', '乐不', '铁索', '借刀'].includes(card);
+        return ['斩', '偷袭', '破坏', '单挑', '火攻', '迷惑', '锁链', '计谋'].includes(card);
     },
-    
+
     // 检查是否为AOE锦囊
     isAOE(card) {
-        return ['万箭', '南蛮', '五谷', '桃园'].includes(card);
+        return ['箭雨', '兽潮', '丰收', '结义'].includes(card);
     },
-    
+
     // 检查是否为延时锦囊
     isDelay(card) {
-        return ['乐不', '兵粮', '闪电'].includes(card);
+        return ['迷惑', '断粮', '闪电'].includes(card);
     },
     
     // 获取卡牌信息
