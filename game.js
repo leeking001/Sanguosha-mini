@@ -291,6 +291,7 @@ const Game = {
             case '桃':
                 if (targetInfo && targetInfo.hp < targetInfo.maxHp) {
                     targetInfo.hp++;
+                    source.stats.healed += 1;
                     events.push({ type: 'heal', target: targetInfo.id, hp: targetInfo.hp, amount: 1 });
                 }
                 break;
@@ -298,6 +299,7 @@ const Game = {
                 source.berserk = true;
                 if (source.hp < source.maxHp) {
                     source.hp++;
+                    source.stats.healed += 1;
                     events.push({ type: 'heal', target: sourceIdx, hp: source.hp, amount: 1 });
                 }
                 break;
@@ -390,10 +392,14 @@ const Game = {
             source.berserk = false;  // 立即清除酒的buff，防止重复加成
         }
         target.hp -= damage;
+        // 更新伤害统计
+        source.stats.damageDealt += damage;
         const events = [{ type: 'damage', source: source.id, target: target.id, damage, hp: target.hp }];
         if (target.hp <= 0) {
             target.isDead = true;
             target.identityKnown = true;
+            // 更新击杀统计
+            source.stats.kills += 1;
             events.push({ type: 'death', player: target.id });
         }
         return { success: true, events };
@@ -583,6 +589,7 @@ const Game = {
 
                 targetForHeal.hp++;
                 player.skillUsed = true;
+                player.stats.healed += 1;
                 events.push({
                     type: 'skill',
                     name: '神医',
@@ -669,6 +676,7 @@ const Game = {
                 if (player.hp < player.maxHp) {
                     player.hp++;
                     player.skillUsed = true;
+                    player.stats.healed += 1;
                     events.push({
                         type: 'skill',
                         name: '急救',
