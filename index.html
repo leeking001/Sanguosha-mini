@@ -831,6 +831,24 @@
                 }
 
                 UI.renderAll();
+            } else if (result.reason === 'need_target') {
+                // 需要选择目标的技能
+                UI.log(`请选择【${result.skillName}】的目标`, 'system');
+                showSkillToast(`点击敌方角色作为【${result.skillName}】的目标`);
+
+                // 标记当前需要选择目标的技能
+                GameState.pendingSkill = {
+                    skillName: result.skillName,
+                    targets: result.targets
+                };
+
+                // 高亮可选目标
+                for (const targetId of result.targets) {
+                    const targetEl = document.getElementById(`player-${targetId}`);
+                    if (targetEl) {
+                        targetEl.classList.add('skill-target-available');
+                    }
+                }
             } else {
                 // 技能无法使用
                 const reasons = {
@@ -839,10 +857,52 @@
                     'skill_already_used': '技能已使用过',
                     'no_cards_to_discard': '没有手牌可弃置',
                     'insufficient_hp': '生命值不足',
+                    'no_valid_target': '没有有效的目标',
                     'skill_not_found': '技能不存在'
                 };
                 const message = reasons[result.reason] || '技能无法使用';
                 UI.log(message, 'system');
+            }
+        }
+
+        // 处理技能目标选择
+        async function handleSkillTargetSelect(targetId) {
+            if (!GameState.pendingSkill) return;
+
+            // 检查是否是有效目标
+            if (!GameState.pendingSkill.targets.includes(targetId)) {
+                UI.log('无效的目标', 'system');
+                return;
+            }
+
+            // 移除高亮
+            for (const id of GameState.pendingSkill.targets) {
+                const targetEl = document.getElementById(`player-${id}`);
+                if (targetEl) {
+                    targetEl.classList.remove('skill-target-available');
+                }
+            }
+
+            const skillName = GameState.pendingSkill.skillName;
+            GameState.pendingSkill = null;
+
+            // 用选中的目标调用技能
+            const result = Game.useActiveSkill(0, targetId);
+
+            if (result.success) {
+                // 处理技能事件
+                for (const event of result.events) {
+                    if (event.type === 'skill') {
+                        UI.log(event.description, 'skill');
+                        AudioSystem.SFX.skill();
+                        await UI.showEffect(0, event.name, 'skill');
+                        showSkillToast(`【${event.name}】已发动`);
+                    }
+                }
+
+                UI.renderAll();
+            } else {
+                UI.log(`【${skillName}】无法作用于该目标`, 'system');
             }
         }
 
@@ -858,10 +918,17 @@
             nextTurn();
         }
 
-        // 点击玩家区域（触发技能）
+        // 点击玩家区域（触发技能或选择目标）
         async function handlePlayerClick(playerId) {
-            if (playerId !== 0) return;
             if (GameState.currentTurnIndex !== 0) return;
+
+            // 如果正在选择技能目标，处理目标选择
+            if (GameState.pendingSkill) {
+                await handleSkillTargetSelect(playerId);
+                return;
+            }
+
+            if (playerId !== 0) return;
 
             const player = GameState.players[0];
             const result = Game.selectTarget(0);

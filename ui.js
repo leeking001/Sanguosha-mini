@@ -200,39 +200,41 @@ const UI = {
     renderEnemyZone() {
         const container = document.getElementById('enemy-zone');
         if (!container || !this.gameState.players.length) return;
-        
+
         container.innerHTML = '';
-        
+
         for (let i = 1; i <= 3; i++) {
             const p = this.gameState.players[i];
             if (!p) continue;
-            
+
             const div = document.createElement('div');
             const roleText = p.identityKnown ? p.role : '???';
-            
+
             let classes = `enemy-card ${p.isDead ? 'dead' : ''} ${this.gameState.currentTurnIndex === i ? 'active-turn' : ''}`;
             if (this.gameState.isTargetingMode && !p.isDead) classes += ' targetable';
             if (this.gameState.pendingChainTargets.includes(i)) classes += ' selected-chain';
+            if (this.gameState.pendingSkill && this.gameState.pendingSkill.targets.includes(i)) classes += ' skill-target-available';
             if (p.role === '主公') classes += ' lord-border';
-            
+
             div.className = classes;
+            div.id = `player-${i}`;
             div.onclick = () => {
                 if (this.callbacks.onTargetSelect) {
                     this.callbacks.onTargetSelect(i);
                 }
             };
-            
+
             // 状态图标
             let statusHtml = '';
             if (p.lebu) statusHtml += '<span class="status-icon">🤐</span>';
             if (p.chained) statusHtml += '<span class="status-icon">⛓️</span>';
-            
+
             // 身份颜色
-            const roleColor = p.identityKnown 
+            const roleColor = p.identityKnown
                 ? (p.role === '反贼' ? '#2ecc71' : (p.role === '忠臣' ? '#e67e22' : (p.role === '主公' ? '#f1c40f' : '#9b59b6')))
                 : '#333';
             const roleTextColor = p.role === '主公' ? '#000' : '#fff';
-            
+
             div.innerHTML = `
                 <div class="role-badge" style="background:${roleColor}; color:${roleTextColor}">${roleText}</div>
                 <div class="avatar-frame" style="color:${p.general.color}">${p.general.avatar}</div>
@@ -244,7 +246,7 @@ const UI = {
                     <div style="font-size:10px; color:#7f8c8d;">手牌: ${p.hand.length}</div>
                 </div>
             `;
-            
+
             container.appendChild(div);
         }
     },
@@ -457,50 +459,56 @@ const UI = {
         const resultOverlay = document.getElementById('result-overlay');
         const resultTitle = document.getElementById('result-title');
         const resultList = document.getElementById('result-list');
-        
+
         if (resultTitle) {
             resultTitle.innerText = message;
             resultTitle.className = win ? 'win' : 'lose';
         }
-        
+
         if (resultList && players) {
             let html = `
                 <div class="result-row result-header">
                     <span class="res-role">身份</span>
                     <span class="res-name">武将</span>
-                    <span class="res-stat">伤害</span>
-                    <span class="res-stat">回复</span>
-                    <span class="res-stat">击杀</span>
+                    <span class="res-stat-small">伤害</span>
+                    <span class="res-stat-small">回复</span>
+                    <span class="res-stat-small">击杀</span>
+                    <span class="res-stat-small">出牌</span>
+                    <span class="res-stat-small">锦囊</span>
+                    <span class="res-stat-small">技能</span>
                 </div>
             `;
-            
+
             players.forEach(p => {
-                const roleColor = p.role === '主公' ? '#f1c40f' : 
+                const roleColor = p.role === '主公' ? '#f1c40f' :
                     (p.role === '忠臣' ? '#e67e22' : (p.role === '反贼' ? '#2ecc71' : '#9b59b6'));
-                
+
                 html += `
                     <div class="result-row">
                         <span class="res-role" style="color:${roleColor}">${p.role}</span>
                         <span class="res-name">${p.general.avatar} ${p.general.name}</span>
-                        <span class="res-stat" style="color:#e74c3c">${p.stats.damageDealt}</span>
-                        <span class="res-stat" style="color:#2ecc71">${p.stats.healed}</span>
-                        <span class="res-stat" style="color:#f1c40f">${p.stats.kills}</span>
+                        <span class="res-stat-small" style="color:#e74c3c">${p.stats.damageDealt}</span>
+                        <span class="res-stat-small" style="color:#2ecc71">${p.stats.healed}</span>
+                        <span class="res-stat-small" style="color:#f1c40f">${p.stats.kills}</span>
+                        <span class="res-stat-small" style="color:#3498db">${p.stats.cardsPlayed}</span>
+                        <span class="res-stat-small" style="color:#9b59b6">${p.stats.strategiesUsed}</span>
+                        <span class="res-stat-small" style="color:#1abc9c">${p.stats.skillsUsed}</span>
                     </div>
                 `;
             });
-            
+
             resultList.innerHTML = html;
         }
-        
+
         if (resultOverlay) resultOverlay.style.display = 'flex';
-        
+
         // 播放音效
         if (win) {
             AudioSystem.SFX.win();
         } else {
             AudioSystem.SFX.lose();
         }
-        
+
         // 停止BGM
         AudioSystem.stopBGM();
     },

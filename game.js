@@ -10,7 +10,8 @@ const GameState = {
     selectedCardIndex: -1,
     isTargetingMode: false,
     pendingChainTargets: [],
-    
+    pendingSkill: null,
+
     reset() {
         this.players = [];
         this.deck = [];
@@ -20,6 +21,7 @@ const GameState = {
         this.selectedCardIndex = -1;
         this.isTargetingMode = false;
         this.pendingChainTargets = [];
+        this.pendingSkill = null;
     }
 };
 
@@ -53,7 +55,14 @@ const Game = {
             lebu: false,
             chained: false,
             skillUsed: false,
-            stats: { damageDealt: 0, healed: 0, kills: 0 }
+            stats: {
+                damageDealt: 0,
+                healed: 0,
+                kills: 0,
+                cardsPlayed: 0,
+                strategiesUsed: 0,
+                skillsUsed: 0
+            }
         };
     },
 
@@ -279,6 +288,7 @@ const Game = {
         const source = GameState.players[sourceIdx];
         const card = source.hand[cardIndex];
         source.hand.splice(cardIndex, 1);
+        source.stats.cardsPlayed += 1;
         const events = [{ type: 'use_card', card, source: sourceIdx }];
 
         switch (card) {
@@ -305,11 +315,13 @@ const Game = {
                 break;
             case '万箭':
             case '南蛮':
+                source.stats.strategiesUsed += 1;
                 const attackType = card === '万箭' ? 'wanjian' : 'nanman';
                 events.push({ type: 'aoe', card, source: sourceIdx, attackType });
                 break;
             case '五谷':
                 // 五谷丰登：全场每人摸1张牌
+                source.stats.strategiesUsed += 1;
                 for (const p of GameState.players) {
                     if (!p.isDead) {
                         this.drawCards(p, 1);
@@ -318,16 +330,19 @@ const Game = {
                 }
                 break;
             case '无中':
+                source.stats.strategiesUsed += 1;
                 this.drawCards(source, 2);
                 events.push({ type: 'draw', count: 2 });
                 break;
             case '乐不':
+                source.stats.strategiesUsed += 1;
                 if (targetInfo && targetInfo.id !== undefined) {
                     targetInfo.lebu = true;
                     events.push({ type: 'delay', card: '乐不', target: targetInfo.id });
                 }
                 break;
             case '顺手':
+                source.stats.strategiesUsed += 1;
                 if (targetInfo && targetInfo.hand && targetInfo.hand.length > 0) {
                     const stolen = targetInfo.hand.pop();
                     source.hand.push(stolen);
@@ -335,22 +350,26 @@ const Game = {
                 }
                 break;
             case '拆桥':
+                source.stats.strategiesUsed += 1;
                 if (targetInfo && targetInfo.hand && targetInfo.hand.length > 0) {
                     targetInfo.hand.pop();
                     events.push({ type: 'discard', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
             case '决斗':
+                source.stats.strategiesUsed += 1;
                 if (targetInfo && targetInfo.id !== undefined) {
                     events.push({ type: 'duel', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
             case '火攻':
+                source.stats.strategiesUsed += 1;
                 if (targetInfo && targetInfo.id !== undefined) {
                     events.push({ type: 'fire_attack', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
             case '铁索':
+                source.stats.strategiesUsed += 1;
                 // targetInfo 应该是数组
                 if (Array.isArray(targetInfo)) {
                     for (const t of targetInfo) {
@@ -705,6 +724,8 @@ const Game = {
                 return { success: false, reason: 'skill_not_found' };
         }
 
+        // 统计技能使用
+        player.stats.skillsUsed += 1;
         return { success: true, events };
     },
 

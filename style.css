@@ -83,6 +83,7 @@ body {
 .enemy-card.dead { opacity: 0.4; filter: grayscale(100%); border-style: dashed; }
 .enemy-card.targetable { border-color: var(--red); box-shadow: 0 0 20px var(--red), 0 0 30px rgba(192, 57, 43, 0.4); animation: shake 0.4s infinite; }
 .enemy-card.selected-chain { border-color: var(--purple); box-shadow: 0 0 20px var(--purple); }
+.enemy-card.skill-target-available { border-color: #3498db; box-shadow: 0 0 25px #3498db, 0 0 40px rgba(52, 152, 219, 0.5); animation: skillTargetPulse 0.6s infinite; cursor: pointer; }
 .enemy-card.lord-border { border: 3px solid #f1c40f; box-shadow: 0 0 20px #f1c40f; }
 .enemy-card:active { transform: scale(0.96); }
 
@@ -318,9 +319,10 @@ body {
 .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #555; align-items: center; }
 .result-row:last-child { border-bottom: none; }
 .result-header { font-weight: bold; color: var(--gold); border-bottom: 2px solid var(--gold); }
-.res-role { width: 15%; text-align: center; }
-.res-name { width: 25%; text-align: left; padding-left: 5px; }
+.res-role { width: 12%; text-align: center; }
+.res-name { width: 20%; text-align: left; padding-left: 5px; }
 .res-stat { width: 20%; text-align: center; }
+.res-stat-small { width: 11%; text-align: center; font-size: 11px; }
 
 /* 再战江湖按钮 */
 .btn-restart {
@@ -333,6 +335,7 @@ body {
 }
 .btn-restart:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(241, 196, 15, 0.8); background: linear-gradient(45deg, #e74c3c, #e67e22); }
 @keyframes pulse { 0% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.3); } 50% { box-shadow: 0 0 25px rgba(241, 196, 15, 0.7); } 100% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.3); } }
+@keyframes skillTargetPulse { 0% { box-shadow: 0 0 15px #3498db, 0 0 30px rgba(52, 152, 219, 0.3); } 50% { box-shadow: 0 0 25px #3498db, 0 0 50px rgba(52, 152, 219, 0.6); } 100% { box-shadow: 0 0 15px #3498db, 0 0 30px rgba(52, 152, 219, 0.3); } }
 
 /* 欢迎页 */
 .welcome-container {
