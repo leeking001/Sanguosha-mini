@@ -169,28 +169,38 @@ const Game = {
         // 检查是否在出牌阶段
         if (GameState.selectedCardIndex === -1) {
             // 可能是在使用技能
-            if (player.general.name === '苦肉战将' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
+            const skillName = player.general.skill;
+
+            // 苦肉技能：失去1点生命摸2张牌
+            if (skillName === '苦肉' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
                 if (player.hp > 1) {
                     player.hp--;
                     this.drawCards(player, 2);
                     player.skillUsed = true;
-                    // 返回技能事件，包含流失生命和当前HP
                     return {
                         success: true,
                         action: 'skill',
                         skill: '苦肉',
+                        skillDesc: `${player.general.name}发动【苦肉】，失去1点生命摸2张牌`,
                         player: 0,
-                        hp: player.hp,
-                        loseHp: 1  // 标记为流失生命而非受到伤害
+                        hp: player.hp
                     };
                 }
             }
-            if (player.general.name === '制衡帝王' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
+
+            // 制衡技能：弃任意张手牌摸等量的牌（每回合限一次）
+            if (skillName === '制衡' && targetId === 0 && GameState.currentTurnIndex === 0 && !player.skillUsed) {
                 if (player.hand.length > 0) {
                     player.hand.pop();
                     this.drawCards(player, 1);
                     player.skillUsed = true;
-                    return { success: true, action: 'skill', skill: '制衡', player: 0 };
+                    return {
+                        success: true,
+                        action: 'skill',
+                        skill: '制衡',
+                        skillDesc: `${player.general.name}发动【制衡】，弃置1张牌摸1张牌`,
+                        player: 0
+                    };
                 }
             }
             return { success: false };
@@ -200,7 +210,7 @@ const Game = {
         if (!card) return { success: false };
 
         // 检查出牌限制
-        if (card === '杀' && player.hasAttacked && player.general.name !== '狂战勇士') {
+        if (card === '杀' && player.hasAttacked && player.general.skill !== '无双') {
             return { success: false, reason: 'already_attacked' };
         }
 
@@ -267,6 +277,15 @@ const Game = {
             case '南蛮':
                 const attackType = card === '万箭' ? 'wanjian' : 'nanman';
                 events.push({ type: 'aoe', card, source: sourceIdx, attackType });
+                break;
+            case '五谷':
+                // 五谷丰登：全场每人摸1张牌
+                for (const p of GameState.players) {
+                    if (!p.isDead) {
+                        this.drawCards(p, 1);
+                        events.push({ type: 'draw', target: p.id, count: 1 });
+                    }
+                }
                 break;
             case '无中':
                 this.drawCards(source, 2);

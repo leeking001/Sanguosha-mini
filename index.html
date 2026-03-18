@@ -145,15 +145,13 @@
             </div>
 
             <div class="help-section">
-                <h3>🦸 武将技能（11名）</h3>
+                <h3>🦸 武将技能（9名）</h3>
                 <div class="help-item"><b>曹操【奸雄】</b>：受到伤害后，可获得对方打出的牌并摸一张牌。</div>
-                <div class="help-item"><b>关羽【武圣】</b>：可将红色牌当【杀】使用或打出。</div>
                 <div class="help-item"><b>诸葛亮【反击】</b>：受到伤害后，可令伤害来源弃置一张手牌。</div>
                 <div class="help-item"><b>刘备【仁德】</b>：出牌阶段开始时，额外摸1张牌。</div>
                 <div class="help-item"><b>吕布【无双】</b>：出牌阶段，使用【杀】无次数限制。</div>
                 <div class="help-item"><b>赵云【龙胆】</b>：【杀】可当【闪】，【闪】可当【杀】。</div>
                 <div class="help-item"><b>孙权【制衡】</b>：出牌阶段，可弃置任意张手牌然后摸等量的牌（每回合限一次）。</div>
-                <div class="help-item"><b>张飞【咆哮】</b>：可将黑色牌当【过河拆桥】使用。</div>
                 <div class="help-item"><b>华佗【苦肉】</b>：出牌阶段，可失去1点生命摸2张牌（每回合限一次）。</div>
                 <div class="help-item"><b>黄月英【急救】</b>：回合结束时若已受伤，回复1点生命。</div>
                 <div class="help-item"><b>魏延【狂暴】</b>：使用【杀】需2张【闪】抵消；决斗时对方需出2张【杀】。</div>
@@ -441,7 +439,7 @@
                     const fireTarget = getPlayer(event.target);
                     if (!fireSource || !fireTarget) break;
 
-                    UI.log(`${getPlayerName(event.source)} 火攻 ${getPlayerName(event.target)}`, 'skill');
+                    UI.log(`${getPlayerName(event.source)} 对 ${getPlayerName(event.target)} 使用【火攻】`, 'skill');
                     const fireResult = await Game.resolveFireAttack(fireSource, fireTarget);
                     for (const e of fireResult.events) {
                         await handleAIEvent(e);
@@ -455,11 +453,21 @@
 
                 case 'discard':
                     if (event.reason === 'fire_attack_defense') {
-                        UI.log(`${getPlayerName(event.source)} 弃牌抵消火攻`, 'skill');
+                        UI.log(`${getPlayerName(event.target)} 弃置一张牌抵消火攻`, 'skill');
                     } else {
                         UI.log(`${getPlayerName(event.source)} 拆掉 ${getPlayerName(event.target)} 一张牌`, 'skill');
                     }
                     await UI.showEffect(event.target, '被拆桥', 'damage');
+                    break;
+
+                case 'draw':
+                    // 处理摸牌事件（五谷、无中等）
+                    const drawCount = event.count || 1;
+                    if (event.target !== undefined) {
+                        UI.log(`${getPlayerName(event.target)} 摸了 ${drawCount} 张牌`, 'skill');
+                    } else {
+                        UI.log(`${getPlayerName(event.source || 0)} 摸了 ${drawCount} 张牌`, 'skill');
+                    }
                     break;
 
                 case 'delay':
@@ -481,6 +489,7 @@
                 case 'heal':
                     AudioSystem.SFX.heal();
                     await UI.showEffect(event.target, `+${event.amount || 1}`, 'heal');
+                    UI.log(`${getPlayerName(event.target)} 回复了 ${event.amount || 1} 点体力`, 'heal');
                     break;
 
                 case 'save':
@@ -809,12 +818,14 @@
         async function handlePlayerClick(playerId) {
             if (playerId !== 0) return;
             if (GameState.currentTurnIndex !== 0) return;
-            
+
             const player = GameState.players[0];
             const result = Game.selectTarget(0);
-            
+
             if (result.success && result.action === 'skill') {
-                UI.log(`【${result.skill}】`, 'skill');
+                const skillDesc = result.skillDesc || `${player.general.name}发动【${result.skill}】`;
+                UI.log(skillDesc, 'skill');
+                showSkillToast(`【${result.skill}】已发动`);
                 await UI.showEffect(0, result.skill, 'skill');
                 UI.renderAll();
             }

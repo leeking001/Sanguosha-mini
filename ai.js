@@ -171,7 +171,7 @@ const AI = {
             // 10. 使用杀
             const shaIdx = ai.hand.indexOf('杀');
             if (shaIdx !== -1) {
-                if (!ai.hasAttacked || ai.general.name === '狂战勇士') {
+                if (!ai.hasAttacked || ai.general.skill === '无双') {
                     const result = await game.useCard(ai.id, shaIdx, target);
                     events.push(...result.events);
                     // 注意：攻击响应和伤害处理由 handleAIEvent 的 resolveAttack 统一处理
