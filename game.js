@@ -580,6 +580,82 @@ const Game = {
                 }
                 break;
 
+            case '奸雄':
+                // 奸雄：出牌阶段，可获得弃牌堆中的一张牌（简化：摸1张牌）
+                this.drawCards(player, 1);
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '奸雄',
+                    player: playerId,
+                    description: `${player.general.name}发动【奸雄】，摸1张牌`
+                });
+                break;
+
+            case '反击':
+                // 反击：出牌阶段，可令一名其他角色弃置一张手牌（简化：选随机敌人弃牌）
+                const aliveEnemies = GameState.players.filter(p => !p.isDead && p.id !== playerId);
+                if (aliveEnemies.length > 0) {
+                    const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+                    if (target.hand.length > 0) {
+                        const discardIdx = Math.floor(Math.random() * target.hand.length);
+                        target.hand.splice(discardIdx, 1);
+                        player.skillUsed = true;
+                        events.push({
+                            type: 'skill',
+                            name: '反击',
+                            player: playerId,
+                            description: `${player.general.name}发动【反击】，令${target.general.name}弃置1张牌`
+                        });
+                    } else {
+                        return { success: false, reason: 'target_no_cards' };
+                    }
+                } else {
+                    return { success: false, reason: 'no_target' };
+                }
+                break;
+
+            case '龙胆':
+                // 龙胆：出牌阶段，可将一张【杀】当【闪】使用，或将一张【闪】当【杀】使用
+                // 这个技能比较复杂，这里只是给提示
+                events.push({
+                    type: 'skill',
+                    name: '龙胆',
+                    player: playerId,
+                    description: `${player.general.name}发动【龙胆】，本回合可互换杀闪`
+                });
+                player.skillUsed = true;
+                break;
+
+            case '急救':
+                // 急救：出牌阶段，可回复1点生命（每回合限一次）
+                if (player.hp < player.maxHp) {
+                    player.hp++;
+                    player.skillUsed = true;
+                    events.push({
+                        type: 'skill',
+                        name: '急救',
+                        player: playerId,
+                        description: `${player.general.name}发动【急救】，回复1点生命`,
+                        hp: player.hp
+                    });
+                } else {
+                    return { success: false, reason: 'already_full_hp' };
+                }
+                break;
+
+            case '狂暴':
+                // 狂暴：出牌阶段，可摸1张牌（每回合限一次）
+                this.drawCards(player, 1);
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '狂暴',
+                    player: playerId,
+                    description: `${player.general.name}发动【狂暴】，摸1张牌`
+                });
+                break;
+
             default:
                 return { success: false, reason: 'skill_not_found' };
         }

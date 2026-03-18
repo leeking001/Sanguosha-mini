@@ -227,6 +227,27 @@ const AI = {
                 // 苦肉：如果需要更多手牌且生命值充足，使用技能
                 return ai.hp > 1 && ai.hand.length < ai.hp + 1;
 
+            case '奸雄':
+                // 奸雄：手牌少时使用
+                return ai.hand.length < ai.hp - 1;
+
+            case '反击':
+                // 反击：如果有敌人且他们有牌，就使用
+                const enemies = GameState.players.filter(p => !p.isDead && p.id !== ai.id && p.hand.length > 0);
+                return enemies.length > 0;
+
+            case '龙胆':
+                // 龙胆：如果有杀或闪，就使用
+                return ai.hand.includes('杀') || ai.hand.includes('闪');
+
+            case '急救':
+                // 急救：如果受伤且生命值不足，使用
+                return ai.hp < ai.maxHp && ai.hp <= 2;
+
+            case '狂暴':
+                // 狂暴：手牌少时使用
+                return ai.hand.length < ai.hp - 1;
+
             default:
                 return false;
         }

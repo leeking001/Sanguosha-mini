@@ -15,6 +15,26 @@ const GENERALS_DATA = [
 
     { name: '华佗', hp: 4, skill: '苦肉', avatar: '🛡️', color: '#f39c12',
       skillDesc: '出牌阶段，可失去1点生命摸2张牌（每回合限一次）',
+      skillType: 'active', canUse: true },
+
+    { name: '曹操', hp: 4, skill: '奸雄', avatar: '🔥', color: '#e74c3c',
+      skillDesc: '出牌阶段，可获得弃牌堆中的一张牌（每回合限一次）',
+      skillType: 'active', canUse: true },
+
+    { name: '诸葛亮', hp: 3, skill: '反击', avatar: '🌙', color: '#2c3e50',
+      skillDesc: '出牌阶段，可令一名其他角色弃置一张手牌（每回合限一次）',
+      skillType: 'active', canUse: true },
+
+    { name: '赵云', hp: 4, skill: '龙胆', avatar: '🏹', color: '#d35400',
+      skillDesc: '出牌阶段，可将一张【杀】当【闪】使用，或将一张【闪】当【杀】使用',
+      skillType: 'active', canUse: true },
+
+    { name: '黄月英', hp: 3, skill: '急救', avatar: '🌿', color: '#27ae60',
+      skillDesc: '出牌阶段，可回复1点生命（每回合限一次）',
+      skillType: 'active', canUse: true },
+
+    { name: '魏延', hp: 5, skill: '狂暴', avatar: '💥', color: '#e67e22',
+      skillDesc: '出牌阶段，可摸1张牌（每回合限一次）',
       skillType: 'active', canUse: true }
 ];
 
