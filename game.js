@@ -102,7 +102,7 @@ const Game = {
         if (!GameState.gameActive) return { success: false };
         GameState.currentTurnIndex = idx;
         const player = GameState.players[idx];
-        if (player.isDead) return { success: false, next: true };
+        if (player.isDead) return { success: false, reason: 'player_dead', next: true };
         player.hasAttacked = false;
         player.berserk = false;
         player.skillUsed = false;
@@ -500,7 +500,7 @@ const Game = {
     },
 
     // 使用主动技能
-    useActiveSkill(playerId) {
+    useActiveSkill(playerId, targetId = null) {
         const player = GameState.players[playerId];
         if (!player || player.isDead) {
             return { success: false, reason: 'player_dead' };
@@ -564,25 +564,32 @@ const Game = {
 
             case '神医':
                 // 神医：出牌阶段，可指定一名其他角色回复1点生命（每回合限一次）
-                const aliveOthers = GameState.players.filter(p => !p.isDead && p.id !== playerId);
-                if (aliveOthers.length > 0) {
-                    const target = aliveOthers[Math.floor(Math.random() * aliveOthers.length)];
-                    if (target.hp < target.maxHp) {
-                        target.hp++;
-                        player.skillUsed = true;
-                        events.push({
-                            type: 'skill',
-                            name: '神医',
-                            player: playerId,
-                            description: `${player.general.name}发动【神医】，令${target.general.name}回复1点生命`,
-                            hp: target.hp
-                        });
-                    } else {
-                        return { success: false, reason: 'target_already_full_hp' };
+                if (targetId === null) {
+                    // 如果没有指定目标，返回可选目标列表
+                    const aliveOthers = GameState.players.filter(p => !p.isDead && p.id !== playerId && p.hp < p.maxHp);
+                    if (aliveOthers.length === 0) {
+                        return { success: false, reason: 'no_valid_target' };
                     }
-                } else {
-                    return { success: false, reason: 'no_target' };
+                    return { success: false, reason: 'need_target', targets: aliveOthers.map(p => p.id), skillName: '神医' };
                 }
+
+                const targetForHeal = GameState.players[targetId];
+                if (!targetForHeal || targetForHeal.isDead || targetForHeal.id === playerId) {
+                    return { success: false, reason: 'invalid_target' };
+                }
+                if (targetForHeal.hp >= targetForHeal.maxHp) {
+                    return { success: false, reason: 'target_already_full_hp' };
+                }
+
+                targetForHeal.hp++;
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '神医',
+                    player: playerId,
+                    description: `${player.general.name}发动【神医】，令${targetForHeal.general.name}回复1点生命`,
+                    hp: targetForHeal.hp
+                });
                 break;
 
             case '苦肉':
@@ -616,26 +623,33 @@ const Game = {
                 break;
 
             case '反击':
-                // 反击：出牌阶段，可令一名其他角色弃置一张手牌（简化：选随机敌人弃牌）
-                const aliveEnemies = GameState.players.filter(p => !p.isDead && p.id !== playerId);
-                if (aliveEnemies.length > 0) {
-                    const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
-                    if (target.hand.length > 0) {
-                        const discardIdx = Math.floor(Math.random() * target.hand.length);
-                        target.hand.splice(discardIdx, 1);
-                        player.skillUsed = true;
-                        events.push({
-                            type: 'skill',
-                            name: '反击',
-                            player: playerId,
-                            description: `${player.general.name}发动【反击】，令${target.general.name}弃置1张牌`
-                        });
-                    } else {
-                        return { success: false, reason: 'target_no_cards' };
+                // 反击：出牌阶段，可令一名其他角色弃置一张手牌（每回合限一次）
+                if (targetId === null) {
+                    // 如果没有指定目标，返回可选目标列表
+                    const aliveEnemies = GameState.players.filter(p => !p.isDead && p.id !== playerId && p.hand.length > 0);
+                    if (aliveEnemies.length === 0) {
+                        return { success: false, reason: 'no_valid_target' };
                     }
-                } else {
-                    return { success: false, reason: 'no_target' };
+                    return { success: false, reason: 'need_target', targets: aliveEnemies.map(p => p.id), skillName: '反击' };
                 }
+
+                const targetForDiscard = GameState.players[targetId];
+                if (!targetForDiscard || targetForDiscard.isDead || targetForDiscard.id === playerId) {
+                    return { success: false, reason: 'invalid_target' };
+                }
+                if (targetForDiscard.hand.length === 0) {
+                    return { success: false, reason: 'target_no_cards' };
+                }
+
+                const discardIdx = Math.floor(Math.random() * targetForDiscard.hand.length);
+                targetForDiscard.hand.splice(discardIdx, 1);
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '反击',
+                    player: playerId,
+                    description: `${player.general.name}发动【反击】，令${targetForDiscard.general.name}弃置1张牌`
+                });
                 break;
 
             case '龙胆':

@@ -29,7 +29,7 @@ const GENERALS_DATA = [
       skillDesc: '出牌阶段，可将一张【杀】当【闪】使用，或将一张【闪】当【杀】使用',
       skillType: 'active', canUse: true },
 
-    { name: '黄忠', hp: 4, skill: '苦肉', avatar: '🏹', color: '#e8860f',
+    { name: '黄忠', hp: 4, skill: '苦肉', avatar: '💂', color: '#e8860f',
       skillDesc: '出牌阶段，可失去1点生命摸2张牌（每回合限一次）',
       skillType: 'active', canUse: true },
 

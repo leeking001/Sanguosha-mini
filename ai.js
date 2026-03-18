@@ -38,6 +38,14 @@ const AI = {
             case '忠臣':
                 // 攻击已知的反贼 - 绝对不攻击主公
                 target = alive.find(p => p.identityKnown && p.role === '反贼');
+                if (!target) {
+                    // 如果没有已知的反贼，攻击未知身份的角色
+                    target = alive.find(p => !p.identityKnown && p.role !== '主公');
+                }
+                if (!target) {
+                    // 如果全是主公，就不出手
+                    return null;
+                }
                 break;
                 
             case '主公':
@@ -59,9 +67,15 @@ const AI = {
                 break;
         }
 
-        // 如果没有明确目标，随机选择
+        // 如果没有明确目标，随机选择（忠臣不能攻击主公）
         if (!target && alive.length > 0) {
-            target = alive[Math.floor(Math.random() * alive.length)];
+            if (ai.role === '忠臣') {
+                // 忠臣只能攻击反贼或内奸
+                const validTargets = alive.filter(p => p.role !== '主公');
+                target = validTargets.length > 0 ? validTargets[Math.floor(Math.random() * validTargets.length)] : null;
+            } else {
+                target = alive[Math.floor(Math.random() * alive.length)];
+            }
         }
 
         return target;
