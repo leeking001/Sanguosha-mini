@@ -146,17 +146,17 @@
 
             <div class="help-section">
                 <h3>🦸 武将技能（11名）</h3>
-                <div class="help-item"><b>【红】赤焰将军【霸权】</b>：受到伤害后，可获得对方打出的牌并摸一张牌。</div>
-                <div class="help-item"><b>【红】青锋剑客【突袭】</b>：摸牌阶段，可少摸1张牌，然后获得其他角色一张手牌。</div>
-                <div class="help-item"><b>【红】智谋军师【反击】</b>：受到伤害后，可令伤害来源弃置一张手牌。</div>
-                <div class="help-item"><b>【蓝】仁德君主【仁德】</b>：出牌阶段开始时，额外摸1张牌。</div>
-                <div class="help-item"><b>【蓝】狂战勇士【咆哮】</b>：出牌阶段，使用【杀】无次数限制。</div>
-                <div class="help-item"><b>【蓝】神弓手【神射】</b>：使用【杀】可额外指定一名目标。</div>
-                <div class="help-item"><b>【绿】制衡帝王【制衡】</b>：出牌阶段，可弃置任意张手牌然后摸等量的牌（每回合限一次）。</div>
-                <div class="help-item"><b>【绿】铁骑将军【奇袭】</b>：可将黑色牌当【过河拆桥】使用。</div>
-                <div class="help-item"><b>【黄】苦肉战将【苦肉】</b>：出牌阶段，可失去1点生命摸2张牌（每回合限一次）。</div>
-                <div class="help-item"><b>【黄】神医圣手【急救】</b>：回合结束时若已受伤，回复1点生命。</div>
-                <div class="help-item"><b>【黄】暴怒战神【无双】</b>：使用【杀】需2张【闪】抵消；决斗时对方需出2张【杀】。</div>
+                <div class="help-item"><b>曹操【奸雄】</b>：受到伤害后，可获得对方打出的牌并摸一张牌。</div>
+                <div class="help-item"><b>关羽【武圣】</b>：可将红色牌当【杀】使用或打出。</div>
+                <div class="help-item"><b>诸葛亮【反击】</b>：受到伤害后，可令伤害来源弃置一张手牌。</div>
+                <div class="help-item"><b>刘备【仁德】</b>：出牌阶段开始时，额外摸1张牌。</div>
+                <div class="help-item"><b>吕布【无双】</b>：出牌阶段，使用【杀】无次数限制。</div>
+                <div class="help-item"><b>赵云【龙胆】</b>：【杀】可当【闪】，【闪】可当【杀】。</div>
+                <div class="help-item"><b>孙权【制衡】</b>：出牌阶段，可弃置任意张手牌然后摸等量的牌（每回合限一次）。</div>
+                <div class="help-item"><b>张飞【咆哮】</b>：可将黑色牌当【过河拆桥】使用。</div>
+                <div class="help-item"><b>华佗【苦肉】</b>：出牌阶段，可失去1点生命摸2张牌（每回合限一次）。</div>
+                <div class="help-item"><b>黄月英【急救】</b>：回合结束时若已受伤，回复1点生命。</div>
+                <div class="help-item"><b>魏延【狂暴】</b>：使用【杀】需2张【闪】抵消；决斗时对方需出2张【杀】。</div>
             </div>
 
             <div class="help-section">
@@ -754,17 +754,35 @@
         async function handleConfirm() {
             const player = GameState.players[0];
             const cardIndex = GameState.selectedCardIndex;
-            
+
             if (cardIndex === -1) return;
-            
+
+            const card = player.hand[cardIndex];
             const useResult = await Game.useCard(0, cardIndex, player);
-            
+
+            // 显示技能提示
+            if (useResult.card) {
+                showSkillToast(`使用【${useResult.card}】`);
+            }
+
             for (const event of useResult.events) {
                 await handlePlayerEvent(event);
             }
-            
+
             Game.cancelAction();
             UI.renderAll();
+        }
+
+        // 显示技能提示
+        function showSkillToast(text) {
+            const toast = document.createElement('div');
+            toast.className = 'skill-toast';
+            toast.innerText = text;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
         }
 
         // 取消操作

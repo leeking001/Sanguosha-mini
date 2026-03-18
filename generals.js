@@ -1,34 +1,30 @@
 // 英雄数据模块 - 迷你杀英雄定义
 
 const GENERALS_DATA = [
-    // 红方势力（强攻型）
-    { name: '赤焰将军', hp: 4, skill: '霸权', avatar: '🔥', color: '#e74c3c', faction: '红',
+    { name: '曹操', hp: 4, skill: '奸雄', avatar: '🔥', color: '#e74c3c',
       skillDesc: '受到伤害后，可获得对方打出的牌并摸一张牌' },
-    { name: '青锋剑客', hp: 4, skill: '突袭', avatar: '⚡', color: '#7f8c8d', faction: '红',
-      skillDesc: '摸牌阶段，可少摸1张牌，然后获得其他角色一张手牌' },
-    { name: '智谋军师', hp: 3, skill: '反击', avatar: '🌙', color: '#2c3e50', faction: '红',
+    { name: '关羽', hp: 4, skill: '武圣', avatar: '⚡', color: '#7f8c8d',
+      skillDesc: '可将红色牌当【杀】使用或打出' },
+    { name: '诸葛亮', hp: 3, skill: '反击', avatar: '🌙', color: '#2c3e50',
       skillDesc: '受到伤害后，可令伤害来源弃置一张手牌' },
 
-    // 蓝方势力（团队型）
-    { name: '仁德君主', hp: 4, skill: '仁德', avatar: '🐉', color: '#2ecc71', faction: '蓝',
+    { name: '刘备', hp: 4, skill: '仁德', avatar: '🐉', color: '#2ecc71',
       skillDesc: '出牌阶段开始时，额外摸1张牌' },
-    { name: '狂战勇士', hp: 4, skill: '咆哮', avatar: '⚔️', color: '#c0392b', faction: '蓝',
+    { name: '吕布', hp: 4, skill: '无双', avatar: '⚔️', color: '#c0392b',
       skillDesc: '出牌阶段，使用【杀】无次数限制' },
-    { name: '神弓手', hp: 4, skill: '神射', avatar: '🏹', color: '#d35400', faction: '蓝',
-      skillDesc: '使用【杀】可额外指定一名目标' },
+    { name: '赵云', hp: 4, skill: '龙胆', avatar: '🏹', color: '#d35400',
+      skillDesc: '【杀】可当【闪】，【闪】可当【杀】' },
 
-    // 绿方势力（平衡型）
-    { name: '制衡帝王', hp: 4, skill: '制衡', avatar: '👑', color: '#3498db', faction: '绿',
+    { name: '孙权', hp: 4, skill: '制衡', avatar: '👑', color: '#3498db',
       skillDesc: '出牌阶段，可弃置任意张手牌然后摸等量的牌（每回合限一次）' },
-    { name: '铁骑将军', hp: 4, skill: '奇袭', avatar: '⚫', color: '#2c3e50', faction: '绿',
+    { name: '张飞', hp: 4, skill: '咆哮', avatar: '⚫', color: '#2c3e50',
       skillDesc: '可将黑色牌当【过河拆桥】使用' },
 
-    // 黄方势力（特殊型）
-    { name: '苦肉战将', hp: 4, skill: '苦肉', avatar: '🛡️', color: '#f39c12', faction: '黄',
+    { name: '华佗', hp: 4, skill: '苦肉', avatar: '🛡️', color: '#f39c12',
       skillDesc: '出牌阶段，可失去1点生命摸2张牌（每回合限一次）' },
-    { name: '神医圣手', hp: 3, skill: '急救', avatar: '🌿', color: '#27ae60', faction: '黄',
+    { name: '黄月英', hp: 3, skill: '急救', avatar: '🌿', color: '#27ae60',
       skillDesc: '回合结束时若已受伤，回复1点生命' },
-    { name: '暴怒战神', hp: 5, skill: '无双', avatar: '💥', color: '#e74c3c', faction: '黄',
+    { name: '魏延', hp: 5, skill: '狂暴', avatar: '💥', color: '#e74c3c',
       skillDesc: '使用【杀】需2张【闪】抵消；决斗时对方需出2张【杀】' }
 ];
 
