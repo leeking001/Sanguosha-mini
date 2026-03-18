@@ -326,7 +326,10 @@ const Game = {
 
     async dealDamage(source, target, baseDamage = 1) {
         let damage = baseDamage;
-        if (source.berserk) damage++;
+        if (source.berserk) {
+            damage++;
+            source.berserk = false;  // 立即清除酒的buff，防止重复加成
+        }
         target.hp -= damage;
         const events = [{ type: 'damage', source: source.id, target: target.id, damage, hp: target.hp }];
         if (target.hp <= 0) {
