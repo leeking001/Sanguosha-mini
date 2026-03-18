@@ -66,7 +66,8 @@ const UI = {
         const confirmBtn = document.getElementById('btn-confirm');
         const cancelBtn = document.getElementById('btn-cancel');
         const endBtn = document.getElementById('btn-end');
-        
+        const skillBtn = document.getElementById('btn-skill');
+
         if (confirmBtn) {
             confirmBtn.addEventListener('click', () => {
                 if (this.callbacks.onConfirm) {
@@ -74,7 +75,7 @@ const UI = {
                 }
             });
         }
-        
+
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => {
                 if (this.callbacks.onCancel) {
@@ -82,11 +83,19 @@ const UI = {
                 }
             });
         }
-        
+
         if (endBtn) {
             endBtn.addEventListener('click', () => {
                 if (this.callbacks.onEndTurn) {
                     this.callbacks.onEndTurn();
+                }
+            });
+        }
+
+        if (skillBtn) {
+            skillBtn.addEventListener('click', () => {
+                if (this.callbacks.onSkillUse) {
+                    this.callbacks.onSkillUse();
                 }
             });
         }
@@ -341,14 +350,15 @@ const UI = {
         const isMyTurn = this.gameState.currentTurnIndex === 0;
         const hasSel = this.gameState.selectedCardIndex !== -1;
         const player = this.gameState.players[0];
-        
+
         const confirmBtn = document.getElementById('btn-confirm');
         const cancelBtn = document.getElementById('btn-cancel');
         const endBtn = document.getElementById('btn-end');
-        
+        const skillBtn = document.getElementById('btn-skill');
+
         if (endBtn) endBtn.disabled = !isMyTurn;
         if (cancelBtn) cancelBtn.disabled = !hasSel;
-        
+
         // 判断是否可以确认出牌
         let canConfirm = false;
         if (isMyTurn && hasSel && player) {
@@ -357,8 +367,20 @@ const UI = {
             if (card === '酒') canConfirm = true;
             if (['万箭', '南蛮', '无中', '五谷'].includes(card)) canConfirm = true;
         }
-        
+
         if (confirmBtn) confirmBtn.disabled = !canConfirm;
+
+        // 更新技能按钮状态
+        if (skillBtn && player) {
+            const canUseSkill = isMyTurn && !player.skillUsed && player.general && player.general.skill;
+            skillBtn.disabled = !canUseSkill;
+            if (canUseSkill && player.general) {
+                skillBtn.innerText = `【${player.general.skill}】`;
+                skillBtn.style.opacity = '1';
+            } else {
+                skillBtn.style.opacity = '0.5';
+            }
+        }
     },
     
     // 添加日志
@@ -493,17 +515,19 @@ const UI = {
     showSkillButton(skillName, onClick) {
         const skillBtn = document.getElementById('btn-skill');
         if (skillBtn) {
-            skillBtn.innerText = skillName;
-            skillBtn.classList.add('show');
+            skillBtn.innerText = `【${skillName}】`;
+            skillBtn.disabled = false;
+            skillBtn.style.opacity = '1';
             skillBtn.onclick = onClick;
         }
     },
-    
+
     // 隐藏技能按钮
     hideSkillButton() {
         const skillBtn = document.getElementById('btn-skill');
         if (skillBtn) {
-            skillBtn.classList.remove('show');
+            skillBtn.disabled = true;
+            skillBtn.style.opacity = '0.5';
             skillBtn.onclick = null;
         }
     },

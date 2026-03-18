@@ -497,6 +497,115 @@ const Game = {
             }
         }
         return { success: true, events };
+    },
+
+    // 使用主动技能
+    useActiveSkill(playerId) {
+        const player = GameState.players[playerId];
+        if (!player || player.isDead) {
+            return { success: false, reason: 'player_dead' };
+        }
+
+        // 检查是否是该玩家的回合
+        if (GameState.currentTurnIndex !== playerId) {
+            return { success: false, reason: 'not_player_turn' };
+        }
+
+        // 检查是否已经使用过技能
+        if (player.skillUsed) {
+            return { success: false, reason: 'skill_already_used' };
+        }
+
+        const skillName = player.general.skill;
+        const events = [];
+
+        switch (skillName) {
+            case '仁德':
+                // 仁德：出牌阶段开始时，额外摸1张牌
+                this.drawCards(player, 1);
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '仁德',
+                    player: playerId,
+                    description: `${player.general.name}发动【仁德】，额外摸1张牌`
+                });
+                break;
+
+            case '无双':
+                // 无双：出牌阶段，使用【杀】无次数限制（这个是被动的，在出牌时处理）
+                // 这里可以给一个视觉反馈
+                events.push({
+                    type: 'skill',
+                    name: '无双',
+                    player: playerId,
+                    description: `${player.general.name}发动【无双】，本回合杀无次数限制`
+                });
+                player.skillUsed = true;
+                break;
+
+            case '制衡':
+                // 制衡：出牌阶段，可弃置任意张手牌然后摸等量的牌（每回合限一次）
+                if (player.hand.length > 0) {
+                    const discardCount = Math.min(player.hand.length, Math.floor(Math.random() * 3) + 1);
+                    player.hand.splice(0, discardCount);
+                    this.drawCards(player, discardCount);
+                    player.skillUsed = true;
+                    events.push({
+                        type: 'skill',
+                        name: '制衡',
+                        player: playerId,
+                        description: `${player.general.name}发动【制衡】，弃置${discardCount}张牌摸${discardCount}张牌`
+                    });
+                } else {
+                    return { success: false, reason: 'no_cards_to_discard' };
+                }
+                break;
+
+            case '苦肉':
+                // 苦肉：出牌阶段，可失去1点生命摸2张牌（每回合限一次）
+                if (player.hp > 1) {
+                    player.hp--;
+                    this.drawCards(player, 2);
+                    player.skillUsed = true;
+                    events.push({
+                        type: 'skill',
+                        name: '苦肉',
+                        player: playerId,
+                        description: `${player.general.name}发动【苦肉】，失去1点生命摸2张牌`,
+                        hp: player.hp
+                    });
+                } else {
+                    return { success: false, reason: 'insufficient_hp' };
+                }
+                break;
+
+            default:
+                return { success: false, reason: 'skill_not_found' };
+        }
+
+        return { success: true, events };
+    },
+
+    // 检查玩家是否可以使用技能
+    canUseSkill(playerId) {
+        const player = GameState.players[playerId];
+        if (!player || player.isDead) return false;
+        if (GameState.currentTurnIndex !== playerId) return false;
+        if (player.skillUsed) return false;
+        if (!player.general || !player.general.skill) return false;
+        return true;
+    },
+
+    // 获取技能信息
+    getSkillInfo(playerId) {
+        const player = GameState.players[playerId];
+        if (!player || !player.general) return null;
+        return {
+            name: player.general.skill,
+            description: player.general.skillDesc,
+            canUse: this.canUseSkill(playerId)
+        };
     }
 };
 

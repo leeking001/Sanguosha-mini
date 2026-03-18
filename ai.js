@@ -86,9 +86,18 @@ const AI = {
     // AI回合行动
     async takeTurn(ai, game) {
         const events = [];
-        
+
         if (ai.isDead || !GameState.gameActive) {
             return { success: false, reason: 'cannot_act' };
+        }
+
+        // 0. 使用主动技能（如果有利）
+        const skillResult = this.shouldUseActiveSkill(ai, game);
+        if (skillResult) {
+            const useSkillResult = game.useActiveSkill(ai.id);
+            if (useSkillResult.success) {
+                events.push(...useSkillResult.events);
+            }
         }
 
         // 1. 使用无中生有
@@ -193,6 +202,34 @@ const AI = {
         }
 
         return { success: true, events };
+    },
+
+    // 评估AI是否应该使用主动技能
+    shouldUseActiveSkill(ai, game) {
+        if (ai.skillUsed || !ai.general || !ai.general.skill) return false;
+
+        const skill = ai.general.skill;
+
+        switch (skill) {
+            case '仁德':
+                // 仁德：如果手牌数接近上限，先摸牌（出牌阶段开始时触发）
+                return ai.hand.length < ai.hp - 1;
+
+            case '无双':
+                // 无双：如果有杀，先使用技能让杀无限制
+                return ai.hand.includes('杀');
+
+            case '制衡':
+                // 制衡：如果手牌过多，可以用技能换牌
+                return ai.hand.length > ai.hp + 2;
+
+            case '苦肉':
+                // 苦肉：如果需要更多手牌且生命值充足，使用技能
+                return ai.hp > 1 && ai.hand.length < ai.hp + 1;
+
+            default:
+                return false;
+        }
     },
 
     // 评估并使用AOE

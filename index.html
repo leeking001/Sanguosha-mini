@@ -46,12 +46,10 @@
             <div class="hp-bar" id="my-hp-bar"></div>
         </div>
 
-        <!-- 技能按钮 -->
-        <button id="btn-skill" class="skill-btn"></button>
-
         <div id="hand-scroll-container"></div>
 
         <div id="controls">
+            <button id="btn-skill" class="skill-btn">【技能】</button>
             <button id="btn-confirm" class="btn-action" disabled>出牌</button>
             <button id="btn-cancel" class="btn-action" disabled>取消</button>
             <button id="btn-end" class="btn-action" disabled>结束</button>
@@ -148,16 +146,11 @@
             </div>
 
             <div class="help-section">
-                <h3>🦸 武将技能（9名）</h3>
-                <div class="help-item"><b>曹操【奸雄】</b>：受到伤害后，可获得对方打出的牌并摸一张牌。</div>
-                <div class="help-item"><b>诸葛亮【反击】</b>：受到伤害后，可令伤害来源弃置一张手牌。</div>
+                <h3>🦸 武将技能（4名）</h3>
                 <div class="help-item"><b>刘备【仁德】</b>：出牌阶段开始时，额外摸1张牌。</div>
                 <div class="help-item"><b>吕布【无双】</b>：出牌阶段，使用【杀】无次数限制。</div>
-                <div class="help-item"><b>赵云【龙胆】</b>：【杀】可当【闪】，【闪】可当【杀】。</div>
                 <div class="help-item"><b>孙权【制衡】</b>：出牌阶段，可弃置任意张手牌然后摸等量的牌（每回合限一次）。</div>
                 <div class="help-item"><b>华佗【苦肉】</b>：出牌阶段，可失去1点生命摸2张牌（每回合限一次）。</div>
-                <div class="help-item"><b>黄月英【急救】</b>：回合结束时若已受伤，回复1点生命。</div>
-                <div class="help-item"><b>魏延【狂暴】</b>：使用【杀】需2张【闪】抵消；决斗时对方需出2张【杀】。</div>
             </div>
 
             <div class="help-section">
@@ -216,6 +209,7 @@
                 onTargetSelect: handleTargetSelect,
                 onConfirm: handleConfirm,
                 onCancel: handleCancel,
+                onSkillUse: handleSkillUse,
                 onEndTurn: handleEndTurn,
                 onPlayerClick: handlePlayerClick
             });
@@ -809,6 +803,42 @@
             UI.updateHandUI();
             UI.updateButtons();
             UI.renderEnemyZone();
+        }
+
+        // 使用主动技能
+        async function handleSkillUse() {
+            if (GameState.currentTurnIndex !== 0) return;
+
+            const player = GameState.players[0];
+            if (!player || !player.general) return;
+
+            const result = Game.useActiveSkill(0);
+
+            if (result.success) {
+                // 处理技能事件
+                for (const event of result.events) {
+                    if (event.type === 'skill') {
+                        UI.log(event.description, 'skill');
+                        AudioSystem.SFX.skill();
+                        await UI.showEffect(0, event.name, 'skill');
+                        showSkillToast(`【${event.name}】已发动`);
+                    }
+                }
+
+                UI.renderAll();
+            } else {
+                // 技能无法使用
+                const reasons = {
+                    'player_dead': '角色已死亡',
+                    'not_player_turn': '不是你的回合',
+                    'skill_already_used': '技能已使用过',
+                    'no_cards_to_discard': '没有手牌可弃置',
+                    'insufficient_hp': '生命值不足',
+                    'skill_not_found': '技能不存在'
+                };
+                const message = reasons[result.reason] || '技能无法使用';
+                UI.log(message, 'system');
+            }
         }
 
         // 结束回合
