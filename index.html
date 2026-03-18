@@ -55,8 +55,42 @@
         </div>
     </div>
 
+    <!-- 欢迎页 -->
+    <div id="welcome-screen" class="overlay" style="display:flex;">
+        <div class="welcome-container">
+            <div class="welcome-logo">⚔️</div>
+            <div class="welcome-title">迷你杀</div>
+            <div class="welcome-subtitle">英雄对决·战火连天</div>
+
+            <div class="welcome-intro">
+                <div class="intro-item">
+                    <span class="intro-icon">🎮</span>
+                    <span class="intro-text">4人身份局 · 主公忠臣反贼内奸</span>
+                </div>
+                <div class="intro-item">
+                    <span class="intro-icon">⚔️</span>
+                    <span class="intro-text">11位英雄 · 独特技能策略对决</span>
+                </div>
+                <div class="intro-item">
+                    <span class="intro-icon">🎴</span>
+                    <span class="intro-text">经典卡牌 · 杀闪桃酒锦囊齐全</span>
+                </div>
+                <div class="intro-item">
+                    <span class="intro-icon">🤖</span>
+                    <span class="intro-text">智能AI · 真实对战体验</span>
+                </div>
+            </div>
+
+            <button class="btn-start" id="btn-start-game">开始游戏</button>
+
+            <div class="welcome-footer">
+                HTML5 单机版 · 无需联网 · 开源免费
+            </div>
+        </div>
+    </div>
+
     <!-- 流程弹窗 -->
-    <div id="setup-screen" class="overlay" style="display:flex;">
+    <div id="setup-screen" class="overlay" style="display:none;">
         <div id="step-role" class="select-container">
             <div class="select-title">第一步：选择你的身份</div>
             <div class="role-options">
@@ -196,7 +230,7 @@
         async function init() {
             // 初始化游戏核心
             Game.init();
-            
+
             // 初始化UI并设置回调
             UI.init(Game, GameState, {
                 onCardSelect: handleCardSelect,
@@ -215,9 +249,24 @@
             if (settings.bgmEnabled) {
                 AudioSystem.toggleBGM();
             }
-            
-            // 显示身份选择
-            UI.showRoleSelection(handleRoleSelect);
+
+            // 显示欢迎页
+            showWelcomeScreen();
+        }
+
+        // 显示欢迎页
+        function showWelcomeScreen() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const startBtn = document.getElementById('btn-start-game');
+
+            welcomeScreen.style.display = 'flex';
+
+            startBtn.addEventListener('click', function handleStartClick() {
+                welcomeScreen.style.display = 'none';
+                startBtn.removeEventListener('click', handleStartClick);
+                // 显示身份选择
+                UI.showRoleSelection(handleRoleSelect);
+            });
         }
 
         // 处理身份选择
