@@ -363,11 +363,23 @@ const Game = {
 
     async respondAttack(target, attackType) {
         const need = attackType === 'nanman' ? '杀' : '闪';
-        const idx = target.hand.indexOf(need);
-        if (idx !== -1) {
-            target.hand.splice(idx, 1);
-            return { success: true, responded: true, card: need, player: target.id };
+
+        // 检查赵云的龙胆技能：【杀】可当【闪】，【闪】可当【杀】
+        let acceptCards = [need];
+        if (target.general.skill === '龙胆') {
+            const alternative = need === '杀' ? '闪' : '杀';
+            acceptCards.push(alternative);
         }
+
+        // 尝试找到可以接受的卡牌
+        for (const card of acceptCards) {
+            const idx = target.hand.indexOf(card);
+            if (idx !== -1) {
+                target.hand.splice(idx, 1);
+                return { success: true, responded: true, card, player: target.id };
+            }
+        }
+
         return { success: true, responded: false, player: target.id };
     },
 
@@ -395,8 +407,64 @@ const Game = {
     },
 
     // 解析决斗
-    resolveDuel(source, target) {
-        return { success: true, events: [] };
+    async resolveDuel(source, target) {
+        const events = [];
+
+        // 决斗：双方轮流出【杀】，不出者受伤害
+        // 源方先出，如果源方出不出【杀】就受伤
+        let currentPlayer = source;
+        let otherPlayer = target;
+        let round = 0;
+
+        while (round < 100) { // 防止无限循环
+            // 当前玩家尝试出【杀】
+            let shaIdx = currentPlayer.hand.indexOf('杀');
+
+            // 检查吕布的无双技能：出【杀】无次数限制（已经在useCard中处理）
+            // 检查魏延的狂暴技能：使用【杀】需2张【闪】抵消
+
+            if (shaIdx !== -1) {
+                currentPlayer.hand.splice(shaIdx, 1);
+                events.push({ type: 'duel_attack', player: currentPlayer.id, card: '杀' });
+
+                // 对方尝试防守
+                let needShans = 1;
+                if (otherPlayer.general.skill === '狂暴') {
+                    needShans = 2; // 魏延需要2张闪
+                }
+
+                // 对方尝试出闪
+                let shanCount = 0;
+                for (let i = 0; i < needShans; i++) {
+                    let shanIdx = otherPlayer.hand.indexOf('闪');
+                    if (shanIdx !== -1) {
+                        otherPlayer.hand.splice(shanIdx, 1);
+                        shanCount++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (shanCount < needShans) {
+                    // 防守失败，受伤害
+                    const dmg = await this.dealDamage(currentPlayer, otherPlayer, 1);
+                    events.push(...dmg.events);
+                    break;
+                }
+
+                // 防守成功，交换攻防角色
+                [currentPlayer, otherPlayer] = [otherPlayer, currentPlayer];
+            } else {
+                // 当前玩家出不出【杀】，受伤害
+                const dmg = await this.dealDamage(otherPlayer, currentPlayer, 1);
+                events.push(...dmg.events);
+                break;
+            }
+
+            round++;
+        }
+
+        return { success: true, events };
     },
 
     // 火攻处理

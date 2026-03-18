@@ -479,6 +479,11 @@
                     await UI.showEffect(event.target, event.card, 'skill');
                     break;
 
+                case 'duel_attack':
+                    UI.log(`${getPlayerName(event.player)} 出【杀】`, 'skill');
+                    await UI.showEffect(event.player, '【杀】', 'skill');
+                    break;
+
                 case 'chain':
                     UI.log(`${getPlayerName(event.target)} ${event.chained ? '进入' : '解除'}连环`, 'skill');
                     await UI.showEffect(event.target, event.chained ? '连环' : '解除', 'skill');
