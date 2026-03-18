@@ -140,8 +140,36 @@ const Game = {
         const lord = GameState.players.find(p => p.role === '主公' && !p.isDead);
         const rebels = GameState.players.filter(p => p.role === '反贼' && !p.isDead);
         const traitor = GameState.players.filter(p => p.role === '内奸' && !p.isDead);
-        if (!lord) return { gameOver: true, win: false, message: '主公阵亡！' };
-        if (rebels.length === 0 && traitor.length === 0) return { gameOver: true, win: true, message: '胜利！' };
+        const user = GameState.players[0];
+
+        // 主公阵亡
+        if (!lord) {
+            // 检查玩家阵营
+            if (user.role === '主公') {
+                return { gameOver: true, win: false, message: '主公阵亡，你败了！' };
+            } else if (user.role === '忠臣') {
+                return { gameOver: true, win: false, message: '主公阵亡，忠臣战败！' };
+            } else if (user.role === '反贼') {
+                return { gameOver: true, win: true, message: '主公阵亡，反贼胜利！' };
+            } else if (user.role === '内奸') {
+                return { gameOver: true, win: true, message: '主公阵亡，内奸胜利！' };
+            }
+        }
+
+        // 反贼和内奸全部阵亡 - 主公阵营胜利
+        if (rebels.length === 0 && traitor.length === 0) {
+            if (user.role === '主公' || user.role === '忠臣') {
+                return { gameOver: true, win: true, message: '反贼全灭，你胜利了！' };
+            } else {
+                return { gameOver: true, win: false, message: '反贼全灭，你败了！' };
+            }
+        }
+
+        // 反贼全部阵亡但还有内奸 - 游戏继续
+        if (rebels.length === 0 && traitor.length > 0) {
+            return { gameOver: false };
+        }
+
         return { gameOver: false };
     },
 

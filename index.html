@@ -37,15 +37,18 @@
                 <span id="my-role-badge" class="my-role"></span>
                 <span id="my-avatar" style="font-size:24px;"></span>
                 <span id="my-name" class="my-name"></span>
-                <span id="my-skill" style="font-size:12px; color:#bdc3c7;"></span>
+                <div id="my-skill-info" style="flex: 1;">
+                    <div id="my-skill" style="font-size:13px; color:#3498db; font-weight:bold;"></div>
+                    <div id="my-skill-desc" style="font-size:11px; color:#bdc3c7; margin-top:2px;"></div>
+                </div>
                 <div id="my-status-icons" class="status-icons"></div>
             </div>
             <div class="hp-bar" id="my-hp-bar"></div>
         </div>
-        
+
         <!-- 技能按钮 -->
         <button id="btn-skill" class="skill-btn"></button>
-        
+
         <div id="hand-scroll-container"></div>
 
         <div id="controls">
@@ -265,7 +268,8 @@
             const player = GameState.players[0];
             document.getElementById('my-avatar').innerText = hero.avatar;
             document.getElementById('my-name').innerText = hero.name;
-            document.getElementById('my-skill').innerText = `[${hero.skill}]`;
+            document.getElementById('my-skill').innerText = `【${hero.skill}】`;
+            document.getElementById('my-skill-desc').innerText = hero.skillDesc;
 
             const badge = document.getElementById('my-role-badge');
             badge.innerText = GameState.userRole;
