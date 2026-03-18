@@ -562,6 +562,29 @@ const Game = {
                 }
                 break;
 
+            case '神医':
+                // 神医：出牌阶段，可指定一名其他角色回复1点生命（每回合限一次）
+                const aliveOthers = GameState.players.filter(p => !p.isDead && p.id !== playerId);
+                if (aliveOthers.length > 0) {
+                    const target = aliveOthers[Math.floor(Math.random() * aliveOthers.length)];
+                    if (target.hp < target.maxHp) {
+                        target.hp++;
+                        player.skillUsed = true;
+                        events.push({
+                            type: 'skill',
+                            name: '神医',
+                            player: playerId,
+                            description: `${player.general.name}发动【神医】，令${target.general.name}回复1点生命`,
+                            hp: target.hp
+                        });
+                    } else {
+                        return { success: false, reason: 'target_already_full_hp' };
+                    }
+                } else {
+                    return { success: false, reason: 'no_target' };
+                }
+                break;
+
             case '苦肉':
                 // 苦肉：出牌阶段，可失去1点生命摸2张牌（每回合限一次）
                 if (player.hp > 1) {

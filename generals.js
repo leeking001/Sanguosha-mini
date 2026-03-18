@@ -13,8 +13,8 @@ const GENERALS_DATA = [
       skillDesc: '出牌阶段，可弃置任意张手牌然后摸等量的牌（每回合限一次）',
       skillType: 'active', canUse: true },
 
-    { name: '华佗', hp: 4, skill: '苦肉', avatar: '🛡️', color: '#f39c12',
-      skillDesc: '出牌阶段，可失去1点生命摸2张牌（每回合限一次）',
+    { name: '华佗', hp: 4, skill: '神医', avatar: '⚕️', color: '#f39c12',
+      skillDesc: '出牌阶段，可指定一名其他角色回复1点生命（每回合限一次）',
       skillType: 'active', canUse: true },
 
     { name: '曹操', hp: 4, skill: '奸雄', avatar: '🔥', color: '#e74c3c',
@@ -29,8 +29,8 @@ const GENERALS_DATA = [
       skillDesc: '出牌阶段，可将一张【杀】当【闪】使用，或将一张【闪】当【杀】使用',
       skillType: 'active', canUse: true },
 
-    { name: '黄月英', hp: 3, skill: '急救', avatar: '🌿', color: '#27ae60',
-      skillDesc: '出牌阶段，可回复1点生命（每回合限一次）',
+    { name: '黄忠', hp: 4, skill: '苦肉', avatar: '🏹', color: '#e8860f',
+      skillDesc: '出牌阶段，可失去1点生命摸2张牌（每回合限一次）',
       skillType: 'active', canUse: true },
 
     { name: '魏延', hp: 5, skill: '狂暴', avatar: '💥', color: '#e67e22',

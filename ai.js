@@ -240,9 +240,15 @@ const AI = {
                 // 龙胆：如果有杀或闪，就使用
                 return ai.hand.includes('杀') || ai.hand.includes('闪');
 
-            case '急救':
-                // 急救：如果受伤且生命值不足，使用
-                return ai.hp < ai.maxHp && ai.hp <= 2;
+            case '神医':
+                // 神医：如果有受伤的队友，就治疗
+                const aliveOthers = GameState.players.filter(p => !p.isDead && p.id !== ai.id);
+                const injuredAlly = aliveOthers.find(p => p.hp < p.maxHp && this.isAlly(ai, p));
+                return injuredAlly !== undefined;
+
+            case '苦肉':
+                // 苦肉：如果需要更多手牌且生命值充足，使用技能
+                return ai.hp > 1 && ai.hand.length < ai.hp + 1;
 
             case '狂暴':
                 // 狂暴：手牌少时使用
