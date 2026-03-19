@@ -112,7 +112,7 @@
                 <div class="role-card" style="border-color:#f1c40f" data-role="主公">👑<br>主公</div>
                 <div class="role-card" style="border-color:#e67e22" data-role="忠臣">⚔️<br>忠臣</div>
                 <div class="role-card" style="border-color:#2ecc71" data-role="反贼">🗡️<br>反贼</div>
-                <div class="role-card" style="border-color:#9b59b6" data-role="内奸">🗠<br>内奸</div>
+                <div class="role-card" style="border-color:#9b59b6" data-role="内奸">🎭<br>内奸</div>
             </div>
         </div>
         <div id="step-hero" class="select-container" style="display:none;">
@@ -356,8 +356,9 @@
             // 游戏规则按钮
             if (guideBtn) {
                 guideBtn.addEventListener('click', () => {
-                    // 打开游戏规则文档
-                    window.open('GAME_GUIDE.md', '_blank');
+                    // 显示游戏内帮助弹窗
+                    const helpOverlay = document.getElementById('help-overlay');
+                    if (helpOverlay) helpOverlay.style.display = 'flex';
                 });
             }
         }

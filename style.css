@@ -159,13 +159,22 @@ body {
     flex: 1 1 auto;
     min-height: 120px;
     background: rgba(0, 0, 0, 0.4);
-    overflow-y: auto; padding: 10px 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 15px;
     font-size: 14px; color: #bdc3c7;
     border-bottom: 1px solid #555;
     font-family: "Courier New", Courier, monospace;
     -webkit-overflow-scrolling: touch;
 }
-.log-line { margin-bottom: 5px; line-height: 1.4; }
+.log-line {
+    margin-bottom: 5px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
 .log-turn { color: var(--gold); margin-top: 8px; border-top: 1px dashed #555; padding-top: 4px; font-weight: bold; }
 .log-damage { color: var(--red); font-weight: bold; }
 .log-skill { color: var(--blue); }
@@ -298,16 +307,38 @@ body {
 }
 
 /* 选将/选身份界面 */
-.select-container { width: 95%; max-width: 600px; text-align: center; max-height: 95vh; display: flex; flex-direction: column; }
-.select-title { font-size: 24px; color: var(--gold); margin-bottom: 15px; flex-shrink: 0; }
+.select-container {
+    width: 95%;
+    max-width: 600px;
+    text-align: center;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+.select-title {
+    font-size: 24px;
+    color: var(--gold);
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
 
-.role-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+.role-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
 
-.hero-options { 
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-    overflow-y: auto; 
-    max-height: 60vh;
-    padding: 5px; flex: 1;
+.hero-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+    padding: 5px;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
 }
 
 .role-card {
@@ -802,11 +833,23 @@ body {
 
 /* 手机屏幕响应式设计 (768px以下) */
 @media (max-width: 768px) {
+    .select-container {
+        width: 98%;
+        max-height: 95vh;
+        padding: 5px;
+    }
+
+    .select-title {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
     /* 英雄选择优化 */
     .hero-options {
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
-        max-height: 50vh;
+        max-height: calc(95vh - 80px);
+        padding: 3px;
     }
 
     .hero-option {
@@ -928,10 +971,22 @@ body {
 
 /* 小屏幕优化 (480px以下) */
 @media (max-width: 480px) {
+    .select-container {
+        width: 100%;
+        max-height: 98vh;
+        padding: 3px;
+    }
+
+    .select-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
     .hero-options {
-        grid-template-columns: repeat(1, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 6px;
-        max-height: 45vh;
+        max-height: calc(98vh - 70px);
+        padding: 2px;
     }
 
     .hero-option {
