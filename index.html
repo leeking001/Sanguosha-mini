@@ -195,6 +195,9 @@
 
         // 安全获取玩家信息
         const getPlayerName = (playerId) => {
+            if (playerId === undefined || playerId === null) {
+                return '未知角色';
+            }
             const player = GameState.players[playerId];
             return player?.general?.name || `玩家${playerId}`;
         };
@@ -409,15 +412,16 @@
 
         // 处理AI事件
         async function handleAIEvent(event) {
-            switch (event.type) {
-                case 'use_card':
-                    // AOE卡牌、决斗、火攻在对应事件中显示，避免重复日志
-                    if (!['万箭', '南蛮', '决斗', '火攻'].includes(event.card)) {
-                        UI.log(`${getPlayerName(event.source)} 使用【${event.card}】`);
-                        AudioSystem.SFX.card();
-                        await UI.showEffect(event.source, event.card);
-                    }
-                    break;
+            try {
+                switch (event.type) {
+                    case 'use_card':
+                        // AOE卡牌、决斗、火攻在对应事件中显示，避免重复日志
+                        if (!['万箭', '南蛮', '决斗', '火攻'].includes(event.card)) {
+                            UI.log(`${getPlayerName(event.source)} 使用【${event.card}】`);
+                            AudioSystem.SFX.card();
+                            await UI.showEffect(event.source, event.card);
+                        }
+                        break;
 
                 case 'attack':
                     AudioSystem.SFX.attack();
@@ -494,10 +498,15 @@
                 case 'discard':
                     if (event.reason === 'fire_attack_defense') {
                         UI.log(`${getPlayerName(event.target)} 弃置一张牌抵消火攻`, 'skill');
-                    } else {
+                    } else if (event.source !== undefined && event.target !== undefined) {
                         UI.log(`${getPlayerName(event.source)} 拆掉 ${getPlayerName(event.target)} 一张牌`, 'skill');
+                    } else if (event.source !== undefined) {
+                        // 回合结束弃牌
+                        UI.log(`${getPlayerName(event.source)} 弃置了一张牌`, 'system');
                     }
-                    await UI.showEffect(event.target, '被拆桥', 'damage');
+                    if (event.target !== undefined) {
+                        await UI.showEffect(event.target, '被拆桥', 'damage');
+                    }
                     break;
 
                 case 'draw':
@@ -584,8 +593,12 @@
                     UI.log(`${getPlayerName(event.target)} 解除连环状态`, 'system');
                     break;
             }
-            
+
             UI.renderAll();
+            } catch (error) {
+                console.error('handleAIEvent error:', error, 'event:', event);
+                UI.renderAll();
+            }
         }
 
         // 解析攻击

@@ -114,7 +114,30 @@ const AI = {
         // 0. 使用主动技能（如果有利）
         const skillResult = this.shouldUseActiveSkill(ai, game);
         if (skillResult) {
-            const useSkillResult = game.useActiveSkill(ai.id);
+            let useSkillResult = game.useActiveSkill(ai.id);
+
+            // 如果技能需要目标，AI自动选择一个目标
+            if (!useSkillResult.success && useSkillResult.reason === 'need_target') {
+                const targets = useSkillResult.targets;
+                if (targets && targets.length > 0) {
+                    // 选择一个敌方目标
+                    let targetId = null;
+                    for (const tid of targets) {
+                        const t = GameState.players[tid];
+                        if (t && !this.isAlly(ai, t)) {
+                            targetId = tid;
+                            break;
+                        }
+                    }
+                    // 如果没有敌方，选第一个
+                    if (targetId === null) {
+                        targetId = targets[0];
+                    }
+                    // 再次调用技能，这次带上目标
+                    useSkillResult = game.useActiveSkill(ai.id, targetId);
+                }
+            }
+
             if (useSkillResult.success) {
                 events.push(...useSkillResult.events);
             }
