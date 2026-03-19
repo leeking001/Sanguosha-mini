@@ -491,7 +491,11 @@
                 case 'damage':
                     AudioSystem.SFX.damage();
                     await UI.showDamage(event.target, event.damage);
-                    UI.log(`${getPlayerName(event.target)} 受到 ${event.damage} 点伤害`, 'damage');
+                    if (event.reason === 'chain_damage') {
+                        UI.log(`${getPlayerName(event.target)} 受到连锁伤害 ${event.damage} 点`, 'damage');
+                    } else {
+                        UI.log(`${getPlayerName(event.target)} 受到 ${event.damage} 点伤害`, 'damage');
+                    }
                     break;
 
                 case 'heal':
@@ -557,7 +561,10 @@
                 AudioSystem.SFX.card();
                 await UI.showEffect(targetIdx, response.card);
             } else {
-                const damageResult = await Game.dealDamage(source, target, 1);
+                // 传递攻击类型给dealDamage
+                // 'sha' = 杀类攻击（【杀】【决斗】）
+                // 'nanman' 或 'wanjian' = 策略卡不受酒buff影响
+                const damageResult = await Game.dealDamage(source, target, 1, type);
                 for (const e of damageResult.events) {
                     await handleAIEvent(e);
                 }

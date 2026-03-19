@@ -618,7 +618,129 @@ body {
 
 /* 治疗动画 */
 .heal-glow { animation: healGlow 0.5s ease-out; }
-@keyframes healGlow { 
+@keyframes healGlow {
     0%, 100% { box-shadow: 0 0 0 transparent; }
     50% { box-shadow: 0 0 30px var(--green); }
+}
+
+/* 手机屏幕响应式设计 (768px以下) */
+@media (max-width: 768px) {
+    /* 英雄选择优化 */
+    .hero-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        max-height: 50vh;
+    }
+
+    .hero-option {
+        height: 110px;
+        padding: 8px;
+    }
+
+    .hero-avatar {
+        font-size: 28px;
+        margin-bottom: 3px;
+    }
+
+    .hero-name {
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 90%;
+    }
+
+    .hero-skill {
+        font-size: 9px;
+        color: #a8b3ba;
+        margin-top: 1px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 95%;
+    }
+
+    .hero-hp {
+        font-size: 9px;
+        margin-top: 1px;
+    }
+
+    /* 日志文本缩小 */
+    #game-log {
+        font-size: 13px;
+    }
+
+    .log-entry {
+        padding: 2px 4px;
+    }
+
+    /* 按钮优化 */
+    .btn-normal, .btn-cancel, #btn-skill, .btn-confirm {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    /* 结算表格优化 */
+    .result-table {
+        font-size: 11px;
+        width: 98%;
+        max-width: none;
+    }
+
+    .result-row {
+        padding: 6px 0;
+    }
+
+    .res-name {
+        width: 25%;
+        font-size: 11px;
+    }
+
+    /* 技能说明提示优化 */
+    .skill-toast {
+        font-size: 12px;
+        padding: 8px 12px;
+        max-width: 90%;
+    }
+}
+
+/* 小屏幕优化 (480px以下) */
+@media (max-width: 480px) {
+    .hero-options {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 6px;
+        max-height: 45vh;
+    }
+
+    .hero-option {
+        height: 100px;
+        padding: 6px;
+    }
+
+    .hero-avatar {
+        font-size: 24px;
+        margin-bottom: 2px;
+    }
+
+    .hero-name {
+        font-size: 11px;
+    }
+
+    .hero-skill {
+        font-size: 8px;
+        margin-top: 1px;
+    }
+
+    .btn-normal, .btn-cancel, #btn-skill, .btn-confirm {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .result-table {
+        font-size: 10px;
+    }
+
+    .res-name {
+        width: 30%;
+    }
 }

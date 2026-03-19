@@ -426,16 +426,51 @@ const Game = {
         return { success: true, responded: false, player: target.id };
     },
 
-    async dealDamage(source, target, baseDamage = 1) {
+    async dealDamage(source, target, baseDamage = 1, attackType = 'sha') {
         let damage = baseDamage;
-        if (source.berserk) {
+        // 只有【杀】类型的攻击才会被酒的buff影响
+        // 策略卡（南蛮、万箭等）不受酒buff影响
+        if (source.berserk && attackType === 'sha') {
             damage++;
             source.berserk = false;  // 立即清除酒的buff，防止重复加成
+        } else if (attackType !== 'sha' && source.berserk) {
+            // 非杀类型的攻击，直接清除berserk，不应用buff
+            source.berserk = false;
         }
+
         target.hp -= damage;
         // 更新伤害统计
         source.stats.damageDealt += damage;
         const events = [{ type: 'damage', source: source.id, target: target.id, damage, hp: target.hp }];
+
+        // 检查是否触发连环伤害共享
+        if (target.chained) {
+            // 找到连环的另一个目标
+            for (const p of GameState.players) {
+                if (p.chained && p.id !== target.id && !p.isDead) {
+                    // 对连环的另一个目标也造成相同伤害
+                    const chainedDamage = damage;
+                    p.hp -= chainedDamage;
+                    source.stats.damageDealt += chainedDamage;
+                    events.push({
+                        type: 'damage',
+                        source: source.id,
+                        target: p.id,
+                        damage: chainedDamage,
+                        hp: p.hp,
+                        reason: 'chain_damage'
+                    });
+                    if (p.hp <= 0) {
+                        p.isDead = true;
+                        p.identityKnown = true;
+                        source.stats.kills += 1;
+                        events.push({ type: 'death', player: p.id });
+                    }
+                    break;
+                }
+            }
+        }
+
         if (target.hp <= 0) {
             target.isDead = true;
             target.identityKnown = true;
@@ -494,7 +529,7 @@ const Game = {
 
                 if (shanCount < needShans) {
                     // 防守失败，受伤害
-                    const dmg = await this.dealDamage(currentPlayer, otherPlayer, 1);
+                    const dmg = await this.dealDamage(currentPlayer, otherPlayer, 1, 'duel');
                     events.push(...dmg.events);
                     break;
                 }
@@ -503,7 +538,7 @@ const Game = {
                 [currentPlayer, otherPlayer] = [otherPlayer, currentPlayer];
             } else {
                 // 当前玩家出不出【杀】，受伤害
-                const dmg = await this.dealDamage(otherPlayer, currentPlayer, 1);
+                const dmg = await this.dealDamage(otherPlayer, currentPlayer, 1, 'duel');
                 events.push(...dmg.events);
                 break;
             }
@@ -525,7 +560,7 @@ const Game = {
             events.push({ type: 'discard', source: source.id, target: target.id, card: discardedCard, reason: 'fire_attack_defense' });
         } else {
             // 目标没有牌，受伤害
-            const dmgResult = this.dealDamage(source, target, 1);
+            const dmgResult = this.dealDamage(source, target, 1, 'fire_attack');
             events.push(...dmgResult.events);
         }
         return { success: true, events };
