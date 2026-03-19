@@ -121,18 +121,29 @@ body {
     display: flex; flex-direction: column;
     justify-content: space-around; align-items: center;
     padding: 3px;
+    gap: 2px;
 }
 .general-name {
     font-size: 15px; font-weight: bold;
     color: var(--paper-color);
     text-shadow: 2px 2px 3px black;
     letter-spacing: 1px;
+    line-height: 1.2;
 }
 
-/* AI 手牌显示 */
+.enemy-skill {
+    font-size: 11px; color: #3498db; font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .enemy-hand-count {
-    display: inline-block;
-    min-width: 20px; height: 20px;
+    font-size: 10px; color: #7f8c8d;
+    line-height: 1.2;
+}
     background: linear-gradient(135deg, var(--gold), #d4af37);
     color: #000; font-size: 11px; font-weight: bold;
     border-radius: 50%; text-align: center; line-height: 20px;
@@ -609,6 +620,10 @@ body {
     .enemy-card { width: 32%; }
     .avatar-frame { font-size: 30px; }
     .general-name { font-size: 12px; }
+    .enemy-skill { font-size: 9px; }
+    .enemy-hand-count { font-size: 9px; }
+    .hp-bar { gap: 2px; }
+    .hp-point { width: 12px; height: 12px; border-width: 1px; }
 }
 
 /* 动画 */

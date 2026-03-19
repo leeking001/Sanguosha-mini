@@ -250,9 +250,9 @@ const UI = {
                 <div class="status-icons">${statusHtml}</div>
                 <div class="info-block">
                     <div class="general-name">${p.general.name}</div>
-                    <div style="font-size:9px; color:#3498db; font-weight:bold;">【${p.general.skill}】</div>
+                    <div class="enemy-skill">【${p.general.skill}】</div>
                     <div class="hp-bar">${this.getHpHtml(p.hp, p.maxHp)}</div>
-                    <div style="font-size:10px; color:#7f8c8d;">手牌: ${p.hand.length}</div>
+                    <div class="enemy-hand-count">手牌: ${p.hand.length}</div>
                 </div>
             `;
 
