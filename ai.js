@@ -300,8 +300,8 @@ const AI = {
 
             case '色诱':
                 // 色诱：如果有敌人且他们手牌多，就使用
-                const enemies = GameState.players.filter(p => !p.isDead && p.id !== ai.id && p.hand.length > 0);
-                return enemies.length > 0 && enemies.some(e => e.hand.length >= 3);
+                const seductionEnemies = GameState.players.filter(p => !p.isDead && p.id !== ai.id && p.hand.length > 0);
+                return seductionEnemies.length > 0 && seductionEnemies.some(e => e.hand.length >= 3);
 
             case '营救':
                 // 营救：如果有队友血量少或手牌少，就救他们
