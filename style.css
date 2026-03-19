@@ -65,7 +65,9 @@ body {
 
 /* --- 战场区域 --- */
 #enemy-zone {
-    flex: 0 0 28%; display: flex; justify-content: space-around; align-items: center;
+    flex: 0 0 auto;
+    height: 140px;
+    display: flex; justify-content: space-around; align-items: center;
     padding: 10px 5px; border-bottom: 1px solid #555;
 }
 
@@ -153,7 +155,10 @@ body {
 
 /* --- 日志区域 --- */
 #log-zone {
-    flex: 1; background: rgba(0, 0, 0, 0.4);
+    flex: 1;
+    min-height: 80px;
+    max-height: 40vh;
+    background: rgba(0, 0, 0, 0.4);
     overflow-y: auto; padding: 10px 15px;
     font-size: 14px; color: #bdc3c7;
     border-bottom: 1px solid #555;
@@ -169,10 +174,15 @@ body {
 
 /* --- 玩家区域 --- */
 #player-zone {
-    flex: 0 0 40%; display: flex; flex-direction: column;
+    flex: 0 0 auto;
+    min-height: 280px;
+    max-height: 50vh;
+    display: flex; flex-direction: column;
     background: rgba(20, 20, 20, 0.95); padding: 5px;
     border-top: 2px solid var(--gold);
     position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #player-status {
@@ -614,6 +624,11 @@ body {
 
 /* 触摸优化 */
 @media (hover: none) and (pointer: coarse) {
+    #top-bar { height: 40px; }
+    #enemy-zone { height: 120px; }
+    #log-zone { max-height: 35vh; min-height: 60px; font-size: 12px; }
+    #player-zone { max-height: 55vh; min-height: 240px; }
+
     .card { width: 70px; height: 98px; }
     .card-icon { font-size: 26px; }
     .card-text { font-size: 14px; }
@@ -624,6 +639,13 @@ body {
     .enemy-hand-count { font-size: 9px; }
     .hp-bar { gap: 2px; }
     .hp-point { width: 12px; height: 12px; border-width: 1px; }
+
+    #player-status { height: 45px; padding: 5px 10px; }
+    .my-info { gap: 8px; font-size: 14px; }
+    .my-info > span:first-child { font-size: 28px; }
+    .my-name { font-size: 14px; }
+    #my-skill { font-size: 11px; }
+    .my-role { font-size: 10px; padding: 3px 6px; }
 }
 
 /* 动画 */
