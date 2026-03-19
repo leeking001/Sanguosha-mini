@@ -9,6 +9,10 @@ const I18N = {
         zh: {
             // UI 文本
             'title': '迷你杀·英雄对决',
+            'welcome_title': '迷你杀',
+            'welcome_subtitle': '英雄对决·战火连天',
+            'welcome_lang': '语言',
+            'welcome_guide': '游戏规则',
             'welcome_intro_1': '4人身份局 · 主公忠臣反贼内奸',
             'welcome_intro_2': '9位英雄 · 独特技能策略对决',
             'welcome_intro_3': '经典卡牌 · 杀闪桃酒锦囊齐全',
@@ -131,6 +135,10 @@ const I18N = {
         en: {
             // UI text
             'title': 'Mini Sha - Legendary Duel',
+            'welcome_title': 'Mini Sha',
+            'welcome_subtitle': 'Legendary Duel',
+            'welcome_lang': 'Language',
+            'welcome_guide': 'How to Play',
             'welcome_intro_1': '4-Player Identity Game · Lord, Loyalist, Rebel, Spy',
             'welcome_intro_2': '9 Heroes · Unique Skill & Strategy',
             'welcome_intro_3': 'Classic Cards · Sha, Shan, Tao, Jiu & Tricks',

@@ -376,6 +376,53 @@ body {
 @keyframes skillTargetPulse { 0% { box-shadow: 0 0 15px #3498db, 0 0 30px rgba(52, 152, 219, 0.3); } 50% { box-shadow: 0 0 25px #3498db, 0 0 50px rgba(52, 152, 219, 0.6); } 100% { box-shadow: 0 0 15px #3498db, 0 0 30px rgba(52, 152, 219, 0.3); } }
 
 /* 欢迎页 */
+.welcome-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.welcome-action-btn {
+    flex: 1;
+    max-width: 200px;
+    padding: 12px 20px;
+    background: rgba(52, 152, 219, 0.15);
+    border: 2px solid rgba(52, 152, 219, 0.6);
+    border-radius: 10px;
+    color: #3498db;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-main);
+}
+
+.welcome-action-btn:hover {
+    background: rgba(52, 152, 219, 0.3);
+    border-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.welcome-action-btn:active {
+    transform: scale(0.98);
+}
+
+.action-icon {
+    font-size: 20px;
+}
+
+.action-text {
+    font-size: 13px;
+    font-weight: 600;
+}
+
 .welcome-container {
     text-align: center;
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(44, 62, 80, 0.8) 100%);
@@ -696,6 +743,63 @@ body {
     50% { box-shadow: 0 0 30px var(--green); }
 }
 
+/* 欢迎页在小屏幕上的响应式设计 */
+@media (max-width: 768px) {
+    .welcome-actions {
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .welcome-action-btn {
+        max-width: 150px;
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+
+    .action-icon {
+        font-size: 18px;
+    }
+
+    .action-text {
+        font-size: 12px;
+    }
+
+    .welcome-container {
+        padding: 30px 25px;
+        max-width: 90%;
+        gap: 15px;
+    }
+
+    .welcome-logo {
+        font-size: 70px;
+    }
+
+    .welcome-title {
+        font-size: 36px;
+    }
+
+    .welcome-subtitle {
+        font-size: 16px;
+    }
+
+    .intro-item {
+        font-size: 12px;
+    }
+
+    .intro-icon {
+        font-size: 16px;
+    }
+
+    .btn-start {
+        padding: 12px 40px;
+        font-size: 18px;
+    }
+
+    .welcome-footer {
+        font-size: 12px;
+    }
+}
+
 /* 手机屏幕响应式设计 (768px以下) */
 @media (max-width: 768px) {
     /* 英雄选择优化 */
@@ -777,6 +881,51 @@ body {
     }
 }
 
+/* 超小屏幕 (480px以下) 欢迎页优化 */
+@media (max-width: 480px) {
+    .welcome-actions {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .welcome-action-btn {
+        max-width: 100%;
+        flex: 0 1 48%;
+        padding: 10px 12px;
+        font-size: 11px;
+    }
+
+    .action-icon {
+        font-size: 16px;
+    }
+
+    .welcome-container {
+        padding: 20px 15px;
+    }
+
+    .welcome-logo {
+        font-size: 60px;
+        margin-bottom: 0;
+    }
+
+    .welcome-title {
+        font-size: 28px;
+    }
+
+    .welcome-subtitle {
+        font-size: 14px;
+    }
+
+    .intro-text {
+        font-size: 11px;
+    }
+
+    .btn-start {
+        padding: 10px 30px;
+        font-size: 16px;
+    }
+}
+
 /* 小屏幕优化 (480px以下) */
 @media (max-width: 480px) {
     .hero-options {
@@ -815,5 +964,99 @@ body {
 
     .res-name {
         width: 30%;
+    }
+}
+
+/* 桌面端大屏幕优化 (宽度 > 1024px, 高度 > 768px) */
+@media (min-width: 1024px) and (min-height: 768px) {
+    body {
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    /* 限制游戏区域最大宽度 */
+    #top-bar {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        border-radius: 8px 8px 0 0;
+    }
+
+    #enemy-zone {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    #log-zone {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        /* 限制日志区域高度，不要占满整个屏幕 */
+        flex: 0 1 auto;
+        max-height: 300px;
+    }
+
+    #player-zone {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        min-height: 280px;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    /* 游戏界面加上圆角效果 */
+    #fx-layer {
+        border-radius: 8px;
+    }
+
+    /* 卡牌尺寸适当增大 */
+    .card {
+        width: 80px;
+        height: 112px;
+    }
+
+    .card-icon {
+        font-size: 32px;
+    }
+
+    .card-text {
+        font-size: 12px;
+    }
+
+    /* 敌方卡片适当增大 */
+    .enemy-card {
+        width: 28%;
+        min-height: 140px;
+    }
+
+    .avatar-frame {
+        font-size: 56px;
+    }
+
+    .general-name {
+        font-size: 14px;
+    }
+
+    .enemy-skill {
+        font-size: 11px;
+    }
+
+    /* 按钮尺寸 */
+    .btn-action {
+        padding: 10px 24px;
+        font-size: 16px;
+    }
+
+    #btn-confirm, #btn-cancel {
+        flex: 1;
+        max-width: 200px;
+    }
+
+    /* 欢迎页也应用宽度限制 */
+    .welcome-container {
+        max-width: 600px;
     }
 }
