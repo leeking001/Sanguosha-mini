@@ -298,6 +298,16 @@ const AI = {
                 // 苦肉：如果需要更多手牌且生命值充足，使用技能
                 return ai.hp > 1 && ai.hand.length < ai.hp + 1;
 
+            case '色诱':
+                // 色诱：如果有敌人且他们手牌多，就使用
+                const enemies = GameState.players.filter(p => !p.isDead && p.id !== ai.id && p.hand.length > 0);
+                return enemies.length > 0 && enemies.some(e => e.hand.length >= 3);
+
+            case '营救':
+                // 营救：如果有队友血量少或手牌少，就救他们
+                const aliveAllies = GameState.players.filter(p => !p.isDead && p.id !== ai.id && this.isAlly(ai, p));
+                return aliveAllies.some(a => a.hp <= 2 || a.hand.length < 2);
+
             case '狂暴':
                 // 狂暴：手牌少时使用
                 return ai.hand.length < ai.hp - 1;

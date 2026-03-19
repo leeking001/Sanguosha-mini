@@ -55,6 +55,7 @@ const Game = {
             lebu: false,
             chained: false,
             skillUsed: false,
+            handLimitReduced: 0,  // 色诱技能的效果：本回合手牌上限减少
             stats: {
                 damageDealt: 0,
                 healed: 0,
@@ -115,6 +116,12 @@ const Game = {
         player.hasAttacked = false;
         player.berserk = false;
         player.skillUsed = false;
+
+        // 重置所有玩家的色诱效果
+        for (const p of GameState.players) {
+            p.handLimitReduced = 0;
+        }
+
         const events = [];
         if (player.lebu) {
             events.push({ type: 'judgment', card: '乐不思蜀', player: player.id });
@@ -137,7 +144,16 @@ const Game = {
     async endTurn() {
         const player = GameState.players[GameState.currentTurnIndex];
         const events = [];
-        const maxCards = player.hp;
+        let maxCards = player.hp;
+
+        // 考虑色诱技能的影响：手牌上限减少
+        if (player.handLimitReduced) {
+            maxCards -= player.handLimitReduced;
+        }
+
+        // 确保手牌上限不为负数
+        maxCards = Math.max(0, maxCards);
+
         while (player.hand.length > maxCards && player.hand.length > 0) {
             player.hand.pop();
             events.push({ type: 'discard', source: player.id });
@@ -798,27 +814,60 @@ const Game = {
                 });
                 break;
 
-            case '挑衅':
-                // 挑衅：被动技能，每个敌方回合开始时摸1张牌（标记但不消耗技能使用次数）
-                events.push({
-                    type: 'skill',
-                    name: '挑衅',
-                    player: playerId,
-                    description: `${player.general.name}发动【挑衅】，等待敌方回合...`
-                });
-                // 这个是被动技能，不消耗skillUsed
-                break;
+            case '色诱':
+                // 色诱：出牌阶段，可指定一名其他角色，该角色本回合手牌上限-1（每回合限一次）
+                if (targetId === null) {
+                    // 如果没有指定目标，返回可选目标列表
+                    const aliveEnemies = GameState.players.filter(p => !p.isDead && p.id !== playerId);
+                    if (aliveEnemies.length === 0) {
+                        return { success: false, reason: 'no_valid_target' };
+                    }
+                    return { success: false, reason: 'need_target', targets: aliveEnemies.map(p => p.id), skillName: '色诱' };
+                }
 
-            case '坚守':
-                // 坚守：被动技能，防御值+1（即最多受到1点伤害时变为0）
-                // 这是一个状态技能，可以在任何时候发动
-                player.defend = true;
+                const targetForSeduction = GameState.players[targetId];
+                if (!targetForSeduction || targetForSeduction.isDead || targetForSeduction.id === playerId) {
+                    return { success: false, reason: 'invalid_target' };
+                }
+
+                // 记录该角色本回合的手牌上限减少
+                if (!targetForSeduction.handLimitReduced) {
+                    targetForSeduction.handLimitReduced = 0;
+                }
+                targetForSeduction.handLimitReduced += 1;
                 player.skillUsed = true;
                 events.push({
                     type: 'skill',
-                    name: '坚守',
+                    name: '色诱',
                     player: playerId,
-                    description: `${player.general.name}发动【坚守】，本回合防御值+1`
+                    description: `${player.general.name}发动【色诱】，${targetForSeduction.general.name}本回合手牌上限-1`
+                });
+                break;
+
+            case '营救':
+                // 营救：出牌阶段，可指定一名其他角色摸1张牌（每回合限一次）
+                if (targetId === null) {
+                    // 如果没有指定目标，返回可选目标列表
+                    const aliveOthers = GameState.players.filter(p => !p.isDead && p.id !== playerId);
+                    if (aliveOthers.length === 0) {
+                        return { success: false, reason: 'no_valid_target' };
+                    }
+                    return { success: false, reason: 'need_target', targets: aliveOthers.map(p => p.id), skillName: '营救' };
+                }
+
+                const targetForRescue = GameState.players[targetId];
+                if (!targetForRescue || targetForRescue.isDead || targetForRescue.id === playerId) {
+                    return { success: false, reason: 'invalid_target' };
+                }
+
+                this.drawCards(targetForRescue, 1);
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '营救',
+                    player: playerId,
+                    description: `${player.general.name}发动【营救】，${targetForRescue.general.name}摸1张牌`,
+                    hp: targetForRescue.hp
                 });
                 break;
 

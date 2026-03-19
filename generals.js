@@ -17,9 +17,9 @@ const GENERALS_DATA = [
       skillDesc: '回复1血',
       skillType: 'active', canUse: true },
 
-    { name: '人妻控', hp: 4, skill: '挑衅', avatar: '🔥', color: '#e74c3c',
-      skillDesc: '敌方回合出牌前摸1张',
-      skillType: 'passive', canUse: true },
+    { name: '人妻控', hp: 4, skill: '色诱', avatar: '🔥', color: '#e74c3c',
+      skillDesc: '敌方手牌上限-1',
+      skillType: 'active', canUse: true },
 
     { name: '孔明亮', hp: 3, skill: '反击', avatar: '🌙', color: '#2c3e50',
       skillDesc: '令敌弃1张牌',
@@ -29,9 +29,9 @@ const GENERALS_DATA = [
       skillDesc: '杀闪互换',
       skillType: 'active', canUse: true },
 
-    { name: '老黄', hp: 4, skill: '坚守', avatar: '💂', color: '#e8860f',
-      skillDesc: '防御值+1',
-      skillType: 'passive', canUse: true },
+    { name: '老黄', hp: 4, skill: '营救', avatar: '💂', color: '#e8860f',
+      skillDesc: '指定角色摸1张',
+      skillType: 'active', canUse: true },
 
     { name: '反骨延', hp: 5, skill: '狂暴', avatar: '💥', color: '#e67e22',
       skillDesc: '【杀】伤害+1',
