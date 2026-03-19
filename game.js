@@ -251,30 +251,45 @@ const Game = {
             return { success: false, reason: 'already_attacked' };
         }
 
-        // 铁索连环特殊逻辑
+        // 铁索连环：需要选择2名目标
         if (card === '铁索') {
-            if (!GameState.pendingChainTargets) GameState.pendingChainTargets = [];
+            // 初始化待选择的链接目标列表
+            if (!GameState.pendingChainTargets) {
+                GameState.pendingChainTargets = [];
+            }
+
+            // 检查目标是否已被选择
             if (GameState.pendingChainTargets.includes(targetId)) {
                 return { success: false, reason: 'already_selected' };
             }
+
+            // 添加目标到待选列表
             GameState.pendingChainTargets.push(targetId);
+
+            // 如果只选了1个目标，等待第二个目标
             if (GameState.pendingChainTargets.length < 2) {
-                return { success: true, action: 'chain_select', selected: GameState.pendingChainTargets };
-            } else {
-                // 选择完成，返回铁索目标
-                const chainTargets = [...GameState.pendingChainTargets];
-                GameState.pendingChainTargets = [];
-                GameState.isTargetingMode = false;
-                const cardIndex = GameState.selectedCardIndex;
-                GameState.selectedCardIndex = -1;
                 return {
                     success: true,
-                    action: 'target_selected',
-                    cardIndex,
-                    chainTargets,
-                    targetId: targetId  // 添加 targetId，虽然铁索不使用单目标
+                    action: 'chain_select',
+                    selected: GameState.pendingChainTargets,
+                    message: '已选择第1个目标，请选择第2个目标'
                 };
             }
+
+            // 2个目标都选完了，返回结果
+            const chainTargets = [...GameState.pendingChainTargets];
+            GameState.pendingChainTargets = [];
+            GameState.isTargetingMode = false;
+            const cardIndex = GameState.selectedCardIndex;
+            GameState.selectedCardIndex = -1;
+
+            return {
+                success: true,
+                action: 'target_selected',
+                cardIndex,
+                chainTargets,
+                message: '铁索已连接两名角色'
+            };
         }
 
         // 有目标卡牌，返回目标信息
@@ -370,11 +385,18 @@ const Game = {
                 break;
             case '铁索':
                 source.stats.strategiesUsed += 1;
-                // targetInfo 应该是数组
+                // 铁索连接两名角色，使其进入连环状态
+                // 连环状态下，一方受伤时另一方也受到伤害
                 if (Array.isArray(targetInfo)) {
-                    for (const t of targetInfo) {
-                        t.chained = !t.chained;
-                        events.push({ type: 'chain', target: t.id, chained: t.chained });
+                    for (const target of targetInfo) {
+                        // 切换目标的连环状态（connected/disconnected）
+                        target.chained = !target.chained;
+                        events.push({
+                            type: 'chain',
+                            target: target.id,
+                            chained: target.chained,
+                            status: target.chained ? '已连锁' : '已解锁'
+                        });
                     }
                 }
                 break;
@@ -588,10 +610,10 @@ const Game = {
                 break;
 
             case '神医':
-                // 神医：出牌阶段，可指定一名其他角色回复1点生命（每回合限一次）
+                // 神医：出牌阶段，可指定一名角色（包括自己）回复1点生命（每回合限一次）
                 if (targetId === null) {
                     // 如果没有指定目标，返回可选目标列表
-                    const aliveOthers = GameState.players.filter(p => !p.isDead && p.id !== playerId && p.hp < p.maxHp);
+                    const aliveOthers = GameState.players.filter(p => !p.isDead && p.hp < p.maxHp);
                     if (aliveOthers.length === 0) {
                         return { success: false, reason: 'no_valid_target' };
                     }
@@ -599,7 +621,7 @@ const Game = {
                 }
 
                 const targetForHeal = GameState.players[targetId];
-                if (!targetForHeal || targetForHeal.isDead || targetForHeal.id === playerId) {
+                if (!targetForHeal || targetForHeal.isDead) {
                     return { success: false, reason: 'invalid_target' };
                 }
                 if (targetForHeal.hp >= targetForHeal.maxHp) {
@@ -615,6 +637,18 @@ const Game = {
                     player: playerId,
                     description: `${player.general.name}发动【神医】，令${targetForHeal.general.name}回复1点生命`,
                     hp: targetForHeal.hp
+                });
+                break;
+
+            case '老当益壮':
+                // 老当益壮：出牌阶段，可摸1张牌（每回合限一次）
+                this.drawCards(player, 1);
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '老当益壮',
+                    player: playerId,
+                    description: `${player.general.name}发动【老当益壮】，摸1张牌`
                 });
                 break;
 
