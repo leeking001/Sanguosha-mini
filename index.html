@@ -14,8 +14,9 @@
 
     <!-- 顶部栏 -->
     <div id="top-bar">
-        <div class="game-title">迷你杀·英雄对决</div>
+        <div class="game-title" id="game-title-text">迷你杀·英雄对决</div>
         <div class="top-btns">
+            <button class="icon-btn" id="btn-lang" title="Toggle Language">🌐</button>
             <button class="icon-btn" id="btn-bgm">🎵</button>
             <button class="icon-btn" id="btn-sound">🔊</button>
             <button class="icon-btn" id="btn-help">?</button>
@@ -189,6 +190,7 @@
         import { UI } from './ui.js';
         import { StorageSystem } from './storage.js';
         import { AudioSystem } from './audio.js';
+        import { I18N } from './i18n.js';
 
         // 工具函数
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -232,9 +234,82 @@
                 AudioSystem.toggleBGM();
             }
 
+            // 初始化语言切换
+            initLanguageToggle();
+
             // 显示欢迎页
             showWelcomeScreen();
         }
+
+        // 初始化语言切换功能
+        function initLanguageToggle() {
+            const langBtn = document.getElementById('btn-lang');
+            if (langBtn) {
+                langBtn.addEventListener('click', () => {
+                    I18N.toggleLanguage();
+                    updateUILanguage();
+                });
+            }
+
+            // 监听语言变更事件
+            window.addEventListener('languageChanged', (e) => {
+                updateUILanguage();
+            });
+        }
+
+        // 更新UI语言
+        function updateUILanguage() {
+            // 更新游戏标题
+            const titleEl = document.getElementById('game-title-text');
+            if (titleEl) {
+                titleEl.innerText = I18N.t('title');
+            }
+
+            // 更新欢迎页面
+            const welcomeTitle = document.querySelector('.welcome-title');
+            const welcomeSubtitle = document.querySelector('.welcome-subtitle');
+            const introItems = document.querySelectorAll('.intro-text');
+            const welcomeFooter = document.querySelector('.welcome-footer');
+            const startBtn = document.getElementById('btn-start-game');
+
+            if (welcomeTitle) welcomeTitle.innerText = '迷你杀'; // Logo保持中文
+            if (welcomeSubtitle) welcomeSubtitle.innerText = I18N.t('title');
+            if (startBtn) startBtn.innerText = I18N.t('btn_start_game');
+
+            if (introItems.length >= 4) {
+                introItems[0].innerText = I18N.t('welcome_intro_1');
+                introItems[1].innerText = I18N.t('welcome_intro_2');
+                introItems[2].innerText = I18N.t('welcome_intro_3');
+                introItems[3].innerText = I18N.t('welcome_intro_4');
+            }
+
+            if (welcomeFooter) welcomeFooter.innerText = I18N.t('welcome_footer');
+
+            // 更新身份选择界面
+            const roleTitle = document.querySelector('#step-role .select-title');
+            if (roleTitle) roleTitle.innerText = I18N.t('step_role');
+
+            const heroTitle = document.querySelector('#step-hero .select-title');
+            if (heroTitle) heroTitle.innerText = I18N.t('step_general');
+
+            // 更新按钮文本
+            const skillBtn = document.getElementById('btn-skill');
+            const confirmBtn = document.getElementById('btn-confirm');
+            const cancelBtn = document.getElementById('btn-cancel');
+            const endBtn = document.getElementById('btn-end');
+            const restartBtn = document.querySelector('.btn-restart');
+
+            if (skillBtn) skillBtn.innerText = I18N.t('btn_skill');
+            if (confirmBtn) confirmBtn.innerText = I18N.t('btn_confirm');
+            if (cancelBtn) cancelBtn.innerText = I18N.t('btn_cancel');
+            if (endBtn) endBtn.innerText = I18N.t('btn_end');
+            if (restartBtn) restartBtn.innerText = I18N.t('btn_end'); // 再战江湖
+
+            // 更新帮助界面标题
+            const helpTitle = document.querySelector('#help-overlay h2');
+            if (helpTitle) helpTitle.innerText = I18N.t('help_title');
+        }
+
 
         // 显示欢迎页
         function showWelcomeScreen() {
