@@ -579,6 +579,10 @@
                 case 'chain_trigger':
                     UI.log('【铁索连环】触发！', 'skill');
                     break;
+
+                case 'chain_removed':
+                    UI.log(`${getPlayerName(event.target)} 解除连环状态`, 'system');
+                    break;
             }
             
             UI.renderAll();
@@ -594,16 +598,9 @@
             const response = await Game.respondAttack(target, type);
 
             if (response.responded) {
-                // ✅ 改进：显示不同应答卡牌的反馈
-                if (response.reason === 'wuxie') {
-                    UI.log(`${getPlayerName(targetIdx)} 打出【无懈可击】自动抵消!`, 'skill');
-                    AudioSystem.SFX.card();
-                    await UI.showEffect(targetIdx, '无懈可击', 'skill');
-                } else {
-                    UI.log(`${getPlayerName(targetIdx)} 打出【${response.card}】`, 'skill');
-                    AudioSystem.SFX.card();
-                    await UI.showEffect(targetIdx, response.card);
-                }
+                UI.log(`${getPlayerName(targetIdx)} 打出【${response.card}】`, 'skill');
+                AudioSystem.SFX.card();
+                await UI.showEffect(targetIdx, response.card);
             } else {
                 // 传递攻击类型给dealDamage
                 // 'sha' = 杀类攻击（【杀】【决斗】）
@@ -841,6 +838,10 @@
                     for (const e of fireResult.events) {
                         await handlePlayerEvent(e);
                     }
+                    break;
+
+                case 'chain_removed':
+                    UI.log(`${getPlayerName(event.target)} 解除连环状态`, 'system');
                     break;
             }
         }

@@ -376,7 +376,7 @@ const UI = {
             const card = player.hand[this.gameState.selectedCardIndex];
             if (card === '桃' && player.hp < player.maxHp) canConfirm = true;
             if (card === '酒') canConfirm = true;
-            if (['万箭', '南蛮', '无中', '五谷'].includes(card)) canConfirm = true;
+            if (['万箭', '南蛮', '无中', '五谷', '桃园'].includes(card)) canConfirm = true;
         }
 
         if (confirmBtn) confirmBtn.disabled = !canConfirm;

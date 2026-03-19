@@ -54,15 +54,21 @@ const AI = {
                 break;
                 
             case '内奸':
-                // 内奸策略：平衡局势，优先攻击已知忠臣，最后才打主公
-                const rebels = alive.filter(p => p.identityKnown && p.role === '忠臣');
-                const lords = alive.filter(p => p.role === '主公');
-                
-                if (rebels.length > 0) {
-                    target = alive.find(p => p.role === '忠臣');
-                } else {
-                    // 只有主公了才打主公
-                    target = alive.find(p => p.role === '主公');
+                // 内奸策略：早期帮主公杀反贼，后期再杀忠臣
+                // 目标是成为最后与主公单挑的人
+                const aliveRebels = alive.filter(p => p.identityKnown && p.role === '反贼');
+                const aliveLoyals = alive.filter(p => p.identityKnown && p.role === '忠臣');
+                const aliveLord = alive.find(p => p.role === '主公');
+
+                if (aliveRebels.length > 0) {
+                    // 优先攻击反贼（帮主公）
+                    target = aliveRebels[Math.floor(Math.random() * aliveRebels.length)];
+                } else if (aliveLoyals.length > 0) {
+                    // 反贼死光后，攻击忠臣
+                    target = aliveLoyals[Math.floor(Math.random() * aliveLoyals.length)];
+                } else if (aliveLord) {
+                    // 只剩主公了，攻击主公
+                    target = aliveLord;
                 }
                 break;
         }
@@ -170,8 +176,13 @@ const AI = {
             // 8. 使用决斗
             const juedouIdx = ai.hand.indexOf('决斗');
             if (juedouIdx !== -1) {
-                // 评估是否适合决斗（目标手牌少时更有利）
-                if (target.hand.length <= 2 || ai.hand.filter(c => c === '杀').length >= 2) {
+                // 评估是否适合决斗
+                // 决斗中被挑战方先出杀，所以需要确保我方杀比对方多
+                const myShaCount = ai.hand.filter(c => c === '杀').length;
+                const targetShaEstimate = Math.min(target.hand.length, 2); // 估计对方大约有2张杀
+
+                // 只有当我方杀数量明显多于对方时才发起决斗
+                if (myShaCount >= targetShaEstimate + 1 || target.hand.length <= 1) {
                     const result = await game.useCard(ai.id, juedouIdx, target);
                     events.push(...result.events);
                     // 注意：决斗的具体处理由 handleAIEvent 统一处理

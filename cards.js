@@ -22,7 +22,8 @@ const CARD_TYPES = {
     SHANDIAN: { name: '闪电', type: 'delay', icon: '⚡', color: '#9b59b6' },
 
     // 新增锦囊
-    WUXIE: { name: '无懈', fullName: '无懈可击', type: 'scroll', icon: '🛡️', color: '#3498db' }
+    WUXIE: { name: '无懈可击', fullName: '无懈可击', type: 'scroll', icon: '🛡️', color: '#3498db' },
+    TAOYUAN: { name: '桃园', fullName: '桃园结义', type: 'scroll', icon: '🌸', color: '#e91e63' }
 };
 
 // 牌堆模板 - 标准牌堆配置
@@ -44,7 +45,7 @@ const DECK_TEMPLATE = [
     ...Array(3).fill('火攻'),
     ...Array(4).fill('铁索'),
     ...Array(3).fill('乐不'),
-    ...Array(2).fill('无懈'),
+    ...Array(2).fill('无懈可击'),
     ...Array(2).fill('桃园')
 ];
 

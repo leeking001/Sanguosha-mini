@@ -118,9 +118,16 @@ const Game = {
         const events = [];
         if (player.lebu) {
             events.push({ type: 'judgment', card: '乐不思蜀', player: player.id });
-            const success = Math.random() > 0.5;
+            // 判定牌：红桃则乐不思蜀失效，其他花色则生效（跳过出牌阶段）
+            // 红桃约占1/4，即25%几率跳过乐不
+            const judgmentSuccess = Math.random() < 0.25;  // 红桃跳过
             player.lebu = false;
-            if (!success) return { success: true, events, skipPlay: true };
+            if (!judgmentSuccess) {
+                events.push({ type: 'judgment_fail', card: '乐不思蜀', player: player.id });
+                return { success: true, events, skipPlay: true };
+            } else {
+                events.push({ type: 'judgment_success', card: '乐不思蜀', player: player.id });
+            }
         }
         this.drawCards(player, 2);
         events.push({ type: 'draw', player: player.id });
@@ -383,6 +390,17 @@ const Game = {
                     events.push({ type: 'fire_attack', source: sourceIdx, target: targetInfo.id });
                 }
                 break;
+            case '桃园':
+                // 桃园结义：所有角色回复1点体力
+                source.stats.strategiesUsed += 1;
+                for (const p of GameState.players) {
+                    if (!p.isDead && p.hp < p.maxHp) {
+                        p.hp++;
+                        source.stats.healed += 1;
+                        events.push({ type: 'heal', target: p.id, hp: p.hp, amount: 1 });
+                    }
+                }
+                break;
             case '铁索':
                 source.stats.strategiesUsed += 1;
                 // 铁索连接两名角色，使其进入连环状态
@@ -406,19 +424,6 @@ const Game = {
 
     async respondAttack(target, attackType) {
         const need = attackType === 'nanman' ? '杀' : '闪';
-
-        // ✅ 新增：检查【无懈可击】- 可以抵消任何攻击
-        const wuxieIdx = target.hand.indexOf('无懈可击');
-        if (wuxieIdx !== -1) {
-            target.hand.splice(wuxieIdx, 1);
-            return {
-                success: true,
-                responded: true,
-                card: '无懈可击',
-                player: target.id,
-                reason: 'wuxie'  // 标记为无懈可击抵消
-            };
-        }
 
         // 检查赵云的龙胆技能：【杀】可当【闪】，【闪】可当【杀】
         let acceptCards = [need];
@@ -458,28 +463,34 @@ const Game = {
 
         // 检查是否触发连环伤害共享
         if (target.chained) {
-            // 找到连环的另一个目标
-            for (const p of GameState.players) {
-                if (p.chained && p.id !== target.id && !p.isDead) {
-                    // 对连环的另一个目标也造成相同伤害
-                    const chainedDamage = damage;
-                    p.hp -= chainedDamage;
-                    source.stats.damageDealt += chainedDamage;
-                    events.push({
-                        type: 'damage',
-                        source: source.id,
-                        target: p.id,
-                        damage: chainedDamage,
-                        hp: p.hp,
-                        reason: 'chain_damage'
-                    });
-                    if (p.hp <= 0) {
-                        p.isDead = true;
-                        p.identityKnown = true;
-                        source.stats.kills += 1;
-                        events.push({ type: 'death', player: p.id });
-                    }
-                    break;
+            // 解除目标的连环状态
+            target.chained = false;
+            events.push({ type: 'chain_removed', target: target.id });
+
+            // 找到所有连环的目标，依次传递伤害
+            const chainedTargets = GameState.players.filter(p => p.chained && p.id !== target.id && !p.isDead);
+            for (const p of chainedTargets) {
+                // 解除该角色的连环状态
+                p.chained = false;
+                events.push({ type: 'chain_removed', target: p.id });
+
+                // 对连环目标造成相同伤害
+                const chainedDamage = damage;
+                p.hp -= chainedDamage;
+                source.stats.damageDealt += chainedDamage;
+                events.push({
+                    type: 'damage',
+                    source: source.id,
+                    target: p.id,
+                    damage: chainedDamage,
+                    hp: p.hp,
+                    reason: 'chain_damage'
+                });
+                if (p.hp <= 0) {
+                    p.isDead = true;
+                    p.identityKnown = true;
+                    source.stats.kills += 1;
+                    events.push({ type: 'death', player: p.id });
                 }
             }
         }
@@ -505,49 +516,34 @@ const Game = {
     async resolveDuel(source, target) {
         const events = [];
 
-        // 决斗：双方轮流出【杀】，不出者受伤害
-        // 源方先出，如果源方出不出【杀】就受伤
-        let currentPlayer = source;
-        let otherPlayer = target;
+        // 决斗：被挑战方先出【杀】，然后双方轮流出【杀】，不出者受伤害
+        // 注意：决斗中只能出【杀】，不能出【闪】
+        let currentPlayer = target;  // 被挑战方先出
+        let otherPlayer = source;
         let round = 0;
 
         while (round < 100) { // 防止无限循环
             // 当前玩家尝试出【杀】
             let shaIdx = currentPlayer.hand.indexOf('杀');
 
-            // 检查吕布的无双技能：出【杀】无次数限制（已经在useCard中处理）
-            // 检查魏延的狂暴技能：使用【杀】需2张【闪】抵消
+            // 检查龙胆技能：【闪】可以当【杀】使用
+            if (shaIdx === -1 && currentPlayer.general.skill === '龙胆') {
+                shaIdx = currentPlayer.hand.indexOf('闪');
+                if (shaIdx !== -1) {
+                    // 用闪当杀
+                    currentPlayer.hand.splice(shaIdx, 1);
+                    events.push({ type: 'duel_attack', player: currentPlayer.id, card: '杀(龙胆)' });
+                    // 交换攻防
+                    [currentPlayer, otherPlayer] = [otherPlayer, currentPlayer];
+                    round++;
+                    continue;
+                }
+            }
 
             if (shaIdx !== -1) {
                 currentPlayer.hand.splice(shaIdx, 1);
                 events.push({ type: 'duel_attack', player: currentPlayer.id, card: '杀' });
-
-                // 对方尝试防守
-                let needShans = 1;
-                if (otherPlayer.general.skill === '狂暴') {
-                    needShans = 2; // 魏延需要2张闪
-                }
-
-                // 对方尝试出闪
-                let shanCount = 0;
-                for (let i = 0; i < needShans; i++) {
-                    let shanIdx = otherPlayer.hand.indexOf('闪');
-                    if (shanIdx !== -1) {
-                        otherPlayer.hand.splice(shanIdx, 1);
-                        shanCount++;
-                    } else {
-                        break;
-                    }
-                }
-
-                if (shanCount < needShans) {
-                    // 防守失败，受伤害
-                    const dmg = await this.dealDamage(currentPlayer, otherPlayer, 1, 'duel');
-                    events.push(...dmg.events);
-                    break;
-                }
-
-                // 防守成功，交换攻防角色
+                // 交换攻防角色，轮到对方出杀
                 [currentPlayer, otherPlayer] = [otherPlayer, currentPlayer];
             } else {
                 // 当前玩家出不出【杀】，受伤害
