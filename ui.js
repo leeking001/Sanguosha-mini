@@ -219,8 +219,17 @@ const UI = {
             div.className = classes;
             div.id = `player-${i}`;
             div.onclick = () => {
-                if (this.callbacks.onTargetSelect) {
-                    this.callbacks.onTargetSelect(i);
+                // ✅ 改进：根据当前状态调用不同的处理器
+                if (this.gameState.pendingSkill) {
+                    // 如果正在选择技能目标，调用技能目标选择处理器
+                    if (this.callbacks.onSkillTargetSelect) {
+                        this.callbacks.onSkillTargetSelect(i);
+                    }
+                } else {
+                    // 否则调用普通目标选择处理器
+                    if (this.callbacks.onTargetSelect) {
+                        this.callbacks.onTargetSelect(i);
+                    }
                 }
             };
 

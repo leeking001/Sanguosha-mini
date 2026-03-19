@@ -407,6 +407,19 @@ const Game = {
     async respondAttack(target, attackType) {
         const need = attackType === 'nanman' ? '杀' : '闪';
 
+        // ✅ 新增：检查【无懈可击】- 可以抵消任何攻击
+        const wuxieIdx = target.hand.indexOf('无懈可击');
+        if (wuxieIdx !== -1) {
+            target.hand.splice(wuxieIdx, 1);
+            return {
+                success: true,
+                responded: true,
+                card: '无懈可击',
+                player: target.id,
+                reason: 'wuxie'  // 标记为无懈可击抵消
+            };
+        }
+
         // 检查赵云的龙胆技能：【杀】可当【闪】，【闪】可当【杀】
         let acceptCards = [need];
         if (target.general.skill === '龙胆') {

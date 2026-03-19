@@ -212,6 +212,7 @@
             UI.init(Game, GameState, {
                 onCardSelect: handleCardSelect,
                 onTargetSelect: handleTargetSelect,
+                onSkillTargetSelect: handleSkillTargetSelect,  // ✅ 新增：技能目标选择回调
                 onConfirm: handleConfirm,
                 onCancel: handleCancel,
                 onSkillUse: handleSkillUse,
@@ -383,16 +384,26 @@
                 nextTurn();
                 return;
             }
-            
+
             const result = await AI.takeTurn(ai, Game);
-            
+
             // 处理AI行动事件
             for (const event of result.events) {
                 await handleAIEvent(event);
             }
-            
+
             UI.renderAll();
             await sleep(500);
+
+            // ✅ 新增：AI回合结束时也需要进行弃牌
+            const endResult = await Game.endTurn();
+            if (endResult.events && endResult.events.length > 0) {
+                for (const event of endResult.events) {
+                    await handleAIEvent(event);
+                }
+                UI.renderAll();
+            }
+
             nextTurn();
         }
 
@@ -428,13 +439,39 @@
                     const targetPlayer = getPlayer(event.target);
                     if (!sourcePlayer || !targetPlayer) break;
 
-                    UI.log(`${getPlayerName(event.source)} 决斗 ${getPlayerName(event.target)}`, 'skill');
+                    // ✅ 改进：显示决斗开始的日志
+                    UI.log(`${getPlayerName(event.source)} 向 ${getPlayerName(event.target)} 发起【决斗】`, 'skill');
                     AudioSystem.SFX.duel();
+                    await UI.showEffect(event.source, '【决斗】', 'skill');
                     await sleep(500);
+
                     const duelResult = await Game.resolveDuel(sourcePlayer, targetPlayer);
-                    for (const e of duelResult.events) {
-                        await handleAIEvent(e);
+
+                    // ✅ 改进：显示决斗过程的日志
+                    if (duelResult.events && duelResult.events.length > 0) {
+                        for (const e of duelResult.events) {
+                            if (e.type === 'duel_attack') {
+                                UI.log(`${getPlayerName(e.player)} 出【杀】`, 'skill');
+                                await UI.showEffect(e.player, '【杀】', 'skill');
+                                await sleep(300);
+                            }
+                        }
                     }
+
+                    // ✅ 改进：显示决斗结果的日志和伤害
+                    for (const e of duelResult.events) {
+                        if (e.type === 'damage') {
+                            UI.log(`${getPlayerName(e.target)} 受到决斗伤害 ${e.damage} 点`, 'damage');
+                            await handleAIEvent(e);
+                        } else if (e.type === 'death') {
+                            await handleAIEvent(e);
+                        } else if (e.type !== 'duel_attack') {
+                            await handleAIEvent(e);
+                        }
+                    }
+
+                    // ✅ 改进：显示决斗结束的反馈
+                    UI.log('【决斗】结束', 'system');
                     break;
 
                 case 'fire_attack':
@@ -557,9 +594,16 @@
             const response = await Game.respondAttack(target, type);
 
             if (response.responded) {
-                UI.log(`${getPlayerName(targetIdx)} 打出【${response.card}】`, 'skill');
-                AudioSystem.SFX.card();
-                await UI.showEffect(targetIdx, response.card);
+                // ✅ 改进：显示不同应答卡牌的反馈
+                if (response.reason === 'wuxie') {
+                    UI.log(`${getPlayerName(targetIdx)} 打出【无懈可击】自动抵消!`, 'skill');
+                    AudioSystem.SFX.card();
+                    await UI.showEffect(targetIdx, '无懈可击', 'skill');
+                } else {
+                    UI.log(`${getPlayerName(targetIdx)} 打出【${response.card}】`, 'skill');
+                    AudioSystem.SFX.card();
+                    await UI.showEffect(targetIdx, response.card);
+                }
             } else {
                 // 传递攻击类型给dealDamage
                 // 'sha' = 杀类攻击（【杀】【决斗】）
@@ -752,12 +796,39 @@
                     const duelTargetP = getPlayer(event.target);
                     if (!duelSourceP || !duelTargetP) break;
 
-                    UI.log(`你决斗 ${getPlayerName(event.target)}`, 'skill');
+                    // ✅ 改进：显示决斗开始的详细信息
+                    UI.log(`你向 ${getPlayerName(event.target)} 发起【决斗】`, 'skill');
                     AudioSystem.SFX.duel();
+                    await UI.showEffect(0, '【决斗】', 'skill');
+                    await sleep(500);
+
                     const duelResult = await Game.resolveDuel(duelSourceP, duelTargetP);
-                    for (const e of duelResult.events) {
-                        await handlePlayerEvent(e);
+
+                    // ✅ 改进：显示决斗过程中的【杀】出牌
+                    if (duelResult.events && duelResult.events.length > 0) {
+                        for (const e of duelResult.events) {
+                            if (e.type === 'duel_attack') {
+                                UI.log(`${getPlayerName(e.player)} 出【杀】`, 'skill');
+                                await UI.showEffect(e.player, '【杀】', 'skill');
+                                await sleep(300);
+                            }
+                        }
                     }
+
+                    // ✅ 改进：显示决斗伤害结果
+                    for (const e of duelResult.events) {
+                        if (e.type === 'damage') {
+                            UI.log(`${getPlayerName(e.target)} 受到决斗伤害 ${e.damage} 点`, 'damage');
+                            await handlePlayerEvent(e);
+                        } else if (e.type === 'death') {
+                            await handlePlayerEvent(e);
+                        } else if (e.type !== 'duel_attack') {
+                            await handlePlayerEvent(e);
+                        }
+                    }
+
+                    // ✅ 改进：显示决斗结束的反馈
+                    UI.log('【决斗】结束', 'system');
                     break;
 
                 case 'fire_attack':
