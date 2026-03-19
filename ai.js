@@ -302,6 +302,14 @@ const AI = {
                 // 狂暴：手牌少时使用
                 return ai.hand.length < ai.hp - 1;
 
+            case '挑衅':
+                // 挑衅：被动技能，不需要主动使用
+                return false;
+
+            case '坚守':
+                // 坚守：防御技能，血量少时使用
+                return ai.hp <= 2;
+
             default:
                 return false;
         }

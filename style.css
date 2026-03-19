@@ -95,6 +95,12 @@ body {
     border-bottom: 2px solid #777;
     position: relative;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
+    animation: avatarGlow 3s ease-in-out infinite;
+}
+
+@keyframes avatarGlow {
+    0%, 100% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(212, 175, 55, 0.3)); }
+    50% { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(212, 175, 55, 0.6)); }
 }
 .role-badge {
     position: absolute; top: 5px; right: 5px;
@@ -285,13 +291,25 @@ body {
 }
 
 .role-card {
-    width: 80px; height: 100px; background: #34495e; border: 2px solid #7f8c8d;
-    display: flex; justify-content: center; align-items: center; font-size: 20px;
-    cursor: pointer; color: white; border-radius: 8px;
-    transition: all 0.2s;
+    width: 80px; height: 100px; background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    border: 2px solid #7f8c8d;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    font-size: 14px; font-weight: bold;
+    cursor: pointer; color: white; border-radius: 12px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
-.role-card:hover { border-color: var(--gold); background: #2c3e50; transform: scale(1.05); }
-.role-card:active { transform: scale(0.98); }
+.role-card::before {
+    content: attr(data-icon);
+    font-size: 32px;
+    margin-bottom: 8px;
+    display: block;
+}
+.role-card:hover {
+    border-color: var(--gold); background: linear-gradient(135deg, #2c3e50 0%, #1a2a3a 100%);
+    transform: scale(1.08); box-shadow: 0 0 20px var(--gold), 0 4px 10px rgba(0,0,0,0.7);
+}
+.role-card:active { transform: scale(0.96); }
 
 .hero-option {
     height: 130px;

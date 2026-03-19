@@ -798,6 +798,30 @@ const Game = {
                 });
                 break;
 
+            case '挑衅':
+                // 挑衅：被动技能，每个敌方回合开始时摸1张牌（标记但不消耗技能使用次数）
+                events.push({
+                    type: 'skill',
+                    name: '挑衅',
+                    player: playerId,
+                    description: `${player.general.name}发动【挑衅】，等待敌方回合...`
+                });
+                // 这个是被动技能，不消耗skillUsed
+                break;
+
+            case '坚守':
+                // 坚守：被动技能，防御值+1（即最多受到1点伤害时变为0）
+                // 这是一个状态技能，可以在任何时候发动
+                player.defend = true;
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '坚守',
+                    player: playerId,
+                    description: `${player.general.name}发动【坚守】，本回合防御值+1`
+                });
+                break;
+
             default:
                 return { success: false, reason: 'skill_not_found' };
         }

@@ -132,7 +132,7 @@ const UI = {
             card.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const role = card.textContent.trim();
+                const role = card.getAttribute('data-role') || card.textContent.trim();
                 console.log('Role selected:', role);
                 if (onSelect && typeof onSelect === 'function') {
                     onSelect(role);
