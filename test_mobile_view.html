@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Mobile View Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-left: 4px solid #d4af37;
+            background: #fafafa;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .pass { background: #4caf50; color: white; }
+        .fail { background: #f44336; color: white; }
+        .pending { background: #ff9800; color: white; }
+        .game-frame {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .instruction {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 15px 0;
+            color: #1565c0;
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎮 PC Mobile View Feature - Local Test</h1>
+        <p>Test date: <strong>2026-03-20</strong></p>
+        
+        <div class="test-section">
+            <h2>📋 Test Checklist</h2>
+            
+            <div class="test-item">
+                <strong>1. Mobile View Button Visibility</strong>
+                <span class="status pending">PENDING</span>
+                <p>Check if the 📱 button is visible in the top-right corner of the game interface</p>
+            </div>
+            
+            <div class="test-item">
+                <strong>2. Toggle Functionality</strong>
+                <span class="status pending">PENDING</span>
+                <p>Click the 📱 button and verify:</p>
+                <ul>
+                    <li>Game container becomes 480px wide</li>
+                    <li>Game is centered on screen</li>
+                    <li>Gold border appears around the game</li>
+                    <li>Button opacity changes to 0.7 (semi-transparent)</li>
+                </ul>
+            </div>
+            
+            <div class="test-item">
+                <strong>3. Desktop View Recovery</strong>
+                <span class="status pending">PENDING</span>
+                <p>Click the 📱 button again and verify:</p>
+                <ul>
+                    <li>Game returns to full-screen display</li>
+                    <li>Gold border disappears</li>
+                    <li>Button opacity returns to 1.0 (fully opaque)</li>
+                </ul>
+            </div>
+            
+            <div class="test-item">
+                <strong>4. UI Element Sizing</strong>
+                <span class="status pending">PENDING</span>
+                <p>In mobile view, verify:</p>
+                <ul>
+                    <li>Cards appear smaller (70x98px)</li>
+                    <li>Text is appropriately scaled down</li>
+                    <li>Buttons and controls are properly sized</li>
+                    <li>Hero selection shows 2 columns instead of 3</li>
+                </ul>
+            </div>
+            
+            <div class="test-item">
+                <strong>5. localStorage Persistence</strong>
+                <span class="status pending">PENDING</span>
+                <p>Test persistence:</p>
+                <ol>
+                    <li>Enable mobile view (click 📱 button)</li>
+                    <li>Refresh the page (F5 or Cmd+R)</li>
+                    <li>Verify mobile view is still active after refresh</li>
+                    <li>Check browser console: <code>localStorage.getItem('sanguosha_mobile_view')</code> should return 'true'</li>
+                </ol>
+            </div>
+            
+            <div class="test-item">
+                <strong>6. Game Functionality Unaffected</strong>
+                <span class="status pending">PENDING</span>
+                <p>In both views, verify:</p>
+                <ul>
+                    <li>Game buttons are clickable</li>
+                    <li>No visual glitches or overlapping elements</li>
+                    <li>All game features work normally</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔍 How to Run Tests</h2>
+            
+            <div class="instruction">
+                <strong>Step 1: Open the Game</strong><br>
+                Open your browser console (F12) to monitor any errors. The game is embedded below:
+            </div>
+            
+            <div class="instruction">
+                <strong>Step 2: Browser Console Commands</strong><br>
+                Use these commands in the browser console to test programmatically:
+                <div class="code-block">
+// Check current state
+document.body.classList.contains('mobile-view')<br>
+<br>
+// Get stored preference
+localStorage.getItem('sanguosha_mobile_view')<br>
+<br>
+// Manually toggle mobile view
+document.body.classList.toggle('mobile-view')<br>
+<br>
+// Set mobile view
+document.body.classList.add('mobile-view')<br>
+<br>
+// Remove mobile view
+document.body.classList.remove('mobile-view')<br>
+<br>
+// Check CSS applied
+window.getComputedStyle(document.body).maxWidth
+                </div>
+            </div>
+            
+            <div class="instruction">
+                <strong>Step 3: Check DevTools</strong><br>
+                In the Elements tab:
+                <ul>
+                    <li>When mobile view is active, &lt;body&gt; should have class "mobile-view"</li>
+                    <li>Applied styles should show: max-width: 480px, margin: 0 auto, border: 2px solid gold</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 Expected Results</h2>
+            <div class="test-item">
+                ✅ Mobile view button is always visible and clickable<br>
+                ✅ Clicking toggles between desktop (full-width) and mobile (480px) views<br>
+                ✅ Mobile view has gold border and centered layout<br>
+                ✅ All UI elements scale appropriately in mobile view<br>
+                ✅ User preference persists across page refreshes (localStorage)<br>
+                ✅ Game functionality is not affected by view toggle<br>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🌐 Game Window (Embedded)</h2>
+            <p>The game is now running at: <strong>http://localhost:8080</strong></p>
+            <p>Open it in a new tab or window to test, or use the commands below:</p>
+            <div class="instruction">
+                Copy this link and open in your browser:<br>
+                <strong style="color: #1565c0; font-size: 16px;">http://localhost:8080</strong>
+            </div>
+        </div>
+        
+        <div class="test-section" style="background: #fff3cd; border-left-color: #ffc107;">
+            <h2>📝 Manual Test Results</h2>
+            <p>Please test the feature manually and record your observations:</p>
+            <div style="margin: 15px 0;">
+                <strong>Test Date & Time:</strong> _______________<br>
+                <strong>Browser:</strong> _______________<br>
+                <strong>Results:</strong>
+                <textarea style="width: 100%; height: 120px; padding: 8px; border-radius: 4px; font-family: monospace; border: 1px solid #ddd;"></textarea>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('PC Mobile View Test Page Loaded');
+        console.log('Game URL: http://localhost:8080');
+    </script>
+</body>
+</html>
