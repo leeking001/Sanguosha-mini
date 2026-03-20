@@ -242,6 +242,14 @@ body {
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     flex-shrink: 0;
 }
+.my-avatar-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+}
 .my-name {
     font-size: 14px; font-weight: bold;
     color: var(--gold); text-shadow: 1px 1px 2px black;
@@ -403,6 +411,7 @@ body {
 .hero-option:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 10; }
 .hero-option:active { transform: scale(0.98); }
 .hero-avatar { font-size: 26px; margin-bottom: 2px; }
+.hero-avatar-img { width: 24px; height: 24px; margin-bottom: 2px; border-radius: 3px; object-fit: cover; }
 .hero-name { font-weight: bold; color: white; font-size: 11px; }
 .hero-skill { font-size: 8px; color: #bdc3c7; margin-top: 1px; }
 .hero-hp { font-size: 8px; color: #2ecc71; margin-top: 1px; }
@@ -875,6 +884,7 @@ body {
     }
 
     .hero-avatar { font-size: 22px; margin-bottom: 1px; }
+    .hero-avatar-img { width: 20px; height: 20px; margin-bottom: 1px; border-radius: 2px; object-fit: cover; }
     .hero-name { font-size: 10px; }
     .hero-skill { font-size: 7px; }
     .hero-hp { font-size: 7px; }

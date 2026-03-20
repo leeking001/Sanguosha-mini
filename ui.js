@@ -167,8 +167,12 @@ const UI = {
             generals.forEach(hero => {
                 const el = document.createElement('div');
                 el.className = 'hero-option';
+                // 支持图片头像和emoji头像
+                const avatarHtml = hero.avatar && hero.avatar.includes('.')
+                    ? `<img src="${hero.avatar}" alt="${hero.name}" class="hero-avatar-img" />`
+                    : `<div class="hero-avatar" style="color:${hero.color}">${hero.avatarEmoji || hero.avatar}</div>`;
                 el.innerHTML = `
-                    <div class="hero-avatar" style="color:${hero.color}">${hero.avatar}</div>
+                    ${avatarHtml}
                     <div class="hero-name">${hero.name}</div>
                     <div class="hero-skill">${hero.skill}</div>
                     <div class="hero-hp">${hero.hp}HP</div>
@@ -271,11 +275,19 @@ const UI = {
             roleBadge.innerText = player.role;
             roleBadge.className = `my-role role-${this.getRoleClass(player.role)}`;
         }
-        
+
         // 更新头像
         const myAvatar = document.getElementById('my-avatar');
-        if (myAvatar) myAvatar.innerText = player.general.avatar;
-        
+        if (myAvatar) {
+            // 支持图片头像
+            if (player.general.avatar && player.general.avatar.includes('.')) {
+                myAvatar.src = player.general.avatar;
+                myAvatar.style.display = 'block';
+            } else if (player.general.avatarEmoji) {
+                myAvatar.style.display = 'none';
+            }
+        }
+
         // 更新名字
         const myName = document.getElementById('my-name');
         if (myName) myName.innerText = player.general.name;

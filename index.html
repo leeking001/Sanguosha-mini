@@ -36,7 +36,7 @@
         <div id="player-status">
             <div class="my-info">
                 <span id="my-role-badge" class="my-role"></span>
-                <span id="my-avatar" style="font-size:24px;"></span>
+                <img id="my-avatar" class="my-avatar-img" style="width:28px; height:28px; border-radius:4px; object-fit:cover;" alt="hero avatar" />
                 <span id="my-name" class="my-name"></span>
                 <div id="my-skill" style="font-size:11px; color:#3498db; font-weight:bold;"></div>
             </div>
@@ -388,7 +388,15 @@
             UI.hideSetupScreen();
 
             // 初始化玩家显示（但不开始游戏）
-            document.getElementById('my-avatar').innerText = hero.avatar;
+            const avatarImg = document.getElementById('my-avatar');
+            // 支持图片头像或emoji头像
+            if (hero.avatar && hero.avatar.includes('.')) {
+                avatarImg.src = hero.avatar;
+                avatarImg.style.display = 'block';
+            } else if (hero.avatarEmoji) {
+                avatarImg.style.display = 'none'; // 隐藏图片，使用emoji
+                // 如果需要fallback到emoji，可以在这里处理
+            }
             document.getElementById('my-name').innerText = hero.name;
             document.getElementById('my-skill').innerText = `【${hero.skill}】`;
             document.getElementById('my-skill-desc').innerText = hero.skillDesc;
