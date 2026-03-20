@@ -217,39 +217,47 @@ body {
 
 #player-status {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    padding: 8px 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
     background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
     border-bottom: 3px solid var(--gold);
     box-shadow: 0 5px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-    gap: 4px;
+    min-height: 45px;
 }
 .my-info {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 14px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 0;
 }
 .my-info > span:first-child {
-    font-size: 36px;
-    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    flex-shrink: 0;
 }
 .my-name {
-    font-size: 18px; font-weight: bold;
-    color: var(--gold); text-shadow: 2px 2px 3px black;
+    font-size: 14px; font-weight: bold;
+    color: var(--gold); text-shadow: 1px 1px 2px black;
     letter-spacing: 1px;
+    flex-shrink: 0;
 }
 #my-skill {
-    font-size: 13px; color: #3498db;
+    font-size: 11px; color: #3498db;
     background: rgba(52, 152, 219, 0.2);
-    padding: 3px 10px; border-radius: 4px;
-    border-left: 3px solid #3498db;
+    padding: 2px 6px; border-radius: 3px;
+    border-left: 2px solid #3498db;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
 }
 .my-role {
-    font-size: 12px; padding: 4px 8px;
-    border-radius: 4px; font-weight: bold;
+    font-size: 10px; padding: 2px 6px;
+    border-radius: 3px; font-weight: bold;
     box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    flex-shrink: 0;
 }
 .role-lord { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000; border: 1px solid #d68910; }
 .role-loyal { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; border: 1px solid #ba4a00; }
@@ -257,12 +265,13 @@ body {
 .role-spy { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; border: 1px solid #76448a; }
 
 .hp-bar {
-    display: flex; gap: 3px; flex-wrap: wrap; max-width: 180px;
+    display: flex; gap: 2px; flex-wrap: wrap; max-width: 120px;
+    flex-shrink: 0;
 }
 .hp-point {
-    width: 14px; height: 14px; border-radius: 50%;
+    width: 12px; height: 12px; border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, #2ecc71, #27ae60);
-    border: 1.5px solid #fff; box-shadow: 0 0 5px rgba(46, 204, 113, 0.8);
+    border: 1.5px solid #fff; box-shadow: 0 0 4px rgba(46, 204, 113, 0.8);
     flex-shrink: 0;
 }
 .hp-lost { background: #444; border-color: #666; box-shadow: 0 0 3px rgba(0,0,0,0.8); }
@@ -341,9 +350,9 @@ body {
 .role-options { display: grid; grid-template-columns: repeat(2, 1fr); justify-items: center; gap: 20px; }
 
 .hero-options {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
     overflow-y: auto;
-    max-height: 40vh;
+    max-height: 50vh;
     padding: 2px; flex: 1;
 }
 
@@ -369,18 +378,18 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: 85px;
-    background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
+    height: 75px;
+    background: #34495e; border: 2px solid #7f8c8d; border-radius: 6px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s;
-    padding: 3px;
+    padding: 2px;
 }
 .hero-option:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 10; }
 .hero-option:active { transform: scale(0.98); }
-.hero-avatar { font-size: 32px; margin-bottom: 3px; }
-.hero-name { font-weight: bold; color: white; font-size: 12px; }
-.hero-skill { font-size: 9px; color: #bdc3c7; margin-top: 1px; }
-.hero-hp { font-size: 9px; color: #2ecc71; margin-top: 1px; }
+.hero-avatar { font-size: 26px; margin-bottom: 2px; }
+.hero-name { font-weight: bold; color: white; font-size: 11px; }
+.hero-skill { font-size: 8px; color: #bdc3c7; margin-top: 1px; }
+.hero-hp { font-size: 8px; color: #2ecc71; margin-top: 1px; }
 
 /* 结算界面 */
 #result-title { font-size: 28px; margin-bottom: 10px; font-family: var(--font-main); }
@@ -586,6 +595,85 @@ body {
     font-weight: 500;
 }
 
+/* 开始战斗覆盖层 */
+.start-battle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 30px;
+}
+
+.start-battle-title {
+    font-size: 28px;
+    color: var(--gold);
+    font-weight: bold;
+    text-shadow: 2px 2px 4px black;
+}
+
+.start-battle-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(212, 175, 55, 0.3);
+    border-top: 4px solid var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 18px;
+    color: #ecf0f1;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.btn-start-battle {
+    padding: 15px 50px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 50%, #1abc9c 100%);
+    border: 3px solid var(--gold);
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.5), 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s;
+    font-family: var(--font-main);
+    text-shadow: 2px 2px 4px black;
+}
+
+.btn-start-battle:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 35px rgba(46, 204, 113, 0.8), 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.btn-start-battle:active {
+    transform: scale(0.96);
+}
+
+.btn-start-battle:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* 帮助界面优化 */
 .help-content {
     background: var(--paper-color); color: #333; padding: 20px; 
@@ -714,16 +802,16 @@ body {
 
     #enemy-zone {
         flex: 0 0 auto;
-        min-height: 120px;
-        max-height: 25vh;
+        min-height: 100px;
+        max-height: 22vh;
     }
 
     #log-zone {
         flex: 1 1 auto;
-        min-height: 85px;
+        min-height: 80px;
         overflow-y: auto;
         font-size: 11px;
-        padding: 8px 10px;
+        padding: 6px 8px;
     }
 
     .log-line {
@@ -733,30 +821,46 @@ body {
 
     #player-zone {
         flex: 0 0 auto;
-        min-height: 180px;
+        min-height: 150px;
         overflow-y: auto;
     }
 
-    .card { width: 70px; height: 98px; }
-    .card-icon { font-size: 26px; }
-    .card-text { font-size: 14px; }
-    .enemy-card { width: 32%; min-height: 100px; }
-    .avatar-frame { font-size: 30px; }
-    .general-name { font-size: 12px; }
-    .enemy-skill { font-size: 9px; }
-    .enemy-hand-count { font-size: 9px; }
-    .hp-bar { gap: 2px; max-width: 150px; flex-wrap: wrap; }
-    .hp-point { width: 12px; height: 12px; border-width: 1px; }
+    .card { width: 65px; height: 90px; }
+    .card-icon { font-size: 24px; }
+    .card-text { font-size: 13px; }
+    .enemy-card { width: 32%; min-height: 95px; }
+    .avatar-frame { font-size: 28px; }
+    .general-name { font-size: 11px; }
+    .enemy-skill { font-size: 8px; }
+    .enemy-hand-count { font-size: 8px; }
+    .hp-bar { gap: 2px; max-width: 100px; flex-wrap: wrap; }
+    .hp-point { width: 10px; height: 10px; border-width: 1px; }
 
-    #player-status { height: auto; min-height: 50px; padding: 6px 8px; flex-shrink: 0; flex-direction: column; gap: 3px; }
-    .my-info { gap: 6px; font-size: 12px; flex-wrap: wrap; }
-    .my-info > span:first-child { font-size: 24px; }
-    .my-name { font-size: 12px; }
-    #my-skill { font-size: 11px; }
-    .my-role { font-size: 10px; padding: 3px 6px; }
+    #player-status { min-height: 38px; padding: 4px 8px; flex-direction: row; }
+    .my-info { gap: 5px; font-size: 11px; }
+    .my-info > span:first-child { font-size: 20px; }
+    .my-name { font-size: 11px; }
+    #my-skill { font-size: 9px; max-width: 70px; padding: 1px 4px; }
+    .my-role { font-size: 8px; padding: 2px 4px; }
 
     #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
-    #controls { flex-shrink: 0; }
+    #controls { flex-shrink: 0; height: 45px; }
+
+    .hero-options {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        max-height: 50vh;
+    }
+
+    .hero-option {
+        height: 70px;
+        padding: 2px;
+    }
+
+    .hero-avatar { font-size: 22px; margin-bottom: 1px; }
+    .hero-name { font-size: 10px; }
+    .hero-skill { font-size: 7px; }
+    .hero-hp { font-size: 7px; }
 }
 
 /* 动画 */
@@ -880,33 +984,33 @@ body {
     .general-name { font-size: 12px; }
     .enemy-skill { font-size: 9px; }
     .enemy-hand-count { font-size: 9px; }
-    .hp-bar { gap: 2px; max-width: 150px; flex-wrap: wrap; }
-    .hp-point { width: 12px; height: 12px; border-width: 1px; }
+    .hp-bar { gap: 2px; max-width: 100px; flex-wrap: wrap; }
+    .hp-point { width: 10px; height: 10px; border-width: 1px; }
 
-    #player-status { height: auto; min-height: 50px; padding: 6px 8px; flex-shrink: 0; flex-direction: column; gap: 3px; }
-    .my-info { gap: 6px; font-size: 12px; flex-wrap: wrap; }
-    .my-info > span:first-child { font-size: 24px; }
+    #player-status { min-height: 40px; padding: 5px 8px; flex-direction: row; }
+    .my-info { gap: 6px; font-size: 11px; }
+    .my-info > span:first-child { font-size: 22px; }
     .my-name { font-size: 12px; }
-    #my-skill { font-size: 11px; }
-    .my-role { font-size: 10px; padding: 3px 6px; }
+    #my-skill { font-size: 10px; max-width: 80px; }
+    .my-role { font-size: 9px; padding: 2px 5px; }
 
     #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
     #controls { flex-shrink: 0; }
 
     .hero-options {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-        max-height: 45vh;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        max-height: 50vh;
     }
 
     .hero-option {
-        height: 95px;
-        padding: 4px;
+        height: 75px;
+        padding: 2px;
     }
 
     .hero-avatar {
-        font-size: 28px;
-        margin-bottom: 3px;
+        font-size: 24px;
+        margin-bottom: 2px;
     }
 
     .hero-name {
@@ -1020,33 +1124,33 @@ body {
 
 /* 手机屏幕响应式设计 (768px以下) */
 @media (max-width: 768px) {
-    /* 英雄选择优化 */
+    /* 英雄选择优化 - 3列布局 */
     .hero-options {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 5px;
-        max-height: 40vh;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        max-height: 50vh;
     }
 
     .hero-option {
-        height: 85px;
-        padding: 3px;
+        height: 70px;
+        padding: 2px;
     }
 
     .hero-avatar {
-        font-size: 32px;
-        margin-bottom: 3px;
+        font-size: 22px;
+        margin-bottom: 1px;
     }
 
     .hero-name {
-        font-size: 12px;
+        font-size: 10px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        max-width: 90%;
+        max-width: 95%;
     }
 
     .hero-skill {
-        font-size: 9px;
+        font-size: 7px;
         color: #a8b3ba;
         margin-top: 1px;
         overflow: hidden;
@@ -1056,7 +1160,7 @@ body {
     }
 
     .hero-hp {
-        font-size: 9px;
+        font-size: 7px;
         margin-top: 1px;
     }
 

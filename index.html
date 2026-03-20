@@ -38,11 +38,7 @@
                 <span id="my-role-badge" class="my-role"></span>
                 <span id="my-avatar" style="font-size:24px;"></span>
                 <span id="my-name" class="my-name"></span>
-                <div id="my-skill-info" style="flex: 1;">
-                    <div id="my-skill" style="font-size:13px; color:#3498db; font-weight:bold;"></div>
-                    <div id="my-skill-desc" style="font-size:11px; color:#bdc3c7; margin-top:2px;"></div>
-                </div>
-                <div id="my-status-icons" class="status-icons"></div>
+                <div id="my-skill" style="font-size:11px; color:#3498db; font-weight:bold;"></div>
             </div>
             <div class="hp-bar" id="my-hp-bar"></div>
         </div>
@@ -54,6 +50,18 @@
             <button id="btn-confirm" class="btn-action" disabled>出牌</button>
             <button id="btn-cancel" class="btn-action" disabled>取消</button>
             <button id="btn-end" class="btn-action" disabled>结束</button>
+        </div>
+    </div>
+
+    <!-- 开始战斗覆盖层 -->
+    <div id="start-battle-overlay" class="overlay" style="display:none;">
+        <div class="start-battle-container">
+            <div id="start-battle-title" class="start-battle-title">准备就绪</div>
+            <div id="start-battle-loading" class="start-battle-loading" style="display:none;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">战斗准备中...</div>
+            </div>
+            <button id="btn-start-battle" class="btn-start-battle">开始战斗</button>
         </div>
     </div>
 
@@ -372,27 +380,61 @@
 
         // 处理武将选择
         function handleHeroSelect(hero) {
-            // 直接开始游戏，无需显示按钮
+            // 保存选中的英雄
+            window.selectedHero = hero;
+
+            // 隐藏选择界面，显示游戏界面
+            UI.hideSetupScreen();
+
+            // 初始化玩家显示（但不开始游戏）
+            document.getElementById('my-avatar').innerText = hero.avatar;
+            document.getElementById('my-name').innerText = hero.name;
+            document.getElementById('my-skill').innerText = `【${hero.skill}】`;
+
+            // 显示开始战斗覆盖层
+            const startOverlay = document.getElementById('start-battle-overlay');
+            startOverlay.style.display = 'flex';
+
+            // 绑定开始战斗按钮事件
+            const startBtn = document.getElementById('btn-start-battle');
+            startBtn.onclick = () => showLoadingAndStart(hero);
+        }
+
+        // 显示 loading 并开始游戏
+        async function showLoadingAndStart(hero) {
+            const startBtn = document.getElementById('btn-start-battle');
+            const loadingDiv = document.getElementById('start-battle-loading');
+            const titleDiv = document.getElementById('start-battle-title');
+
+            // 隐藏按钮，显示 loading
+            startBtn.style.display = 'none';
+            loadingDiv.style.display = 'flex';
+            titleDiv.innerText = '战斗即将开始';
+
+            // 等待 3 秒
+            await sleep(3000);
+
+            // 隐藏覆盖层
+            document.getElementById('start-battle-overlay').style.display = 'none';
+
+            // 重置按钮和 loading 状态
+            startBtn.style.display = 'block';
+            loadingDiv.style.display = 'none';
+            titleDiv.innerText = '准备就绪';
+
+            // 开始游戏
             startGameWithHero(hero);
         }
 
         // 开始游戏
         async function startGameWithHero(hero) {
-            UI.hideSetupScreen();
-
-            // 开始游戏
+            // 开始游戏逻辑
             const result = Game.startGame(hero, GENERALS_DATA);
 
             // 播放开始音效
             AudioSystem.SFX.win();
 
-            // 初始化玩家显示
-            const player = GameState.players[0];
-            document.getElementById('my-avatar').innerText = hero.avatar;
-            document.getElementById('my-name').innerText = hero.name;
-            document.getElementById('my-skill').innerText = `【${hero.skill}】`;
-            document.getElementById('my-skill-desc').innerText = hero.skillDesc;
-
+            // 设置角色徽章
             const badge = document.getElementById('my-role-badge');
             badge.innerText = GameState.userRole;
             badge.className = `my-role role-${getRoleClass(GameState.userRole)}`;
