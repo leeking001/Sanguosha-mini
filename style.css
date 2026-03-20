@@ -217,19 +217,22 @@ body {
 
 #player-status {
     display: flex;
-    justify-content: space-between; align-items: center;
-    padding: 10px 18px;
-    height: 55px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 8px 12px;
     background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
     border-bottom: 3px solid var(--gold);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    gap: 4px;
 }
 .my-info {
-    display: flex; align-items: center; gap: 14px;
-    font-size: 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px;
+    flex-wrap: wrap;
 }
 .my-info > span:first-child {
-    font-size: 42px;
+    font-size: 36px;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.5));
 }
 .my-name {
@@ -332,16 +335,16 @@ body {
 }
 
 /* 选将/选身份界面 */
-.select-container { width: 90%; max-width: 420px; text-align: center; max-height: 90vh; display: flex; flex-direction: column; }
+.select-container { width: 90%; max-width: 420px; text-align: center; max-height: 85vh; display: flex; flex-direction: column; }
 .select-title { font-size: 24px; color: var(--gold); margin-bottom: 15px; flex-shrink: 0; }
 
 .role-options { display: grid; grid-template-columns: repeat(2, 1fr); justify-items: center; gap: 20px; }
 
 .hero-options {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;
     overflow-y: auto;
-    max-height: 45vh;
-    padding: 4px; flex: 1;
+    max-height: 40vh;
+    padding: 2px; flex: 1;
 }
 
 .role-card {
@@ -366,18 +369,18 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: 95px;
+    height: 85px;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s;
-    padding: 4px;
+    padding: 3px;
 }
 .hero-option:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 10; }
 .hero-option:active { transform: scale(0.98); }
-.hero-avatar { font-size: 36px; margin-bottom: 5px; }
-.hero-name { font-weight: bold; color: white; font-size: 14px; }
-.hero-skill { font-size: 10px; color: #bdc3c7; margin-top: 2px; }
-.hero-hp { font-size: 10px; color: #2ecc71; margin-top: 2px; }
+.hero-avatar { font-size: 32px; margin-bottom: 3px; }
+.hero-name { font-weight: bold; color: white; font-size: 12px; }
+.hero-skill { font-size: 9px; color: #bdc3c7; margin-top: 1px; }
+.hero-hp { font-size: 9px; color: #2ecc71; margin-top: 1px; }
 
 /* 结算界面 */
 #result-title { font-size: 28px; margin-bottom: 10px; font-family: var(--font-main); }
@@ -742,13 +745,13 @@ body {
     .general-name { font-size: 12px; }
     .enemy-skill { font-size: 9px; }
     .enemy-hand-count { font-size: 9px; }
-    .hp-bar { gap: 2px; max-width: 160px; flex-wrap: wrap; }
-    .hp-point { width: 13px; height: 13px; border-width: 1.5px; }
+    .hp-bar { gap: 2px; max-width: 150px; flex-wrap: wrap; }
+    .hp-point { width: 12px; height: 12px; border-width: 1px; }
 
-    #player-status { height: 40px; padding: 4px 8px; flex-shrink: 0; }
-    .my-info { gap: 8px; font-size: 14px; }
-    .my-info > span:first-child { font-size: 28px; }
-    .my-name { font-size: 14px; }
+    #player-status { height: auto; min-height: 50px; padding: 6px 8px; flex-shrink: 0; flex-direction: column; gap: 3px; }
+    .my-info { gap: 6px; font-size: 12px; flex-wrap: wrap; }
+    .my-info > span:first-child { font-size: 24px; }
+    .my-name { font-size: 12px; }
     #my-skill { font-size: 11px; }
     .my-role { font-size: 10px; padding: 3px 6px; }
 
@@ -877,13 +880,13 @@ body {
     .general-name { font-size: 12px; }
     .enemy-skill { font-size: 9px; }
     .enemy-hand-count { font-size: 9px; }
-    .hp-bar { gap: 2px; max-width: 160px; flex-wrap: wrap; }
-    .hp-point { width: 13px; height: 13px; border-width: 1.5px; }
+    .hp-bar { gap: 2px; max-width: 150px; flex-wrap: wrap; }
+    .hp-point { width: 12px; height: 12px; border-width: 1px; }
 
-    #player-status { height: 40px; padding: 4px 8px; flex-shrink: 0; }
-    .my-info { gap: 8px; font-size: 14px; }
-    .my-info > span:first-child { font-size: 28px; }
-    .my-name { font-size: 14px; }
+    #player-status { height: auto; min-height: 50px; padding: 6px 8px; flex-shrink: 0; flex-direction: column; gap: 3px; }
+    .my-info { gap: 6px; font-size: 12px; flex-wrap: wrap; }
+    .my-info > span:first-child { font-size: 24px; }
+    .my-name { font-size: 12px; }
     #my-skill { font-size: 11px; }
     .my-role { font-size: 10px; padding: 3px 6px; }
 
@@ -1020,17 +1023,17 @@ body {
     /* 英雄选择优化 */
     .hero-options {
         grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-        max-height: 45vh;
+        gap: 5px;
+        max-height: 40vh;
     }
 
     .hero-option {
-        height: 95px;
-        padding: 4px;
+        height: 85px;
+        padding: 3px;
     }
 
     .hero-avatar {
-        font-size: 28px;
+        font-size: 32px;
         margin-bottom: 3px;
     }
 

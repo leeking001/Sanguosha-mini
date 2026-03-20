@@ -118,7 +118,6 @@
         <div id="step-hero" class="select-container" style="display:none;">
             <div class="select-title">第二步：选择你的武将</div>
             <div class="hero-options" id="hero-selection"></div>
-            <button id="btn-start-battle" class="btn-start" style="display:none; margin-top:15px;">开始游戏</button>
         </div>
     </div>
 
@@ -373,15 +372,8 @@
 
         // 处理武将选择
         function handleHeroSelect(hero) {
-            // 保存选中的英雄
-            window.selectedHero = hero;
-
-            // 显示开始游戏按钮
-            const startBtn = document.getElementById('btn-start-battle');
-            startBtn.style.display = 'block';
-
-            // 按钮点击事件
-            startBtn.onclick = () => startGameWithHero(hero);
+            // 直接开始游戏，无需显示按钮
+            startGameWithHero(hero);
         }
 
         // 开始游戏
