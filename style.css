@@ -218,19 +218,24 @@ body {
 #player-status {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    gap: 8px;
     padding: 6px 10px;
     background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
     border-bottom: 3px solid var(--gold);
     box-shadow: 0 5px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
     min-height: 45px;
+    flex-wrap: wrap;
 }
 .my-info {
-    display: flex; align-items: center; gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 13px;
-    flex: 1;
+    flex: 0 0 auto;
     min-width: 0;
+    flex-wrap: nowrap;
 }
 .my-info > span:first-child {
     font-size: 28px;
@@ -255,11 +260,14 @@ body {
     flex-shrink: 0;
 }
 #my-skill-desc {
-    font-size: 9px; color: #bdc3c7;
+    font-size: 9px;
+    color: #bdc3c7;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 80px;
+    min-width: 80px;
+    flex-shrink: 0;
+    text-align: right;
 }
 .my-role {
     font-size: 10px; padding: 2px 6px;
@@ -352,13 +360,13 @@ body {
 }
 
 /* 选将/选身份界面 */
-.select-container { width: 95%; max-width: 480px; text-align: center; max-height: 85vh; display: flex; flex-direction: column; }
+.select-container { width: 98%; max-width: 420px; text-align: center; max-height: 85vh; display: flex; flex-direction: column; }
 .select-title { font-size: 24px; color: var(--gold); margin-bottom: 15px; flex-shrink: 0; }
 
 .role-options { display: grid; grid-template-columns: repeat(2, 1fr); justify-items: center; gap: 20px; }
 
 .hero-options {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
     overflow-y: auto;
     max-height: 50vh;
     padding: 2px; flex: 1;
@@ -386,7 +394,7 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: 75px;
+    height: 65px;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 6px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s;
@@ -849,6 +857,7 @@ body {
     .my-info > span:first-child { font-size: 20px; }
     .my-name { font-size: 11px; }
     #my-skill { font-size: 9px; max-width: 70px; padding: 1px 4px; }
+    #my-skill-desc { font-size: 8px; min-width: 60px; }
     .my-role { font-size: 8px; padding: 2px 4px; }
 
     #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
@@ -856,12 +865,12 @@ body {
 
     .hero-options {
         grid-template-columns: repeat(3, 1fr);
-        gap: 4px;
+        gap: 3px;
         max-height: 50vh;
     }
 
     .hero-option {
-        height: 70px;
+        height: 65px;
         padding: 2px;
     }
 
@@ -1000,6 +1009,7 @@ body {
     .my-info > span:first-child { font-size: 22px; }
     .my-name { font-size: 12px; }
     #my-skill { font-size: 10px; max-width: 80px; }
+    #my-skill-desc { font-size: 9px; min-width: 80px; }
     .my-role { font-size: 9px; padding: 2px 5px; }
 
     #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
@@ -1135,12 +1145,12 @@ body {
     /* 英雄选择优化 - 3列布局 */
     .hero-options {
         grid-template-columns: repeat(3, 1fr);
-        gap: 4px;
+        gap: 3px;
         max-height: 50vh;
     }
 
     .hero-option {
-        height: 70px;
+        height: 65px;
         padding: 2px;
     }
 
@@ -1256,17 +1266,17 @@ body {
     }
 }
 
-/* 小屏幕优化 (480px以下) */
+/* 小屏幕优化 (480px以下) - 保持3列布局 */
 @media (max-width: 480px) {
     .hero-options {
-        grid-template-columns: repeat(1, 1fr);
-        gap: 6px;
-        max-height: 45vh;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+        max-height: 50vh;
     }
 
     .hero-option {
-        height: 100px;
-        padding: 6px;
+        height: 60px;
+        padding: 1px;
     }
 
     .hero-avatar {
