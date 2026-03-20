@@ -20,21 +20,38 @@ body {
     color: var(--text-color);
     margin: 0;
     padding: 0;
-    width: 480px;
+    width: 100%;
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    position: fixed;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
+}
+
+/* PC 上默认显示 480px 手机视图（最小窗口宽度 600px） */
+@media (min-width: 600px) {
+    body {
+        width: 480px;
+        height: 100vh;
+        position: fixed;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+    }
 }
 
 /* --- 动画特效层 --- */
 #fx-layer {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 50;
+}
+
+/* PC 上限制特效层范围 */
+@media (min-width: 600px) {
+    #fx-layer {
+        width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 }
 .fx-text {
     position: absolute;
@@ -835,59 +852,61 @@ body {
     overflow-y: auto;
 }
 
-.card { width: 70px; height: 98px; }
-.card-icon { font-size: 26px; }
-.card-text { font-size: 14px; }
-.enemy-card { width: 32%; min-height: 100px; }
-.avatar-frame { font-size: 30px; }
-.general-name { font-size: 12px; }
-.enemy-skill { font-size: 9px; }
-.enemy-hand-count { font-size: 9px; }
-.hp-bar { gap: 2px; }
-.hp-point { width: 12px; height: 12px; border-width: 1px; }
+/* PC 上的手机视图优化样式 - 只在 min-width: 600px 时应用 */
+@media (min-width: 600px) {
+    .card { width: 70px; height: 98px; }
+    .card-icon { font-size: 26px; }
+    .card-text { font-size: 14px; }
+    .enemy-card { width: 32%; min-height: 100px; }
+    .avatar-frame { font-size: 30px; }
+    .general-name { font-size: 12px; }
+    .enemy-skill { font-size: 9px; }
+    .enemy-hand-count { font-size: 9px; }
+    .hp-bar { gap: 2px; }
+    .hp-point { width: 12px; height: 12px; border-width: 1px; }
 
-#player-status { height: 45px; padding: 5px 10px; flex-shrink: 0; }
-.my-info { gap: 8px; font-size: 14px; }
-.my-info > span:first-child { font-size: 28px; }
-.my-name { font-size: 14px; }
-#my-skill { font-size: 11px; }
-.my-role { font-size: 10px; padding: 3px 6px; }
+    #player-status { height: 45px; padding: 5px 10px; flex-shrink: 0; }
+    .my-info { gap: 8px; font-size: 14px; }
+    .my-info > span:first-child { font-size: 28px; }
+    .my-name { font-size: 14px; }
+    #my-skill { font-size: 11px; }
+    .my-role { font-size: 10px; padding: 3px 6px; }
 
-#hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
-#controls { flex-shrink: 0; }
+    #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
+    #controls { flex-shrink: 0; }
 
-.hero-options {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    max-height: 50vh;
-}
+    .hero-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        max-height: 50vh;
+    }
 
-.hero-option {
-    height: 110px;
-    padding: 8px;
-}
+    .hero-option {
+        height: 110px;
+        padding: 8px;
+    }
 
-.hero-avatar {
-    font-size: 28px;
-    margin-bottom: 3px;
-}
+    .hero-avatar {
+        font-size: 28px;
+        margin-bottom: 3px;
+    }
 
-.hero-name {
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 90%;
-}
+    .hero-name {
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 90%;
+    }
 
-.hero-skill {
-    font-size: 9px;
-    color: #a8b3ba;
-    margin-top: 1px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 95%;
+        font-size: 9px;
+        color: #a8b3ba;
+        margin-top: 1px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 95%;
+    }
 }
 
 .hero-hp {
