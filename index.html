@@ -16,6 +16,7 @@
     <div id="top-bar">
         <div class="game-title" id="game-title-text">迷你杀·英雄对决</div>
         <div class="top-btns">
+            <button class="icon-btn" id="btn-mobile-view" title="Toggle Mobile View / 切换手机视图">📱</button>
             <button class="icon-btn" id="btn-lang" title="Toggle Language">🌐</button>
             <button class="icon-btn" id="btn-bgm">🎵</button>
             <button class="icon-btn" id="btn-sound">🔊</button>
@@ -248,6 +249,9 @@
             // 初始化语言切换
             initLanguageToggle();
 
+            // 初始化手机视图切换
+            initMobileViewToggle();
+
             // 显示欢迎页
             showWelcomeScreen();
         }
@@ -266,6 +270,26 @@
             window.addEventListener('languageChanged', (e) => {
                 updateUILanguage();
             });
+        }
+
+        // 初始化手机视图切换功能
+        function initMobileViewToggle() {
+            const mobileViewBtn = document.getElementById('btn-mobile-view');
+            if (mobileViewBtn) {
+                // 从本地存储中恢复手机视图状态
+                const isMobileView = localStorage.getItem('sanguosha_mobile_view') === 'true';
+                if (isMobileView) {
+                    document.body.classList.add('mobile-view');
+                    mobileViewBtn.style.opacity = '0.7';
+                }
+
+                mobileViewBtn.addEventListener('click', () => {
+                    document.body.classList.toggle('mobile-view');
+                    const isActive = document.body.classList.contains('mobile-view');
+                    localStorage.setItem('sanguosha_mobile_view', isActive ? 'true' : 'false');
+                    mobileViewBtn.style.opacity = isActive ? '0.7' : '1';
+                });
+            }
         }
 
         // 更新UI语言

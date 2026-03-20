@@ -831,6 +831,182 @@ body {
     }
 }
 
+/* PC 上的手机视图模式 */
+body.mobile-view {
+    max-width: 480px;
+    margin: 0 auto;
+    height: 100vh;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+body.mobile-view #top-bar { height: 40px; flex-shrink: 0; }
+
+body.mobile-view #enemy-zone {
+    flex: 0 0 auto;
+    min-height: 120px;
+    max-height: 25vh;
+}
+
+body.mobile-view #log-zone {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+body.mobile-view #player-zone {
+    flex: 0 0 auto;
+    min-height: 180px;
+    overflow-y: auto;
+}
+
+body.mobile-view .card { width: 70px; height: 98px; }
+body.mobile-view .card-icon { font-size: 26px; }
+body.mobile-view .card-text { font-size: 14px; }
+body.mobile-view .enemy-card { width: 32%; min-height: 100px; }
+body.mobile-view .avatar-frame { font-size: 30px; }
+body.mobile-view .general-name { font-size: 12px; }
+body.mobile-view .enemy-skill { font-size: 9px; }
+body.mobile-view .enemy-hand-count { font-size: 9px; }
+body.mobile-view .hp-bar { gap: 2px; }
+body.mobile-view .hp-point { width: 12px; height: 12px; border-width: 1px; }
+
+body.mobile-view #player-status { height: 45px; padding: 5px 10px; flex-shrink: 0; }
+body.mobile-view .my-info { gap: 8px; font-size: 14px; }
+body.mobile-view .my-info > span:first-child { font-size: 28px; }
+body.mobile-view .my-name { font-size: 14px; }
+body.mobile-view #my-skill { font-size: 11px; }
+body.mobile-view .my-role { font-size: 10px; padding: 3px 6px; }
+
+body.mobile-view #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
+body.mobile-view #controls { flex-shrink: 0; }
+
+body.mobile-view .hero-options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    max-height: 50vh;
+}
+
+body.mobile-view .hero-option {
+    height: 110px;
+    padding: 8px;
+}
+
+body.mobile-view .hero-avatar {
+    font-size: 28px;
+    margin-bottom: 3px;
+}
+
+body.mobile-view .hero-name {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 90%;
+}
+
+body.mobile-view .hero-skill {
+    font-size: 9px;
+    color: #a8b3ba;
+    margin-top: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 95%;
+}
+
+body.mobile-view .hero-hp {
+    font-size: 9px;
+    margin-top: 1px;
+}
+
+body.mobile-view #game-log {
+    font-size: 13px;
+}
+
+body.mobile-view .log-entry {
+    padding: 2px 4px;
+}
+
+body.mobile-view .btn-normal,
+body.mobile-view .btn-cancel,
+body.mobile-view #btn-skill,
+body.mobile-view .btn-confirm {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+body.mobile-view .result-table {
+    font-size: 11px;
+    width: 98%;
+    max-width: none;
+}
+
+body.mobile-view .result-row {
+    padding: 6px 0;
+}
+
+body.mobile-view .res-name {
+    width: 20%;
+    text-align: left;
+    padding-left: 5px;
+}
+
+body.mobile-view .welcome-actions {
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+body.mobile-view .welcome-action-btn {
+    max-width: 150px;
+    padding: 10px 15px;
+    font-size: 12px;
+}
+
+body.mobile-view .action-icon {
+    font-size: 18px;
+}
+
+body.mobile-view .action-text {
+    font-size: 12px;
+}
+
+body.mobile-view .welcome-container {
+    padding: 30px 25px;
+    max-width: 90%;
+    gap: 15px;
+}
+
+body.mobile-view .welcome-logo {
+    font-size: 70px;
+}
+
+body.mobile-view .welcome-title {
+    font-size: 36px;
+}
+
+body.mobile-view .welcome-subtitle {
+    font-size: 16px;
+}
+
+body.mobile-view .intro-item {
+    font-size: 12px;
+}
+
+body.mobile-view .intro-icon {
+    font-size: 16px;
+}
+
+body.mobile-view .btn-start {
+    padding: 12px 40px;
+    font-size: 18px;
+}
+
+body.mobile-view .welcome-footer {
+    font-size: 12px;
+}
+
 /* 手机屏幕响应式设计 (768px以下) */
 @media (max-width: 768px) {
     .select-container {
