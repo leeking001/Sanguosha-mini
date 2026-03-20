@@ -251,7 +251,15 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100px;
+    max-width: 80px;
+    flex-shrink: 0;
+}
+#my-skill-desc {
+    font-size: 9px; color: #bdc3c7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
 }
 .my-role {
     font-size: 10px; padding: 2px 6px;
@@ -265,7 +273,7 @@ body {
 .role-spy { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; border: 1px solid #76448a; }
 
 .hp-bar {
-    display: flex; gap: 2px; flex-wrap: wrap; max-width: 120px;
+    display: flex; gap: 2px; flex-wrap: nowrap; max-width: 100px;
     flex-shrink: 0;
 }
 .hp-point {
@@ -344,7 +352,7 @@ body {
 }
 
 /* 选将/选身份界面 */
-.select-container { width: 90%; max-width: 420px; text-align: center; max-height: 85vh; display: flex; flex-direction: column; }
+.select-container { width: 95%; max-width: 480px; text-align: center; max-height: 85vh; display: flex; flex-direction: column; }
 .select-title { font-size: 24px; color: var(--gold); margin-bottom: 15px; flex-shrink: 0; }
 
 .role-options { display: grid; grid-template-columns: repeat(2, 1fr); justify-items: center; gap: 20px; }
