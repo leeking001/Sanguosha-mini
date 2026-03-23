@@ -271,21 +271,20 @@ body {
     background: rgba(52, 152, 219, 0.2);
     padding: 2px 6px; border-radius: 3px;
     border-left: 2px solid #3498db;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 80px;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 150px;
     flex-shrink: 0;
 }
 #my-skill-desc {
     font-size: 9px;
     color: #bdc3c7;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 80px;
+    white-space: normal;
+    word-break: break-word;
+    min-width: 100px;
     flex-shrink: 0;
     text-align: right;
+    line-height: 1.2;
 }
 .my-role {
     font-size: 10px; padding: 2px 6px;
@@ -896,8 +895,8 @@ body {
     .my-info { gap: 5px; font-size: 11px; }
     .my-info > span:first-child { font-size: 20px; }
     .my-name { font-size: 11px; }
-    #my-skill { font-size: 9px; max-width: 70px; padding: 1px 4px; }
-    #my-skill-desc { font-size: 8px; min-width: 60px; }
+    #my-skill { font-size: 9px; max-width: 100px; padding: 1px 4px; white-space: normal; word-break: break-word; }
+    #my-skill-desc { font-size: 8px; min-width: 70px; white-space: normal; word-break: break-word; }
     .my-role { font-size: 8px; padding: 2px 4px; }
 
     #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
@@ -1052,8 +1051,8 @@ body {
     .my-info { gap: 6px; font-size: 11px; }
     .my-info > span:first-child { font-size: 22px; }
     .my-name { font-size: 12px; }
-    #my-skill { font-size: 10px; max-width: 80px; }
-    #my-skill-desc { font-size: 9px; min-width: 80px; }
+    #my-skill { font-size: 10px; max-width: 120px; white-space: normal; word-break: break-word; }
+    #my-skill-desc { font-size: 9px; min-width: 100px; white-space: normal; word-break: break-word; }
     .my-role { font-size: 9px; padding: 2px 5px; }
 
     #hand-scroll-container { flex: 1 1 auto; overflow-y: auto; }
@@ -1097,11 +1096,12 @@ body {
 }
 
 #game-log {
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .log-entry {
-    padding: 2px 4px;
+    padding: 4px 6px;
+    line-height: 1.4;
 }
 
 .btn-normal,
@@ -1223,11 +1223,12 @@ body {
 
     /* 日志文本缩小 */
     #game-log {
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .log-entry {
-        padding: 2px 4px;
+        padding: 3px 5px;
+        line-height: 1.3;
     }
 
     /* 按钮优化 */
