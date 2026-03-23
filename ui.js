@@ -259,9 +259,15 @@ const UI = {
                 ? `<img src="${p.general.avatar}" alt="${p.general.name}" class="enemy-avatar-img" />`
                 : `<div class="avatar-frame" style="color:${p.general.color}">${p.general.avatarEmoji || p.general.avatar}</div>`;
 
+            // 主公标识徽章
+            const lordBadgeHtml = p.role === '主公' ? '<div class="enemy-lord-badge">👑</div>' : '';
+
             div.innerHTML = `
                 <div class="role-badge" style="background:${roleColor}; color:${roleTextColor}">${roleText}</div>
-                ${enemyAvatarHtml}
+                <div class="enemy-avatar-container">
+                    ${enemyAvatarHtml}
+                    ${lordBadgeHtml}
+                </div>
                 <div class="status-icons">${statusHtml}</div>
                 <div class="info-block">
                     <div class="general-name">${p.general.name}</div>

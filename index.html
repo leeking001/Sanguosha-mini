@@ -290,6 +290,63 @@
             return GameState.players[playerId];
         };
 
+        // 生成丰富和幽默的日志消息
+        const getLogMessage = (type, source, target, data) => {
+            const sourceRoleName = getPlayerName(source);
+            const targetRoleName = target !== undefined ? getPlayerName(target) : '';
+
+            const messages = {
+                damage: [
+                    `${targetRoleName} 遭到猛击，失去 ${data.amount} 点体力！`,
+                    `${targetRoleName} 被打得措手不及，扣血 ${data.amount} 点！`,
+                    `${sourceRoleName} 的一击命中，${targetRoleName} 很疼！-${data.amount}`,
+                    `啪！${targetRoleName} 吃了一记重击，掉血 ${data.amount}！`,
+                    `${sourceRoleName} 挥舞武器，${targetRoleName} 闪避不及！-${data.amount}`,
+                ],
+                heal: [
+                    `${targetRoleName} 喝下灵丹妙药，恢复 ${data.amount} 点体力！`,
+                    `${targetRoleName} 涂抹伤药，恢复 ${data.amount} 点血量！`,
+                    `${targetRoleName} 大补特补，+${data.amount} 生命值！`,
+                    `${targetRoleName} 吃了个桃子，气血恢复 ${data.amount}！`,
+                ],
+                kill: [
+                    `${sourceRoleName} 终于击败了 ${targetRoleName}！`,
+                    `${targetRoleName} 不敌 ${sourceRoleName}，告别江湖！`,
+                    `战场上传来一声惨叫...${targetRoleName} 已阵亡！`,
+                    `${sourceRoleName} 一击必杀，${targetRoleName} 应声倒下！`,
+                ],
+                duel: [
+                    `${sourceRoleName} 对 ${targetRoleName} 喊道：决斗！`,
+                    `两位高手开启【决斗】，谁能笑到最后？`,
+                    `${sourceRoleName} 挑衅 ${targetRoleName}：来决斗吧！`,
+                    `一场激烈的【决斗】即将开始...`,
+                ],
+                steal: [
+                    `${sourceRoleName} 顺了 ${targetRoleName} 一张牌...好手段！`,
+                    `${sourceRoleName} 用了一手【顺手牵羊】，${targetRoleName} 防不胜防！`,
+                    `呃...${targetRoleName} 发现少了一张牌，原来是被 ${sourceRoleName} 顺走了！`,
+                ],
+                discard: [
+                    `${sourceRoleName} 拆掉 ${targetRoleName} 一张关键牌！`,
+                    `${sourceRoleName} 执行【过河拆桥】，${targetRoleName} 手中牌被毁！`,
+                    `${targetRoleName} 眼睁睁看着一张牌被 ${sourceRoleName} 毁掉...`,
+                ],
+                draw: [
+                    `${sourceRoleName} 摸牌 ${data.count} 张，欣喜若狂！`,
+                    `${sourceRoleName} 好运爆棚，连摸 ${data.count} 张牌！`,
+                    `${sourceRoleName}：哈！我的运气真不错！摸了 ${data.count} 张！`,
+                ],
+                skill: [
+                    `${sourceRoleName} 使出了【${data.skillName}】这一绝技！`,
+                    `${sourceRoleName} 发动技能【${data.skillName}】，局势生变！`,
+                    `嗡——${sourceRoleName} 的【${data.skillName}】闪闪发光！`,
+                ],
+            };
+
+            const msgList = messages[type] || [`${sourceRoleName} 执行了操作`];
+            return msgList[Math.floor(Math.random() * msgList.length)];
+        };
+
         // 初始化游戏
         async function init() {
             // 初始化游戏核心
@@ -677,7 +734,8 @@
                     if (!sourcePlayer || !targetPlayer) break;
 
                     // ✅ 改进：显示决斗开始的日志
-                    UI.log(`${getPlayerName(event.source)} 向 ${getPlayerName(event.target)} 发起【决斗】`, 'skill');
+                    const duelMsg = getLogMessage('duel', event.source, event.target, {});
+                    UI.log(duelMsg, 'skill');
                     AudioSystem.SFX.duel();
                     await UI.showEffect(event.source, '【决斗】', 'skill');
                     await sleep(500);
@@ -688,7 +746,7 @@
                     if (duelResult.events && duelResult.events.length > 0) {
                         for (const e of duelResult.events) {
                             if (e.type === 'duel_attack') {
-                                UI.log(`${getPlayerName(e.player)} 出【杀】`, 'skill');
+                                UI.log(`${getPlayerName(e.player)} 出【杀】⚔️`, 'skill');
                                 await UI.showEffect(e.player, '【杀】', 'skill');
                                 await sleep(300);
                             }
@@ -698,7 +756,7 @@
                     // ✅ 改进：显示决斗结果的日志和伤害
                     for (const e of duelResult.events) {
                         if (e.type === 'damage') {
-                            UI.log(`${getPlayerName(e.target)} 受到决斗伤害 ${e.damage} 点`, 'damage');
+                            UI.log(`${getPlayerName(e.target)} 在决斗中失利，受伤 ${e.damage} 点！`, 'damage');
                             await handleAIEvent(e);
                         } else if (e.type === 'death') {
                             await handleAIEvent(e);
@@ -708,7 +766,7 @@
                     }
 
                     // ✅ 改进：显示决斗结束的反馈
-                    UI.log('【决斗】结束', 'system');
+                    UI.log('⚔️ 【决斗】落幕，胜负已分！', 'system');
                     break;
 
                 case 'fire_attack':
@@ -716,7 +774,7 @@
                     const fireTarget = getPlayer(event.target);
                     if (!fireSource || !fireTarget) break;
 
-                    UI.log(`${getPlayerName(event.source)} 对 ${getPlayerName(event.target)} 使用【火攻】`, 'skill');
+                    UI.log(`${getPlayerName(event.source)} 对 ${getPlayerName(event.target)} 使用【火攻】🔥，火势蔓延！`, 'skill');
                     const fireResult = await Game.resolveFireAttack(fireSource, fireTarget);
                     for (const e of fireResult.events) {
                         await handleAIEvent(e);
@@ -724,18 +782,20 @@
                     break;
 
                 case 'steal':
-                    UI.log(`${getPlayerName(event.source)} 顺走 ${getPlayerName(event.target)} 一张牌`, 'skill');
+                    const stealMsg = getLogMessage('steal', event.source, event.target, {});
+                    UI.log(stealMsg, 'skill');
                     await UI.showEffect(event.target, '被顺手', 'damage');
                     break;
 
                 case 'discard':
                     if (event.reason === 'fire_attack_defense') {
-                        UI.log(`${getPlayerName(event.target)} 弃置一张牌抵消火攻`, 'skill');
+                        UI.log(`${getPlayerName(event.target)} 弃置一张牌抵消火攻 🔥`, 'skill');
                     } else if (event.source !== undefined && event.target !== undefined) {
-                        UI.log(`${getPlayerName(event.source)} 拆掉 ${getPlayerName(event.target)} 一张牌`, 'skill');
+                        const discardMsg = getLogMessage('discard', event.source, event.target, {});
+                        UI.log(discardMsg, 'skill');
                     } else if (event.source !== undefined) {
                         // 回合结束弃牌
-                        UI.log(`${getPlayerName(event.source)} 弃置了一张牌`, 'system');
+                        UI.log(`${getPlayerName(event.source)} 弃置了一张牌（手牌超限）`, 'system');
                     }
                     if (event.target !== undefined) {
                         await UI.showEffect(event.target, '被拆桥', 'damage');
@@ -746,14 +806,21 @@
                     // 处理摸牌事件（五谷、无中等）
                     const drawCount = event.count || 1;
                     if (event.target !== undefined) {
-                        UI.log(`${getPlayerName(event.target)} 摸了 ${drawCount} 张牌`, 'skill');
+                        const drawMsg = getLogMessage('draw', event.target, undefined, { count: drawCount });
+                        UI.log(drawMsg, 'skill');
                     } else {
-                        UI.log(`${getPlayerName(event.source || 0)} 摸了 ${drawCount} 张牌`, 'skill');
+                        const drawMsg = getLogMessage('draw', event.source || 0, undefined, { count: drawCount });
+                        UI.log(drawMsg, 'skill');
                     }
                     break;
 
                 case 'delay':
-                    UI.log(`${getPlayerName(event.source)} 对 ${getPlayerName(event.target)} 使用【${event.card}】`, 'skill');
+                    const delayCardNames = {
+                        '乐不': '乐不思蜀',
+                        '兵粮': '兵粮寸断'
+                    };
+                    const fullCardName = delayCardNames[event.card] || event.card;
+                    UI.log(`${getPlayerName(event.source)} 对 ${getPlayerName(event.target)} 使用【${event.card}】，${getPlayerName(event.target)} 陷入困境！`, 'skill');
                     await UI.showEffect(event.target, event.card, 'skill');
                     break;
 
@@ -763,7 +830,7 @@
                     break;
 
                 case 'chain':
-                    UI.log(`${getPlayerName(event.target)} ${event.chained ? '进入' : '解除'}连环`, 'skill');
+                    UI.log(`${getPlayerName(event.target)} ${event.chained ? '进入' : '解除'}连环 ⛓️`, 'skill');
                     await UI.showEffect(event.target, event.chained ? '连环' : '解除', 'skill');
                     break;
 
@@ -771,20 +838,22 @@
                     AudioSystem.SFX.damage();
                     await UI.showDamage(event.target, event.damage);
                     if (event.reason === 'chain_damage') {
-                        UI.log(`${getPlayerName(event.target)} 受到连锁伤害 ${event.damage} 点`, 'damage');
+                        UI.log(`${getPlayerName(event.target)} 受到连锁伤害 ${event.damage} 点！⛓️`, 'damage');
                     } else {
-                        UI.log(`${getPlayerName(event.target)} 受到 ${event.damage} 点伤害`, 'damage');
+                        const damageMsg = getLogMessage('damage', event.source, event.target, { amount: event.damage });
+                        UI.log(damageMsg, 'damage');
                     }
                     break;
 
                 case 'heal':
                     AudioSystem.SFX.heal();
                     await UI.showEffect(event.target, `+${event.amount || 1}`, 'heal');
-                    UI.log(`${getPlayerName(event.target)} 回复了 ${event.amount || 1} 点体力`, 'heal');
+                    const healMsg = getLogMessage('heal', event.target, undefined, { amount: event.amount || 1 });
+                    UI.log(healMsg, 'heal');
                     break;
 
                 case 'save':
-                    UI.log(`${getPlayerName(event.target)} 濒死吃桃`, 'skill');
+                    UI.log(`${getPlayerName(event.target)} 在生死关头吃下桃子，绝地逢生！🍑`, 'skill');
                     AudioSystem.SFX.heal();
                     await UI.showEffect(event.target, '濒死回血', 'skill');
                     break;
@@ -794,14 +863,15 @@
                     if (dead) {
                         dead.isDead = true;
                         dead.identityKnown = true;
-                        UI.log(`${dead.general.name} 阵亡!`, 'damage');
+                        const deathMsg = getLogMessage('kill', event.attacker, event.player, {});
+                        UI.log(deathMsg, 'damage');
                     }
 
                     if (event.reward) {
-                        UI.log('击杀反贼，摸3张牌', 'system');
+                        UI.log('🎉 击杀反贼，摸3张牌！反贼尽歼了！', 'system');
                     }
                     if (event.punish) {
-                        UI.log('主公杀忠臣，弃光手牌', 'damage');
+                        UI.log('⚠️ 主公杀忠臣，弃光手牌！这是大过错！', 'damage');
                     }
                     break;
                     
@@ -1030,7 +1100,7 @@
                     break;
 
                 case 'chain':
-                    UI.log(`${getPlayerName(event.target)} ${event.chained ? '进入' : '解除'}连环`, 'skill');
+                    UI.log(`${getPlayerName(event.target)} ${event.chained ? '进入' : '解除'}连环 ⛓️`, 'skill');
                     await UI.showEffect(event.target, event.chained ? '连环' : '解除', 'skill');
                     break;
 
