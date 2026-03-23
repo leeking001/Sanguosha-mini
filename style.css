@@ -384,7 +384,7 @@ body {
 .role-options { display: grid; grid-template-columns: repeat(2, 1fr); justify-items: center; gap: 30px; flex: 1; padding: 20px; align-content: center; }
 
 .hero-options {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
     overflow-y: auto;
     max-height: 70vh;
     padding: 8px; flex: 1;
@@ -896,14 +896,14 @@ body {
     #controls { flex-shrink: 0; height: 45px; }
 
     .hero-options {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 3px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
         max-height: 50vh;
     }
 
     .hero-option {
         height: 140px;
-        padding: 3px;
+        padding: 2px;
         aspect-ratio: 9 / 16;
     }
 
@@ -1052,15 +1052,15 @@ body {
     #controls { flex-shrink: 0; }
 
     .hero-options {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 4px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
         max-height: 50vh;
     }
 
     .hero-option {
         aspect-ratio: 9 / 16;
         height: 120px;
-        padding: 2px;
+        padding: 1px;
     }
 
     .hero-avatar {
@@ -1178,15 +1178,15 @@ body {
 @media (max-width: 768px) {
     /* 英雄选择优化 - 3列布局 */
     .hero-options {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 3px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
         max-height: 50vh;
     }
 
     .hero-option {
         aspect-ratio: 9 / 16;
         height: 110px;
-        padding: 2px;
+        padding: 1px;
     }
 
     .hero-avatar {
@@ -1300,15 +1300,15 @@ body {
 /* 小屏幕优化 (480px以下) - 保持3列布局 */
 @media (max-width: 480px) {
     .hero-options {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
         max-height: 50vh;
     }
 
     .hero-option {
         aspect-ratio: 9 / 16;
         height: 100px;
-        padding: 1px;
+        padding: 0px;
     }
 
     .hero-avatar {
