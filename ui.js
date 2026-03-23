@@ -248,9 +248,14 @@ const UI = {
                 : '#333';
             const roleTextColor = p.role === '主公' ? '#000' : '#fff';
 
+            // 处理头像 - 支持图片和emoji
+            const enemyAvatarHtml = p.general.avatar && p.general.avatar.includes('.')
+                ? `<img src="${p.general.avatar}" alt="${p.general.name}" class="enemy-avatar-img" />`
+                : `<div class="avatar-frame" style="color:${p.general.color}">${p.general.avatarEmoji || p.general.avatar}</div>`;
+
             div.innerHTML = `
                 <div class="role-badge" style="background:${roleColor}; color:${roleTextColor}">${roleText}</div>
-                <div class="avatar-frame" style="color:${p.general.color}">${p.general.avatar}</div>
+                ${enemyAvatarHtml}
                 <div class="status-icons">${statusHtml}</div>
                 <div class="info-block">
                     <div class="general-name">${p.general.name}</div>
