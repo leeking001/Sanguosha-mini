@@ -1069,19 +1069,16 @@ body {
 
     .hero-name {
         font-size: 12px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 90%;
+        word-break: break-word;
+        line-height: 1.2;
     }
 
+    .hero-skill {
         font-size: 9px;
         color: #a8b3ba;
         margin-top: 1px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 95%;
+        word-break: break-word;
+        line-height: 1.2;
     }
 }
 
@@ -1198,20 +1195,16 @@ body {
 
     .hero-name {
         font-size: 10px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 95%;
+        word-break: break-word;
+        line-height: 1.2;
     }
 
     .hero-skill {
         font-size: 7px;
         color: #a8b3ba;
         margin-top: 1px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 95%;
+        word-break: break-word;
+        line-height: 1.2;
     }
 
     .hero-hp {
