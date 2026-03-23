@@ -803,20 +803,21 @@ body {
 
 /* 帮助界面优化 */
 .help-content {
-    background: var(--paper-color); color: #333; padding: 20px; 
+    background: var(--paper-color); color: #333; padding: 20px;
     border-radius: 5px; width: 90%; height: 85%; overflow-y: auto;
     font-size: 14px; line-height: 1.6;
 }
 .help-section { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-.help-item { 
+.help-item {
     display: flex; align-items: flex-start;
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
+    word-break: break-word;
 }
-.help-icon { 
-    width: 30px; font-size: 20px; text-align: center; margin-right: 10px; flex-shrink: 0; 
+.help-icon {
+    width: 30px; font-size: 20px; text-align: center; margin-right: 10px; flex-shrink: 0;
     padding-top: 2px;
 }
-.help-text { flex: 1; }
+.help-text { flex: 1; word-break: break-word; }
 
 /* 统计面板 */
 .stats-panel {
