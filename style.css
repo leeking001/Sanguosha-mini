@@ -909,9 +909,10 @@ body {
 
     .hero-avatar { font-size: 28px; margin-bottom: 1px; }
     .hero-avatar-img { width: 45px; height: 45px; margin-bottom: 2px; border-radius: 3px; object-fit: cover; }
-    .hero-name { font-size: 10px; }
-    .hero-skill { font-size: 7px; }
+    .hero-name { font-size: 10px; word-break: break-word; line-height: 1.2; }
+    .hero-skill { font-size: 7px; word-break: break-word; line-height: 1.2; }
     .hero-skill-brief { font-size: 5px; }
+
     .hero-hp { font-size: 7px; }
 }
 
@@ -1317,11 +1318,15 @@ body {
 
     .hero-name {
         font-size: 11px;
+        word-break: break-word;
+        line-height: 1.2;
     }
 
     .hero-skill {
         font-size: 8px;
         margin-top: 1px;
+        word-break: break-word;
+        line-height: 1.2;
     }
 
     .btn-normal, .btn-cancel, #btn-skill, .btn-confirm {
