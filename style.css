@@ -904,7 +904,7 @@ body {
     .hero-option {
         height: 90px;
         padding: 3px;
-        aspect-ratio: 3 / 4;
+        aspect-ratio: auto;
     }
 
     .hero-avatar { font-size: 28px; margin-bottom: 1px; }
@@ -1057,6 +1057,7 @@ body {
     }
 
     .hero-option {
+        aspect-ratio: auto;
         height: 75px;
         padding: 2px;
     }
@@ -1185,6 +1186,7 @@ body {
     }
 
     .hero-option {
+        aspect-ratio: auto;
         height: 65px;
         padding: 2px;
     }
@@ -1310,6 +1312,7 @@ body {
     }
 
     .hero-option {
+        aspect-ratio: auto;
         height: 60px;
         padding: 1px;
     }
