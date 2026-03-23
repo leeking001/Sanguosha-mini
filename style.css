@@ -391,19 +391,30 @@ body {
 }
 
 .role-card {
-    width: 80px; height: 100px; background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    width: 80px; height: 120px; background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
     border: 2px solid #7f8c8d;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    font-size: 14px; font-weight: bold;
     cursor: pointer; color: white; border-radius: 12px;
     transition: all 0.3s;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    padding: 8px;
+    text-align: center;
 }
-.role-card::before {
-    content: attr(data-icon);
+.role-icon {
     font-size: 32px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     display: block;
+}
+.role-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.role-desc {
+    font-size: 9px;
+    color: #bdc3c7;
+    line-height: 1.2;
+    word-break: break-word;
 }
 .role-card:hover {
     border-color: var(--gold); background: linear-gradient(135deg, #2c3e50 0%, #1a2a3a 100%);
@@ -412,11 +423,12 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: 65px;
+    height: auto;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 6px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s;
-    padding: 2px;
+    padding: 4px;
+    min-height: 80px;
 }
 .hero-option:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 10; }
 .hero-option:active { transform: scale(0.98); }
@@ -424,6 +436,7 @@ body {
 .hero-avatar-img { width: 48px; height: 48px; margin-bottom: 4px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.6); }
 .hero-name { font-weight: bold; color: white; font-size: 11px; }
 .hero-skill { font-size: 8px; color: #bdc3c7; margin-top: 1px; }
+.hero-skill-brief { font-size: 7px; color: #95a5a6; margin-top: 2px; line-height: 1.2; max-width: 90%; word-break: break-word; }
 .hero-hp { font-size: 8px; color: #2ecc71; margin-top: 1px; }
 
 /* 结算界面 */
@@ -889,14 +902,16 @@ body {
     }
 
     .hero-option {
-        height: 65px;
-        padding: 2px;
+        height: auto;
+        min-height: 75px;
+        padding: 3px;
     }
 
     .hero-avatar { font-size: 26px; margin-bottom: 1px; }
     .hero-avatar-img { width: 36px; height: 36px; margin-bottom: 2px; border-radius: 3px; object-fit: cover; }
     .hero-name { font-size: 10px; }
     .hero-skill { font-size: 7px; }
+    .hero-skill-brief { font-size: 6px; }
     .hero-hp { font-size: 7px; }
 }
 

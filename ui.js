@@ -175,6 +175,7 @@ const UI = {
                     ${avatarHtml}
                     <div class="hero-name">${hero.name}</div>
                     <div class="hero-skill">${hero.skill}</div>
+                    <div class="hero-skill-brief">${hero.skillBrief || hero.skillDesc}</div>
                     <div class="hero-hp">${hero.hp}HP</div>
                 `;
                 el.onclick = () => {
