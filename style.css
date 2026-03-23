@@ -423,7 +423,7 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: 160px;
+    height: 180px;
     width: 100%;
     box-sizing: border-box;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
@@ -904,7 +904,7 @@ body {
     }
 
     .hero-option {
-        height: 140px;
+        height: 160px;
         padding: 2px;
         aspect-ratio: 9 / 16;
     }
@@ -1061,7 +1061,7 @@ body {
 
     .hero-option {
         aspect-ratio: 9 / 16;
-        height: 120px;
+        height: 140px;
         padding: 1px;
     }
 
@@ -1187,7 +1187,7 @@ body {
 
     .hero-option {
         aspect-ratio: 9 / 16;
-        height: 110px;
+        height: 130px;
         padding: 1px;
     }
 
@@ -1309,7 +1309,7 @@ body {
 
     .hero-option {
         aspect-ratio: 9 / 16;
-        height: 100px;
+        height: 120px;
         padding: 0px;
     }
 

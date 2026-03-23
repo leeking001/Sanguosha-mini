@@ -171,12 +171,17 @@ const UI = {
                 const avatarHtml = hero.avatar && hero.avatar.includes('.')
                     ? `<img src="${hero.avatar}" alt="${hero.name}" class="hero-avatar-img" />`
                     : `<div class="hero-avatar" style="color:${hero.color}">${hero.avatarEmoji || hero.avatar}</div>`;
+                // 生成血量条
+                const hpBars = Array.from({length: hero.hp}, () => '<div class="hp-point"></div>').join('');
+
                 el.innerHTML = `
                     ${avatarHtml}
                     <div class="hero-name">${hero.name}</div>
                     <div class="hero-skill">${hero.skill}</div>
                     <div class="hero-skill-brief">${hero.skillBrief || hero.skillDesc}</div>
-                    <div class="hero-hp">${hero.hp}HP</div>
+                    <div class="hero-hp-bar" style="display: flex; gap: 2px; justify-content: center; margin-top: 2px;">
+                        ${hpBars}
+                    </div>
                 `;
                 el.onclick = () => {
                     console.log('Hero selected:', hero.name);
