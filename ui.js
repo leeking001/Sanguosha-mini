@@ -280,11 +280,17 @@ const UI = {
         const player = this.gameState.players[0];
         if (!player) return;
         
-        // 更新角色徽章
+        // 更新角色徽章和主公标识
         const roleBadge = document.getElementById('my-role-badge');
         if (roleBadge) {
             roleBadge.innerText = player.role;
             roleBadge.className = `my-role role-${this.getRoleClass(player.role)}`;
+        }
+
+        // 显示主公标识
+        const lordBadge = document.getElementById('my-lord-badge');
+        if (lordBadge) {
+            lordBadge.style.display = player.role === '主公' ? 'flex' : 'none';
         }
 
         // 更新头像
@@ -515,10 +521,15 @@ const UI = {
                 const roleColor = p.role === '主公' ? '#f1c40f' :
                     (p.role === '忠臣' ? '#e67e22' : (p.role === '反贼' ? '#2ecc71' : '#9b59b6'));
 
+                // 处理头像 - 支持图片和emoji
+                const avatarHtml = p.general.avatar && p.general.avatar.includes('.')
+                    ? `<img src="${p.general.avatar}" alt="${p.general.name}" style="width:32px; height:32px; border-radius:3px; object-fit:cover;" />`
+                    : p.general.avatarEmoji || p.general.avatar;
+
                 html += `
                     <div class="result-row">
                         <span class="res-role" style="color:${roleColor}">${p.role}</span>
-                        <span class="res-name">${p.general.avatar} ${p.general.name}</span>
+                        <span class="res-name">${avatarHtml} ${p.general.name}</span>
                         <span class="res-stat-small" style="color:#e74c3c">${p.stats.damageDealt}</span>
                         <span class="res-stat-small" style="color:#2ecc71">${p.stats.healed}</span>
                         <span class="res-stat-small" style="color:#f1c40f">${p.stats.kills}</span>

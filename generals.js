@@ -36,7 +36,7 @@ const GENERALS_DATA = [
       skillBrief: '灵活应对，【杀】【闪】随意转换',
       skillType: 'active', canUse: true },
 
-    { name: '老黄', hp: 4, skill: '营救', avatar: 'images/laohuang.png', avatarEmoji: '💂', color: '#e8860f',
+    { name: '老黄头', hp: 4, skill: '营救', avatar: 'images/laohuang.png', avatarEmoji: '💂', color: '#e8860f',
       skillDesc: '指定角色摸1张',
       skillBrief: '帮助友方摸牌，团队协作',
       skillType: 'active', canUse: true },

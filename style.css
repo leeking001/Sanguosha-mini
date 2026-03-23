@@ -260,6 +260,28 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     flex-shrink: 0;
 }
+
+.avatar-container {
+    position: relative;
+    display: inline-block;
+}
+
+.lord-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 16px;
+    background: radial-gradient(135deg, #f1c40f, #d68910);
+    border: 2px solid #f39c12;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(241, 196, 15, 0.6);
+}
+
 .my-name {
     font-size: 14px; font-weight: bold;
     color: var(--gold); text-shadow: 1px 1px 2px black;

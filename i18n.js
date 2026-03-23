@@ -80,7 +80,7 @@ const I18N = {
             'hero_renwuqi': '人妻控',
             'hero_kongmingliang': '孔明亮',
             'hero_changshanzhao': '常山赵',
-            'hero_laohuang': '老黄',
+            'hero_laohuang': '老黄头',
             'hero_fangueyan': '反骨延',
 
             // 英雄技能

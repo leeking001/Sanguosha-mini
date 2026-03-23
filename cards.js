@@ -19,7 +19,6 @@ const CARD_TYPES = {
     HUOGONG: { name: '火攻', type: 'scroll', icon: '🔥', color: '#e74c3c' },
     TIESUO: { name: '铁索', fullName: '铁索连环', type: 'scroll', icon: '⛓️', color: '#555' },
     LEBU: { name: '乐不', fullName: '乐不思蜀', type: 'delay', icon: '🤐', color: '#2c3e50' },
-    SHANDIAN: { name: '闪电', type: 'delay', icon: '⚡', color: '#9b59b6' },
 
     // 新增锦囊
     WUXIE: { name: '无懈可击', fullName: '无懈可击', type: 'scroll', icon: '🛡️', color: '#3498db' },
@@ -53,7 +52,7 @@ const DECK_TEMPLATE = [
 const CardUtils = {
     // 检查卡牌是否需要目标
     requiresTarget(card) {
-        return ['杀', '顺手', '拆桥', '决斗', '火攻', '乐不', '铁索', '借刀'].includes(card);
+        return ['杀', '顺手', '拆桥', '决斗', '火攻', '乐不', '铁索'].includes(card);
     },
 
     // 检查是否为AOE锦囊
