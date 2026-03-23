@@ -386,7 +386,7 @@ body {
 .hero-options {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
     overflow-y: auto;
-    max-height: 60vh;
+    max-height: 70vh;
     padding: 8px; flex: 1;
 }
 
@@ -423,21 +423,21 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: auto;
+    height: 120px;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     cursor: pointer; transition: all 0.2s;
     padding: 6px;
-    min-height: 100px;
+    aspect-ratio: 3 / 4;
 }
 .hero-option:hover { transform: scale(1.08); border-color: var(--gold); box-shadow: 0 0 18px var(--gold); z-index: 10; }
 .hero-option:active { transform: scale(0.96); }
-.hero-avatar { font-size: 40px; margin-bottom: 3px; }
-.hero-avatar-img { width: 72px; height: 72px; margin-bottom: 6px; border-radius: 5px; object-fit: cover; box-shadow: 0 3px 8px rgba(0,0,0,0.7); }
-.hero-name { font-weight: bold; color: white; font-size: 12px; }
-.hero-skill { font-size: 9px; color: #bdc3c7; margin-top: 2px; }
-.hero-skill-brief { font-size: 7px; color: #95a5a6; margin-top: 2px; line-height: 1.2; max-width: 95%; word-break: break-word; }
-.hero-hp { font-size: 9px; color: #2ecc71; margin-top: 2px; font-weight: bold; }
+.hero-avatar { font-size: 40px; margin-bottom: 2px; }
+.hero-avatar-img { width: 60px; height: 60px; margin-bottom: 3px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.7); }
+.hero-name { font-weight: bold; color: white; font-size: 11px; margin-top: 1px; }
+.hero-skill { font-size: 8px; color: #bdc3c7; margin-top: 1px; }
+.hero-skill-brief { font-size: 6px; color: #95a5a6; margin-top: 1px; line-height: 1.1; max-width: 95%; word-break: break-word; }
+.hero-hp { font-size: 8px; color: #2ecc71; margin-top: 1px; font-weight: bold; }
 
 /* 结算界面 */
 #result-title { font-size: 28px; margin-bottom: 10px; font-family: var(--font-main); }
@@ -902,17 +902,17 @@ body {
     }
 
     .hero-option {
-        height: auto;
-        min-height: 75px;
+        height: 90px;
         padding: 3px;
+        aspect-ratio: 3 / 4;
     }
 
-    .hero-avatar { font-size: 32px; margin-bottom: 2px; }
-    .hero-avatar-img { width: 54px; height: 54px; margin-bottom: 4px; border-radius: 4px; object-fit: cover; }
-    .hero-name { font-size: 11px; }
-    .hero-skill { font-size: 8px; }
-    .hero-skill-brief { font-size: 6px; }
-    .hero-hp { font-size: 8px; }
+    .hero-avatar { font-size: 28px; margin-bottom: 1px; }
+    .hero-avatar-img { width: 45px; height: 45px; margin-bottom: 2px; border-radius: 3px; object-fit: cover; }
+    .hero-name { font-size: 10px; }
+    .hero-skill { font-size: 7px; }
+    .hero-skill-brief { font-size: 5px; }
+    .hero-hp { font-size: 7px; }
 }
 
 /* 动画 */
