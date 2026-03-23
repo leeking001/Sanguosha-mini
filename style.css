@@ -423,12 +423,12 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: 120px;
+    height: 160px;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     cursor: pointer; transition: all 0.2s;
     padding: 6px;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 9 / 16;
 }
 .hero-option:hover { transform: scale(1.08); border-color: var(--gold); box-shadow: 0 0 18px var(--gold); z-index: 10; }
 .hero-option:active { transform: scale(0.96); }
@@ -902,9 +902,9 @@ body {
     }
 
     .hero-option {
-        height: 90px;
+        height: 140px;
         padding: 3px;
-        aspect-ratio: auto;
+        aspect-ratio: 9 / 16;
     }
 
     .hero-avatar { font-size: 28px; margin-bottom: 1px; }
@@ -1058,8 +1058,8 @@ body {
     }
 
     .hero-option {
-        aspect-ratio: auto;
-        height: 75px;
+        aspect-ratio: 9 / 16;
+        height: 120px;
         padding: 2px;
     }
 
@@ -1184,8 +1184,8 @@ body {
     }
 
     .hero-option {
-        aspect-ratio: auto;
-        height: 65px;
+        aspect-ratio: 9 / 16;
+        height: 110px;
         padding: 2px;
     }
 
@@ -1306,8 +1306,8 @@ body {
     }
 
     .hero-option {
-        aspect-ratio: auto;
-        height: 60px;
+        aspect-ratio: 9 / 16;
+        height: 100px;
         padding: 1px;
     }
 
