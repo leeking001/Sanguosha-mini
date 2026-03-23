@@ -387,7 +387,7 @@ body {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
     overflow-y: auto;
     max-height: 70vh;
-    padding: 8px; flex: 1;
+    padding: 0px; flex: 1;
 }
 
 .role-card {
@@ -424,6 +424,8 @@ body {
 
 .hero-option {
     height: 160px;
+    width: 100%;
+    box-sizing: border-box;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     cursor: pointer; transition: all 0.2s;
