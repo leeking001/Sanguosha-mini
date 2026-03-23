@@ -99,7 +99,7 @@ body {
 }
 
 .enemy-card {
-    width: 28%; height: 100%;
+    width: 32%; height: 100%;
     min-height: 110px;
     background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
     border: 2.5px solid #555;
@@ -121,7 +121,7 @@ body {
 .avatar-frame {
     width: 100%; height: 55%;
     display: flex; justify-content: center; align-items: center;
-    font-size: 48px;
+    font-size: 56px;
     background: linear-gradient(135deg, #3a5a7a 0%, #2c4a5a 100%);
     border-bottom: 2px solid #777;
     position: relative;
@@ -494,23 +494,23 @@ body {
 .role-card:active { transform: scale(0.96); }
 
 .hero-option {
-    height: 180px;
+    height: 220px;
     width: 100%;
     box-sizing: border-box;
     background: #34495e; border: 2px solid #7f8c8d; border-radius: 8px;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     cursor: pointer; transition: all 0.2s;
-    padding: 6px;
+    padding: 8px;
     aspect-ratio: 9 / 16;
 }
 .hero-option:hover { transform: scale(1.08); border-color: var(--gold); box-shadow: 0 0 18px var(--gold); z-index: 10; }
 .hero-option:active { transform: scale(0.96); }
-.hero-avatar { font-size: 40px; margin-bottom: 2px; }
-.hero-avatar-img { width: 60px; height: 60px; margin-bottom: 3px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.7); }
-.hero-name { font-weight: bold; color: white; font-size: 11px; margin-top: 1px; }
-.hero-skill { font-size: 8px; color: #bdc3c7; margin-top: 1px; }
-.hero-skill-brief { font-size: 6px; color: #95a5a6; margin-top: 1px; line-height: 1.1; max-width: 95%; word-break: break-word; }
-.hero-hp { font-size: 8px; color: #2ecc71; margin-top: 1px; font-weight: bold; }
+.hero-avatar { font-size: 56px; margin-bottom: 3px; }
+.hero-avatar-img { width: 80px; height: 80px; margin-bottom: 4px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.7); }
+.hero-name { font-weight: bold; color: white; font-size: 14px; margin-top: 2px; }
+.hero-skill { font-size: 11px; color: #bdc3c7; margin-top: 1px; }
+.hero-skill-brief { font-size: 8px; color: #95a5a6; margin-top: 1px; line-height: 1.1; max-width: 95%; word-break: break-word; }
+.hero-hp { font-size: 10px; color: #2ecc71; margin-top: 2px; font-weight: bold; }
 
 /* 英雄选择界面血量条 */
 .hero-hp-bar .hp-point {
@@ -981,18 +981,18 @@ body {
     }
 
     .hero-option {
-        height: 160px;
-        padding: 2px;
+        height: 200px;
+        padding: 3px;
         aspect-ratio: 9 / 16;
     }
 
-    .hero-avatar { font-size: 28px; margin-bottom: 1px; }
-    .hero-avatar-img { width: 45px; height: 45px; margin-bottom: 2px; border-radius: 3px; object-fit: cover; }
-    .hero-name { font-size: 10px; word-break: break-word; line-height: 1.2; }
-    .hero-skill { font-size: 7px; word-break: break-word; line-height: 1.2; }
-    .hero-skill-brief { font-size: 5px; }
+    .hero-avatar { font-size: 44px; margin-bottom: 2px; }
+    .hero-avatar-img { width: 70px; height: 70px; margin-bottom: 3px; border-radius: 3px; object-fit: cover; }
+    .hero-name { font-size: 12px; word-break: break-word; line-height: 1.2; }
+    .hero-skill { font-size: 9px; word-break: break-word; line-height: 1.2; }
+    .hero-skill-brief { font-size: 7px; }
 
-    .hero-hp { font-size: 7px; }
+    .hero-hp { font-size: 9px; }
 }
 
 /* 动画 */
@@ -1138,23 +1138,23 @@ body {
 
     .hero-option {
         aspect-ratio: 9 / 16;
-        height: 140px;
-        padding: 1px;
+        height: 180px;
+        padding: 2px;
     }
 
     .hero-avatar {
-        font-size: 24px;
+        font-size: 40px;
         margin-bottom: 2px;
     }
 
     .hero-name {
-        font-size: 12px;
+        font-size: 13px;
         word-break: break-word;
         line-height: 1.2;
     }
 
     .hero-skill {
-        font-size: 9px;
+        font-size: 10px;
         color: #a8b3ba;
         margin-top: 1px;
         word-break: break-word;
@@ -1265,23 +1265,23 @@ body {
 
     .hero-option {
         aspect-ratio: 9 / 16;
-        height: 130px;
-        padding: 1px;
+        height: 170px;
+        padding: 2px;
     }
 
     .hero-avatar {
-        font-size: 22px;
+        font-size: 36px;
         margin-bottom: 1px;
     }
 
     .hero-name {
-        font-size: 10px;
+        font-size: 12px;
         word-break: break-word;
         line-height: 1.2;
     }
 
     .hero-skill {
-        font-size: 7px;
+        font-size: 9px;
         color: #a8b3ba;
         margin-top: 1px;
         word-break: break-word;
@@ -1388,23 +1388,23 @@ body {
 
     .hero-option {
         aspect-ratio: 9 / 16;
-        height: 120px;
-        padding: 0px;
+        height: 160px;
+        padding: 1px;
     }
 
     .hero-avatar {
-        font-size: 24px;
+        font-size: 36px;
         margin-bottom: 2px;
     }
 
     .hero-name {
-        font-size: 11px;
+        font-size: 12px;
         word-break: break-word;
         line-height: 1.2;
     }
 
     .hero-skill {
-        font-size: 8px;
+        font-size: 9px;
         margin-top: 1px;
         word-break: break-word;
         line-height: 1.2;
@@ -1485,7 +1485,7 @@ body {
 
     /* 敌方卡片适当增大 */
     .enemy-card {
-        width: 28%;
+        width: 32%;
         min-height: 140px;
     }
 
