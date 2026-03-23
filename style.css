@@ -441,6 +441,12 @@ body {
 .hero-skill-brief { font-size: 6px; color: #95a5a6; margin-top: 1px; line-height: 1.1; max-width: 95%; word-break: break-word; }
 .hero-hp { font-size: 8px; color: #2ecc71; margin-top: 1px; font-weight: bold; }
 
+/* 英雄选择界面血量条 */
+.hero-hp-bar .hp-point {
+    width: 10px;
+    height: 10px;
+}
+
 /* 结算界面 */
 #result-title { font-size: 28px; margin-bottom: 10px; font-family: var(--font-main); }
 .win { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
