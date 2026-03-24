@@ -511,7 +511,7 @@ const Game = {
                     p.isDead = true;
                     p.identityKnown = true;
                     source.stats.kills += 1;
-                    events.push({ type: 'death', player: p.id });
+                    events.push({ type: 'death', player: p.id, attacker: source.id });
                 }
             }
         }
@@ -521,7 +521,7 @@ const Game = {
             target.identityKnown = true;
             // 更新击杀统计
             source.stats.kills += 1;
-            events.push({ type: 'death', player: target.id });
+            events.push({ type: 'death', player: target.id, attacker: source.id });
         }
         return { success: true, events };
     },
