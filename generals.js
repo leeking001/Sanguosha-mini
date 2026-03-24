@@ -42,9 +42,9 @@ const GENERALS_DATA = [
       skillType: 'active', canUse: true },
 
     { name: '反骨延', hp: 4, skill: '狂暴', avatar: 'images/fanguyen.png', avatarEmoji: '💥', color: '#e67e22',
-      skillDesc: '【杀】伤害+1',
-      skillBrief: '被动增强杀伤害，硬控局面',
-      skillType: 'passive', canUse: true }
+      skillDesc: '下次【杀】伤害+1',
+      skillBrief: '主动强化下次攻击，爆发输出',
+      skillType: 'active', canUse: true }
 ];
 
 // 获取随机英雄（排除已选）

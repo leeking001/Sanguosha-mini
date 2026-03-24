@@ -472,9 +472,10 @@ const Game = {
             source.berserk = false;
         }
 
-        // 反骨延的狂暴技能：【杀】伤害+1（被动）
-        if (source.general.skill === '狂暴' && attackType === 'sha') {
+        // 反骨延的狂暴技能：使用后下次【杀】伤害+1（主动）
+        if (source.berserkActive && attackType === 'sha') {
             damage++;
+            source.berserkActive = false; // 使用后清除状态
         }
 
         target.hp -= damage;
@@ -808,9 +809,15 @@ const Game = {
                 break;
 
             case '狂暴':
-                // 狂暴是被动技能，在伤害计算时自动触发
-                // 此处不需要手动激活，返回错误
-                return { success: false, reason: 'passive_skill' };
+                // 狂暴：主动激活，下一次使用【杀】时伤害+1
+                player.berserkActive = true;
+                player.skillUsed = true;
+                events.push({
+                    type: 'skill',
+                    name: '狂暴',
+                    player: playerId,
+                    description: `${player.general.name}发动【狂暴】，下次【杀】伤害+1`
+                });
                 break;
 
             case '色诱':

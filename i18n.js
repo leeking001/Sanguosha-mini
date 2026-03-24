@@ -103,7 +103,7 @@ const I18N = {
             'skill_desc_fanjiji': '令敌弃1张牌',
             'skill_desc_longdan': '杀闪互换',
             'skill_desc_yingjiuye': '指定角色摸1张',
-            'skill_desc_kuangbao': '【杀】伤害+1',
+            'skill_desc_kuangbao': '下次【杀】伤害+1',
 
             // 身份描述
             'role_desc_lord': '身份：主公\n要求：消灭所有反贼和内奸',
