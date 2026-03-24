@@ -14,8 +14,8 @@ yarn.lock
 *.swo
 *~
 
-# Logs
-logs/
+# Logs (but not docs/logs which contains documentation)
+/logs/
 *.log
 
 # Build outputs
