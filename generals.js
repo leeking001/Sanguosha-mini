@@ -6,7 +6,7 @@ const GENERALS_DATA = [
       skillBrief: '每回合额外摸牌，手牌优势',
       skillType: 'active', canUse: true },
 
-    { name: '大奉先', hp: 4, skill: '无双', avatar: 'images/dafengxian.png', avatarEmoji: '⚔️', color: '#c0392b',
+    { name: '大奉先', hp: 3, skill: '无双', avatar: 'images/dafengxian.png', avatarEmoji: '⚔️', color: '#c0392b',
       skillDesc: '【杀】无限制',
       skillBrief: '无限使用【杀】，进攻无敌',
       skillType: 'active', canUse: true },
@@ -26,7 +26,7 @@ const GENERALS_DATA = [
       skillBrief: '压制对手，限制其出牌能力',
       skillType: 'active', canUse: true },
 
-    { name: '孔明亮', hp: 3, skill: '反击', avatar: 'images/kongmingliang.png', avatarEmoji: '🌙', color: '#2c3e50',
+    { name: '孔明亮', hp: 4, skill: '反击', avatar: 'images/kongmingliang.png', avatarEmoji: '🌙', color: '#2c3e50',
       skillDesc: '令敌弃1张牌',
       skillBrief: '主动制裁对手，打乱节奏',
       skillType: 'active', canUse: true },
@@ -41,9 +41,9 @@ const GENERALS_DATA = [
       skillBrief: '帮助友方摸牌，团队协作',
       skillType: 'active', canUse: true },
 
-    { name: '反骨延', hp: 5, skill: '狂暴', avatar: 'images/fanguyen.png', avatarEmoji: '💥', color: '#e67e22',
+    { name: '反骨延', hp: 4, skill: '狂暴', avatar: 'images/fanguyen.png', avatarEmoji: '💥', color: '#e67e22',
       skillDesc: '【杀】伤害+1',
-      skillBrief: '高血量+伤害加强，硬控局面',
+      skillBrief: '被动增强杀伤害，硬控局面',
       skillType: 'passive', canUse: true }
 ];
 

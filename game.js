@@ -472,6 +472,11 @@ const Game = {
             source.berserk = false;
         }
 
+        // 反骨延的狂暴技能：【杀】伤害+1（被动）
+        if (source.general.skill === '狂暴' && attackType === 'sha') {
+            damage++;
+        }
+
         target.hp -= damage;
         // 更新伤害统计
         source.stats.damageDealt += damage;
@@ -803,15 +808,9 @@ const Game = {
                 break;
 
             case '狂暴':
-                // 狂暴：出牌阶段，可摸1张牌（每回合限一次）
-                this.drawCards(player, 1);
-                player.skillUsed = true;
-                events.push({
-                    type: 'skill',
-                    name: '狂暴',
-                    player: playerId,
-                    description: `${player.general.name}发动【狂暴】，摸1张牌`
-                });
+                // 狂暴是被动技能，在伤害计算时自动触发
+                // 此处不需要手动激活，返回错误
+                return { success: false, reason: 'passive_skill' };
                 break;
 
             case '色诱':
