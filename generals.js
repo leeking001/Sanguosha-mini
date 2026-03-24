@@ -22,8 +22,8 @@ const GENERALS_DATA = [
       skillType: 'active', canUse: true },
 
     { name: '人妻控', hp: 4, skill: '色诱', avatar: 'images/renqikong.png', avatarEmoji: '🔥', color: '#e74c3c',
-      skillDesc: '敌方手牌上限-1',
-      skillBrief: '压制对手，限制其出牌能力',
+      skillDesc: '获得目标1张牌',
+      skillBrief: '拉拢对手，获取其手牌',
       skillType: 'active', canUse: true },
 
     { name: '孔明亮', hp: 4, skill: '反击', avatar: 'images/kongmingliang.png', avatarEmoji: '🌙', color: '#2c3e50',

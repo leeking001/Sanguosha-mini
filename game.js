@@ -821,10 +821,10 @@ const Game = {
                 break;
 
             case '色诱':
-                // 色诱：出牌阶段，可指定一名其他角色，该角色本回合手牌上限-1（每回合限一次）
+                // 色诱：出牌阶段，可指定一名其他角色，获得其一张手牌（每回合限一次）
                 if (targetId === null) {
                     // 如果没有指定目标，返回可选目标列表
-                    const aliveEnemies = GameState.players.filter(p => !p.isDead && p.id !== playerId);
+                    const aliveEnemies = GameState.players.filter(p => !p.isDead && p.id !== playerId && p.hand.length > 0);
                     if (aliveEnemies.length === 0) {
                         return { success: false, reason: 'no_valid_target' };
                     }
@@ -836,17 +836,21 @@ const Game = {
                     return { success: false, reason: 'invalid_target' };
                 }
 
-                // 记录该角色本回合的手牌上限减少
-                if (!targetForSeduction.handLimitReduced) {
-                    targetForSeduction.handLimitReduced = 0;
+                if (targetForSeduction.hand.length === 0) {
+                    return { success: false, reason: 'target_no_cards' };
                 }
-                targetForSeduction.handLimitReduced += 1;
+
+                // 随机抽取目标的一张手牌，交给使用者
+                const stealIdx = Math.floor(Math.random() * targetForSeduction.hand.length);
+                const stolenCard = targetForSeduction.hand.splice(stealIdx, 1)[0];
+                player.hand.push(stolenCard);
+
                 player.skillUsed = true;
                 events.push({
                     type: 'skill',
                     name: '色诱',
                     player: playerId,
-                    description: `${player.general.name}发动【色诱】，${targetForSeduction.general.name}本回合手牌上限-1`
+                    description: `${player.general.name}发动【色诱】，获得了${targetForSeduction.general.name}一张手牌`
                 });
                 break;
 

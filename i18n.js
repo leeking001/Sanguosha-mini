@@ -99,7 +99,7 @@ const I18N = {
             'skill_desc_wushuang': '【杀】无限制',
             'skill_desc_zhiheng': '弃牌摸等量',
             'skill_desc_shenyi': '回复1血',
-            'skill_desc_seyou': '敌方手牌上限-1',
+            'skill_desc_seyou': '获得目标1张牌',
             'skill_desc_fanjiji': '令敌弃1张牌',
             'skill_desc_longdan': '杀闪互换',
             'skill_desc_yingjiuye': '指定角色摸1张',
