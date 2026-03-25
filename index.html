@@ -662,8 +662,12 @@
 
                 case 'draw':
                     AudioSystem.SFX.card();
+                    // 显示摸牌特效
+                    if (event.target !== undefined) {
+                        await UI.showEffect(event.target, '摸牌', 'skill');
+                    }
                     break;
-                    
+
                 case 'heal':
                     AudioSystem.SFX.heal();
                     await UI.showEffect(event.target, `+${event.amount || 1}`, 'heal');
@@ -682,9 +686,65 @@
 
             const result = await AI.takeTurn(ai, Game);
 
+            // ✅ 新增：检查是否有针对玩家的锦囊被无懈可击抵消
+            let wuxieNullified = false;
+            const negativeScrolls = ['顺手', '拆桥', '乐不', '决斗', '火攻'];
+            const player0 = GameState.players[0];
+
+            // 先检查use_card事件中是否有需要无懈的
+            const useCardEvent = result.events.find(e =>
+                e.type === 'use_card' &&
+                negativeScrolls.includes(e.card) &&
+                e.target === 0
+            );
+
+            if (useCardEvent &&
+                !player0.isDead &&
+                player0.hand.includes('无懈可击')) {
+
+                // 自动使用无懈可击抵消
+                const wuxieResult = Game.checkWuxie(player0, useCardEvent.source, useCardEvent.card);
+
+                if (wuxieResult.nullified) {
+                    wuxieNullified = true;
+                    UI.log(`你打出【无懈可击】抵消了【${useCardEvent.card}】！`, 'skill');
+                    AudioSystem.SFX.skill();
+                    await UI.showEffect(0, '无懈可击', 'skill');
+                    await sleep(500);
+
+                    // 过滤掉被抵消的锦囊相关的所有事件
+                    result.events = result.events.filter(e => {
+                        // 保留use_card事件本身（用于显示AI使用了什么牌）
+                        if (e.type === 'use_card' && e.card === useCardEvent.card) {
+                            return true;
+                        }
+                        // 过滤掉相关的后续事件（steal、discard、duel、delay、fire_attack）
+                        if ((e.type === 'steal' || e.type === 'discard' || e.type === 'delay') &&
+                            e.target === 0) {
+                            return false;
+                        }
+                        if ((e.type === 'duel' || e.type === 'fire_attack') &&
+                            e.target === 0) {
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+            }
+
             // 处理AI行动事件
             for (const event of result.events) {
-                await handleAIEvent(event);
+                // 如果是被无懈抵消的use_card事件，特殊处理
+                if (wuxieNullified &&
+                    event.type === 'use_card' &&
+                    event.card === useCardEvent.card) {
+                    const targetText = event.target !== undefined ? ` 对 ${getPlayerName(event.target)}` : '';
+                    UI.log(`${getPlayerName(event.source)} 使用【${event.card}】${targetText}（已被无懈抵消）`, 'system');
+                    AudioSystem.SFX.card();
+                    await UI.showEffect(event.source, event.card);
+                } else {
+                    await handleAIEvent(event);
+                }
             }
 
             UI.renderAll();

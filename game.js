@@ -460,6 +460,24 @@ const Game = {
         return { success: true, responded: false, player: target.id };
     },
 
+    // 检查目标是否可以使用无懈可击抵消锦囊
+    checkWuxie(target, sourceId, cardName) {
+        // 检查目标手中是否有无懈可击
+        const wuxieIdx = target.hand.indexOf('无懈可击');
+        if (wuxieIdx !== -1) {
+            // 移除无懈可击
+            target.hand.splice(wuxieIdx, 1);
+            return {
+                success: true,
+                nullified: true,
+                player: target.id,
+                card: '无懈可击',
+                targetCard: cardName
+            };
+        }
+        return { success: true, nullified: false, player: target.id };
+    },
+
     async dealDamage(source, target, baseDamage = 1, attackType = 'sha') {
         let damage = baseDamage;
         // 只有【杀】类型的攻击才会被酒的buff影响
