@@ -779,15 +779,39 @@ const Game = {
                 break;
 
             case '龙胆':
-                // 龙胆：出牌阶段，可将一张【杀】当【闪】使用，或将一张【闪】当【杀】使用
-                // 这个技能比较复杂，这里只是给提示
+                // 龙胆：出牌阶段，可将一张【杀】转换为【闪】，或将一张【闪】转换为【杀】（每回合限一次）
+                // 检查是否有可转换的牌
+                const shaCards = player.hand.filter(c => c.type === 'sha');
+                const shanCards = player.hand.filter(c => c.type === 'shan');
+
+                if (shaCards.length === 0 && shanCards.length === 0) {
+                    return { success: false, reason: 'no_convertible_cards' };
+                }
+
+                // 优先转换策略：如果有杀就转成闪，如果没杀有闪就转成杀
+                let convertedCard;
+                let fromType, toType;
+                if (shaCards.length > 0) {
+                    // 将第一张【杀】转换为【闪】
+                    const shaIdx = player.hand.findIndex(c => c.type === 'sha');
+                    player.hand[shaIdx] = { type: 'shan', name: '闪' };
+                    fromType = '杀';
+                    toType = '闪';
+                } else {
+                    // 将第一张【闪】转换为【杀】
+                    const shanIdx = player.hand.findIndex(c => c.type === 'shan');
+                    player.hand[shanIdx] = { type: 'sha', name: '杀' };
+                    fromType = '闪';
+                    toType = '杀';
+                }
+
+                player.skillUsed = true;
                 events.push({
                     type: 'skill',
                     name: '龙胆',
                     player: playerId,
-                    description: `${player.general.name}发动【龙胆】，本回合可互换杀闪`
+                    description: `${player.general.name}发动【龙胆】，将一张【${fromType}】转换为【${toType}】`
                 });
-                player.skillUsed = true;
                 break;
 
             case '急救':

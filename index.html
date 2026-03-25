@@ -208,7 +208,7 @@
                 <div class="help-item"><b>华老头【神医】</b>：出牌阶段，可指定一名角色（包括自己）回复1点生命（每回合限一次）。</div>
                 <div class="help-item"><b>人妻控【色诱】</b>：出牌阶段，可指定一名其他角色，获得其一张手牌（每回合限一次）。</div>
                 <div class="help-item"><b>孔明亮【反击】</b>：出牌阶段，可令一名其他角色弃置一张手牌（每回合限一次）。</div>
-                <div class="help-item"><b>常山赵【龙胆】</b>：出牌阶段，可将一张【杀】当【闪】使用，或将一张【闪】当【杀】使用。</div>
+                <div class="help-item"><b>常山赵【龙胆】</b>：出牌阶段，可将手牌中一张【杀】转换为【闪】，或将【闪】转换为【杀】（每回合限一次）。</div>
                 <div class="help-item"><b>老黄头【营救】</b>：指定角色摸1张牌，帮助友方团队协作。</div>
                 <div class="help-item"><b>反骨延【狂暴】</b>：出牌阶段，主动激活技能，下次使用【杀】时伤害+1（每回合限一次）。</div>
             </div>
@@ -1254,7 +1254,9 @@
                     'insufficient_hp': '生命值不足',
                     'no_valid_target': '没有有效的目标',
                     'skill_not_found': '技能不存在',
-                    'passive_skill': '这是被动技能，会在攻击时自动触发'
+                    'passive_skill': '这是被动技能，会在攻击时自动触发',
+                    'no_convertible_cards': '手牌中没有【杀】或【闪】可转换',
+                    'target_no_cards': '目标没有手牌'
                 };
                 const message = reasons[result.reason] || '技能无法使用';
                 UI.log(message, 'system');
