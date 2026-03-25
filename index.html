@@ -707,7 +707,12 @@
                     case 'use_card':
                         // AOE卡牌、决斗、火攻在对应事件中显示，避免重复日志
                         if (!['万箭', '南蛮', '决斗', '火攻'].includes(event.card)) {
-                            UI.log(`${getPlayerName(event.source)} 使用【${event.card}】`);
+                            const targetText = event.target !== undefined ? ` 对 ${getPlayerName(event.target)}` : '';
+                            UI.log(`${getPlayerName(event.source)} 使用【${event.card}】${targetText}`);
+                            AudioSystem.SFX.card();
+                            await UI.showEffect(event.source, event.card);
+                        }
+                        break;event.source)} 使用【${event.card}】`);
                             AudioSystem.SFX.card();
                             await UI.showEffect(event.source, event.card);
                         }

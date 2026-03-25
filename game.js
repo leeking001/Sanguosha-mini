@@ -327,7 +327,7 @@ const Game = {
         const card = source.hand[cardIndex];
         source.hand.splice(cardIndex, 1);
         source.stats.cardsPlayed += 1;
-        const events = [{ type: 'use_card', card, source: sourceIdx }];
+        const events = [{ type: 'use_card', card, source: sourceIdx, target: targetInfo?.id }];
 
         switch (card) {
             case '杀':

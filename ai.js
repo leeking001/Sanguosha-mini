@@ -309,8 +309,10 @@ const AI = {
                 return aliveAllies.some(a => a.hp <= 2 || a.hand.length < 2);
 
             case '狂暴':
-                // 狂暴：手牌少时使用
-                return ai.hand.length < ai.hp - 1;
+                // 狂暴：如果手里有杀且有敌人可攻击，就先用狂暴再出杀
+                const hasSha = ai.hand.some(c => c === '杀');
+                const hasEnemy = GameState.players.some(p => !p.isDead && p.id !== ai.id);
+                return hasSha && hasEnemy;
 
             case '挑衅':
                 // 挑衅：被动技能，不需要主动使用
