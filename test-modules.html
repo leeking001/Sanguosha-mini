@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模块加载测试</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #0f0;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .info { color: #0ff; }
+        pre { background: #000; padding: 10px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>🔍 三国杀mini - 模块加载诊断</h1>
+    <div id="output"></div>
+
+    <script type="module">
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        log('🚀 开始加载模块...', 'info');
+
+        try {
+            log('📦 正在加载 generals.js...', 'info');
+            const { GENERALS_DATA } = await import('./generals.js');
+            log(`✅ generals.js 加载成功！找到 ${GENERALS_DATA.length} 个武将`, 'success');
+
+            log('📦 正在加载 cards.js...', 'info');
+            const { CardUtils } = await import('./cards.js');
+            log('✅ cards.js 加载成功！', 'success');
+
+            log('📦 正在加载 game.js...', 'info');
+            const { Game, GameState } = await import('./game.js');
+            log('✅ game.js 加载成功！', 'success');
+
+            log('📦 正在加载 ai.js...', 'info');
+            const { AI } = await import('./ai.js');
+            log('✅ ai.js 加载成功！', 'success');
+
+            log('📦 正在加载 ui.js...', 'info');
+            const { UI } = await import('./ui.js');
+            log('✅ ui.js 加载成功！', 'success');
+
+            log('📦 正在加载 storage.js...', 'info');
+            const { StorageSystem } = await import('./storage.js');
+            log('✅ storage.js 加载成功！', 'success');
+
+            log('📦 正在加载 audio.js...', 'info');
+            const { AudioSystem } = await import('./audio.js');
+            log('✅ audio.js 加载成功！', 'success');
+
+            log('📦 正在加载 i18n.js...', 'info');
+            const { I18N } = await import('./i18n.js');
+            log('✅ i18n.js 加载成功！', 'success');
+
+            log('📦 正在加载 effects.js...', 'info');
+            const { EffectSystem } = await import('./effects.js');
+            log('✅ effects.js 加载成功！', 'success');
+
+            log('', 'info');
+            log('🎉 所有模块加载成功！项目可以正常运行！', 'success');
+            log('', 'info');
+            log('📊 武将列表:', 'info');
+            GENERALS_DATA.forEach(g => {
+                log(`   ${g.avatarEmoji} ${g.name} - ${g.skill} (${g.hp}HP)`, 'success');
+            });
+
+        } catch (error) {
+            log(`❌ 模块加载失败: ${error.message}`, 'error');
+            log(`错误详情: ${error.stack}`, 'error');
+        }
+    </script>
+</body>
+</html>

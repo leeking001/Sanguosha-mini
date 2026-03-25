@@ -612,6 +612,53 @@ const Game = {
         return { success: true, events };
     },
 
+    // 使用龙胆技能：将选中的【杀】转换为【闪】，或【闪】转换为【杀】
+    useLongdanSkill(playerId, cardIndex) {
+        const player = GameState.players[playerId];
+        if (!player || player.isDead) {
+            return { success: false, reason: 'player_dead' };
+        }
+
+        // 检查是否是该玩家的回合
+        if (GameState.currentTurnIndex !== playerId) {
+            return { success: false, reason: 'not_player_turn' };
+        }
+
+        // 检查技能是否已使用
+        if (player.skillUsed) {
+            return { success: false, reason: 'skill_already_used' };
+        }
+
+        // 检查是否选中了手牌
+        if (cardIndex === null || cardIndex === undefined) {
+            return { success: false, reason: 'no_card_selected' };
+        }
+
+        const card = player.hand[cardIndex];
+        if (!card) {
+            return { success: false, reason: 'invalid_card_index' };
+        }
+
+        // 检查选中的牌是否是【杀】或【闪】
+        if (card !== '杀' && card !== '闪') {
+            return { success: false, reason: 'invalid_card_for_longdan' };
+        }
+
+        // 转换卡牌
+        const newCard = card === '杀' ? '闪' : '杀';
+        player.hand[cardIndex] = newCard;
+        player.skillUsed = true;
+
+        const events = [{
+            type: 'skill',
+            name: '龙胆',
+            player: playerId,
+            description: `${player.general.name}发动【龙胆】，将一张【${card}】转换为【${newCard}】`
+        }];
+
+        return { success: true, events };
+    },
+
     // 使用主动技能
     useActiveSkill(playerId, targetId = null) {
         const player = GameState.players[playerId];
@@ -779,39 +826,22 @@ const Game = {
                 break;
 
             case '龙胆':
-                // 龙胆：出牌阶段，可将一张【杀】转换为【闪】，或将一张【闪】转换为【杀】（每回合限一次）
-                // 检查是否有可转换的牌
-                const shaCards = player.hand.filter(c => c.type === 'sha');
-                const shanCards = player.hand.filter(c => c.type === 'shan');
+                // 龙胆：出牌阶段，需要先选中手牌中的【杀】或【闪】，点击技能后自动转换
+                // 该技能需要配合选中的手牌使用，在这里只做检查
+                // 实际转换逻辑在 useLongdanSkill 方法中
+                const shaCards = player.hand.filter(c => c === '杀');
+                const shanCards = player.hand.filter(c => c === '闪');
 
                 if (shaCards.length === 0 && shanCards.length === 0) {
                     return { success: false, reason: 'no_convertible_cards' };
                 }
 
-                // 优先转换策略：如果有杀就转成闪，如果没杀有闪就转成杀
-                let convertedCard;
-                let fromType, toType;
-                if (shaCards.length > 0) {
-                    // 将第一张【杀】转换为【闪】
-                    const shaIdx = player.hand.findIndex(c => c.type === 'sha');
-                    player.hand[shaIdx] = { type: 'shan', name: '闪' };
-                    fromType = '杀';
-                    toType = '闪';
-                } else {
-                    // 将第一张【闪】转换为【杀】
-                    const shanIdx = player.hand.findIndex(c => c.type === 'shan');
-                    player.hand[shanIdx] = { type: 'sha', name: '杀' };
-                    fromType = '闪';
-                    toType = '杀';
-                }
-
-                player.skillUsed = true;
-                events.push({
-                    type: 'skill',
-                    name: '龙胆',
-                    player: playerId,
-                    description: `${player.general.name}发动【龙胆】，将一张【${fromType}】转换为【${toType}】`
-                });
+                // 返回需要选择手牌的提示
+                return {
+                    success: false,
+                    reason: 'need_card_selection',
+                    message: '请先选中手牌中的【杀】或【闪】，再点击龙胆技能'
+                };
                 break;
 
             case '急救':

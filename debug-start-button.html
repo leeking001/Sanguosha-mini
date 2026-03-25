@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开始按钮诊断</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #0f0;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+        .info { color: #0ff; }
+        pre { background: #000; padding: 10px; border: 1px solid #333; margin: 10px 0; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 开始按钮诊断工具</h1>
+    <div id="output"></div>
+    <hr>
+    <button onclick="testButton()">重新测试</button>
+    <button onclick="window.location.href='/'">返回游戏</button>
+
+    <script type="module">
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        window.testButton = async function() {
+            output.innerHTML = '';
+            log('🚀 开始诊断...', 'info');
+            log('', 'info');
+
+            try {
+                // 测试1: 加载主页面
+                log('📄 测试1: 获取主页面HTML...', 'info');
+                const response = await fetch('/');
+                if (response.ok) {
+                    log('✅ 主页面加载成功', 'success');
+                    const html = await response.text();
+
+                    // 检查按钮是否存在
+                    if (html.includes('id="btn-start-game"')) {
+                        log('✅ 找到开始游戏按钮定义', 'success');
+                    } else {
+                        log('❌ 未找到开始游戏按钮定义', 'error');
+                    }
+
+                    if (html.includes('showWelcomeScreen()')) {
+                        log('✅ 找到 showWelcomeScreen() 调用', 'success');
+                    } else {
+                        log('❌ 未找到 showWelcomeScreen() 调用', 'error');
+                    }
+                } else {
+                    log('❌ 主页面加载失败', 'error');
+                }
+
+                log('', 'info');
+
+                // 测试2: 检查DOM元素
+                log('📄 测试2: 在iframe中加载页面检查DOM...', 'info');
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = '/';
+                document.body.appendChild(iframe);
+
+                await new Promise(resolve => {
+                    iframe.onload = resolve;
+                    setTimeout(resolve, 3000); // 3秒超时
+                });
+
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+                const welcomeScreen = iframeDoc.getElementById('welcome-screen');
+                const startBtn = iframeDoc.getElementById('btn-start-game');
+
+                if (welcomeScreen) {
+                    log('✅ 找到 welcome-screen 元素', 'success');
+                    log(`   display: ${welcomeScreen.style.display}`, 'info');
+                } else {
+                    log('❌ 未找到 welcome-screen 元素', 'error');
+                }
+
+                if (startBtn) {
+                    log('✅ 找到开始游戏按钮', 'success');
+                    log(`   文本: ${startBtn.textContent}`, 'info');
+                    log(`   是否可见: ${startBtn.offsetParent !== null}`, 'info');
+
+                    // 检查是否有事件监听器
+                    const listeners = getEventListeners ? getEventListeners(startBtn) : null;
+                    if (listeners && listeners.click) {
+                        log(`✅ 按钮有 ${listeners.click.length} 个点击事件监听器`, 'success');
+                    } else {
+                        log('⚠️  无法检查事件监听器（需要在开发者工具Console中运行）', 'warning');
+                    }
+                } else {
+                    log('❌ 未找到开始游戏按钮', 'error');
+                }
+
+                // 检查控制台错误
+                log('', 'info');
+                log('📄 测试3: 检查控制台错误...', 'info');
+                log('⚠️  请打开浏览器控制台 (F12) 查看是否有JavaScript错误', 'warning');
+
+                document.body.removeChild(iframe);
+
+                log('', 'info');
+
+                // 测试4: 检查所需模块
+                log('📄 测试4: 检查ES6模块...', 'info');
+                try {
+                    const { UI } = await import('./ui.js');
+                    log('✅ UI 模块加载成功', 'success');
+
+                    if (typeof UI.showRoleSelection === 'function') {
+                        log('✅ UI.showRoleSelection 函数存在', 'success');
+                    } else {
+                        log('❌ UI.showRoleSelection 函数不存在', 'error');
+                    }
+                } catch (error) {
+                    log(`❌ UI 模块加载失败: ${error.message}`, 'error');
+                }
+
+                log('', 'info');
+                log('🎉 诊断完成！', 'success');
+                log('', 'info');
+                log('💡 建议:', 'warning');
+                log('1. 打开浏览器控制台 (F12) 查看详细错误', 'info');
+                log('2. 检查 Console 标签是否有红色错误信息', 'info');
+                log('3. 尝试在 Console 中执行: document.getElementById("btn-start-game")', 'info');
+                log('4. 检查 Network 标签，确认所有文件都加载成功', 'info');
+
+            } catch (error) {
+                log(`❌ 诊断过程出错: ${error.message}`, 'error');
+                log(`错误堆栈: ${error.stack}`, 'error');
+            }
+        };
+
+        // 自动运行测试
+        testButton();
+    </script>
+</body>
+</html>

@@ -1,10 +1,46 @@
 # 🀄 迷你杀 H5 单机版
 
-**HTML5 / JavaScript 模块化 · 无需服务器 · 可离线运行**
+**HTML5 / JavaScript 模块化 · 需要HTTP服务器 · 可离线运行**
 
 一个极简但功能完整的 **迷你杀单机版**：无需安装环境、无需联网、无需资源文件，纯前端实现，即可体验完整武将技能、身份模式、音效卡牌逻辑和智能 AI。
 
 **🌍 多语言支持：中文 | [English](README_EN.md)**
+
+---
+
+## 🚀 快速启动
+
+### ⚠️ 重要说明
+由于项目使用ES6模块系统，**必须通过HTTP服务器运行**，不能直接双击打开HTML文件。
+
+### 方法一：使用管理脚本（推荐）✨
+
+```bash
+# 启动服务器并打开游戏
+./manage.sh start
+
+# 其他命令
+./manage.sh stop      # 停止服务器
+./manage.sh restart   # 重启服务器
+./manage.sh status    # 查看状态
+./manage.sh open      # 打开游戏页面
+./manage.sh test      # 模块测试页面
+```
+
+### 方法二：手动启动
+
+```bash
+# 启动Python HTTP服务器
+python3 -m http.server 8000
+
+# 然后在浏览器访问: http://localhost:8000
+```
+
+### 方法三：使用启动脚本
+
+```bash
+./start-server.sh
+```
 
 ---
 

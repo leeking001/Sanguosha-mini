@@ -208,7 +208,7 @@
                 <div class="help-item"><b>华老头【神医】</b>：出牌阶段，可指定一名角色（包括自己）回复1点生命（每回合限一次）。</div>
                 <div class="help-item"><b>人妻控【色诱】</b>：出牌阶段，可指定一名其他角色，获得其一张手牌（每回合限一次）。</div>
                 <div class="help-item"><b>孔明亮【反击】</b>：出牌阶段，可令一名其他角色弃置一张手牌（每回合限一次）。</div>
-                <div class="help-item"><b>常山赵【龙胆】</b>：出牌阶段，可将手牌中一张【杀】转换为【闪】，或将【闪】转换为【杀】（每回合限一次）。</div>
+                <div class="help-item"><b>常山赵【龙胆】</b>：出牌阶段，先选中手牌中的【杀】或【闪】，再点击技能按钮，即可转换为对应卡牌（杀→闪，闪→杀），每回合限一次。</div>
                 <div class="help-item"><b>老黄头【营救】</b>：指定角色摸1张牌，帮助友方团队协作。</div>
                 <div class="help-item"><b>反骨延【狂暴】</b>：出牌阶段，主动激活技能，下次使用【杀】时伤害+1（每回合限一次）。</div>
             </div>
@@ -464,6 +464,8 @@
             const langBtn = document.getElementById('welcome-lang-btn');
             const guideBtn = document.getElementById('welcome-guide-btn');
 
+            if (!welcomeScreen || !startBtn) return;
+
             welcomeScreen.style.display = 'flex';
 
             // 开始游戏按钮
@@ -713,12 +715,8 @@
                             await UI.showEffect(event.source, event.card);
                         }
                         break;
-                            AudioSystem.SFX.card();
-                            await UI.showEffect(event.source, event.card);
-                        }
-                        break;
 
-                case 'attack':
+                    case 'attack':
                     AudioSystem.SFX.attack();
                     await resolveAttack(event.source, event.target, event.attackType);
                     break;
@@ -1217,6 +1215,52 @@
             const player = GameState.players[0];
             if (!player || !player.general) return;
 
+            // 特殊处理龙胆技能：需要先选中手牌
+            if (player.general.skill === '龙胆') {
+                // 检查是否选中了手牌
+                if (GameState.selectedCardIndex === null || GameState.selectedCardIndex === undefined) {
+                    UI.log('请先选中手牌中的【杀】或【闪】，再点击龙胆技能', 'system');
+                    showSkillToast('⚠️ 请先选择手牌');
+                    return;
+                }
+
+                // 调用龙胆技能方法
+                const result = Game.useLongdanSkill(0, GameState.selectedCardIndex);
+
+                if (result.success) {
+                    // 处理技能事件
+                    for (const event of result.events) {
+                        if (event.type === 'skill') {
+                            UI.log(event.description, 'skill');
+                            AudioSystem.SFX.skill();
+                            await UI.showEffect(0, event.name, 'skill');
+                            showSkillToast(`【${event.name}】已发动`);
+                        }
+                    }
+
+                    // 清空选中状态
+                    GameState.selectedCardIndex = null;
+                    GameState.selectedTargetId = null;
+
+                    UI.renderAll();
+                } else {
+                    // 技能无法使用
+                    const reasons = {
+                        'player_dead': '角色已死亡',
+                        'not_player_turn': '不是你的回合',
+                        'skill_already_used': '技能已使用过',
+                        'no_card_selected': '请先选中一张手牌',
+                        'invalid_card_index': '选中的卡牌无效',
+                        'invalid_card_for_longdan': '龙胆技能只能转换【杀】或【闪】'
+                    };
+                    const message = reasons[result.reason] || '技能无法使用';
+                    UI.log(message, 'system');
+                    showSkillToast(`❌ ${message}`);
+                }
+                return;
+            }
+
+            // 其他技能的处理逻辑
             const result = Game.useActiveSkill(0);
 
             if (result.success) {
@@ -1261,7 +1305,8 @@
                     'skill_not_found': '技能不存在',
                     'passive_skill': '这是被动技能，会在攻击时自动触发',
                     'no_convertible_cards': '手牌中没有【杀】或【闪】可转换',
-                    'target_no_cards': '目标没有手牌'
+                    'target_no_cards': '目标没有手牌',
+                    'need_card_selection': '请先选中手牌中的【杀】或【闪】'
                 };
                 const message = reasons[result.reason] || '技能无法使用';
                 UI.log(message, 'system');
